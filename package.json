@@ -1,6 +1,6 @@
 {
   "name": "root",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "private": true,
   "engines": {
     "node": "20 || 22"
@@ -20,7 +20,8 @@
     "lint": "backstage-cli repo lint --since origin/main",
     "lint:all": "backstage-cli repo lint",
     "prettier:check": "prettier --check .",
-    "new": "backstage-cli new"
+    "new": "backstage-cli new",
+    "prepare": "husky"
   },
   "workspaces": {
     "packages": [
@@ -31,7 +32,10 @@
   "devDependencies": {
     "@backstage/cli": "backstage:^",
     "@backstage/e2e-test-utils": "backstage:^",
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
     "@playwright/test": "^1.32.3",
+    "husky": "^9.1.7",
     "prettier": "^2.3.2",
     "typescript": "~5.8.0"
   },
@@ -47,6 +51,12 @@
     ],
     "*.{json,md}": [
       "prettier --write"
+    ],
+    "package.json": [
+      "yarn fix"
+    ],
+    "yarn.lock": [
+      "yarn dedupe"
     ]
   },
   "packageManager": "yarn@4.4.1"

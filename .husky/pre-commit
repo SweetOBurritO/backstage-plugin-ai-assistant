@@ -1,0 +1,2 @@
+#!/bin/sh
+yarn lint:all && yarn prettier:check
