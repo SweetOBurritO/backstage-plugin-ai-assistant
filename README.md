@@ -1,1 +1,1 @@
-# backstage-plugin-rag-ai
+# backstage-plugin-ai-assistant
