@@ -1,0 +1,44 @@
+name: Version or Publish Changeset
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  version-or-publish:
+    name: Create Changeset PR
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      - name: Install dependencies
+        uses: backstage/actions/yarn-install@v0.6.17
+        with:
+          cache-prefix: ${{ runner.os }}-v20.x
+
+      - name: Build Type Declarations
+        run: yarn tsc
+
+      - name: Build Packages
+        run: yarn build:all
+
+      - uses: changesets/action@v1
+        with:
+          version: yarn release
+          publish: yarn publish
+          title: 'chore(release): release plugins'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
