@@ -9,6 +9,8 @@ import {
   readSchedulerServiceTaskScheduleDefinitionFromConfig,
 } from '@backstage/backend-plugin-api';
 
+import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
+
 const DEFAULT_DATA_INGESTION_SCHEDULE: SchedulerServiceTaskScheduleDefinition =
   {
     frequency: {
@@ -58,16 +60,34 @@ export const createDataIngestionPipeline = ({
           `Ingested documents for ${ingestor.id}: ${documents.length}`,
         );
 
+        const splitter = new RecursiveCharacterTextSplitter({
+          chunkSize: 500,
+          chunkOverlap: 50,
+        });
+
+        const docs = await Promise.all(
+          documents.map(async document => {
+            const chunks = await splitter.splitText(document.content);
+
+            const chunkDocs: EmbeddingDocument[] = chunks.flatMap(
+              (chunk, i) => ({
+                metadata: { ...document.metadata, chunk: String(i) },
+                content: chunk,
+              }),
+            );
+
+            return chunkDocs;
+          }),
+        );
+
         logger.info(`Adding documents to vector store...`);
-        await vectorStore.addDocuments(documents);
+        await vectorStore.addDocuments(docs.flat());
         logger.info(`Added documents to vector store for ${ingestor.id}`);
       };
 
       const documents = await ingestor.ingest({
         saveDocumentsBatch,
       });
-
-      console.log('documents:', documents);
 
       if (documents) {
         saveDocumentsBatch(documents);

@@ -6916,6 +6916,7 @@ __metadata:
     "@backstage/errors": "backstage:^"
     "@backstage/types": "backstage:^"
     "@langchain/core": "npm:^0.3.72"
+    "@langchain/textsplitters": "npm:^0.1.0"
     "@sweetoburrito/backstage-plugin-ai-assistant-node": "workspace:^"
     "@types/express": "npm:^4.0.0"
     "@types/supertest": "npm:^2.0.12"
@@ -6934,7 +6935,6 @@ __metadata:
     "@backstage/backend-plugin-api": "backstage:^"
     "@backstage/cli": "backstage:^"
     "@langchain/core": "npm:^0.3.72"
-    "@langchain/textsplitters": "npm:^0.1.0"
   languageName: unknown
   linkType: soft
 

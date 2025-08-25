@@ -31,6 +31,7 @@
     "@backstage/catalog-client": "backstage:^",
     "@backstage/errors": "backstage:^",
     "@langchain/core": "^0.3.72",
+    "@langchain/textsplitters": "^0.1.0",
     "@sweetoburrito/backstage-plugin-ai-assistant-node": "workspace:^",
     "express": "^4.17.1",
     "express-promise-router": "^4.1.0",
