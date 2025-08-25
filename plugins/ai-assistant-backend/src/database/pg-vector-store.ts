@@ -47,6 +47,9 @@ export class PgVectorStore implements VectorStore {
   }
 
   connectEmbeddings(embeddings: Embeddings) {
+    if (this.embeddings) {
+      this.logger.warn('Embeddings already connected, overwriting.');
+    }
     this.embeddings = embeddings;
   }
 
@@ -62,6 +65,9 @@ export class PgVectorStore implements VectorStore {
    * @returns {Promise<void>} Resolves when the documents have been added successfully.
    */
   async addDocuments(documents: EmbeddingDocument[]): Promise<void> {
+    if (documents.length === 0) {
+      return;
+    }
     const texts = documents.map(({ content }) => content);
     if (!this.embeddings) {
       throw new Error('No Embeddings configured for the vector store.');
@@ -71,7 +77,7 @@ export class PgVectorStore implements VectorStore {
     this.logger.info(
       `Received ${vectors.length} vectors from embeddings creation.`,
     );
-    return this.addVectors(vectors, documents);
+    this.addVectors(vectors, documents);
   }
 
   /**

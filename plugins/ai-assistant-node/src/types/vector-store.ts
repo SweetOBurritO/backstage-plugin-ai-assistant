@@ -4,6 +4,7 @@ export type EmbeddingsSource = string;
 
 export type EmbeddingDocumentMetadata = Partial<{
   source: EmbeddingsSource;
+  id: string;
   [key: string]: string;
 }>;
 

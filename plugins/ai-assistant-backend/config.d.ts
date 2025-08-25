@@ -1,7 +1,10 @@
+import { HumanDuration } from '@backstage/types';
+import { SchedulerServiceTaskScheduleDefinitionConfig } from '@backstage/backend-plugin-api';
+
 export interface Config {
   aiAssistant: {
-    storage: {
-      pgVector: {
+    storage?: {
+      pgVector?: {
         /**
          * The size of the chunk to flush when storing embeddings to the DB
          */
@@ -12,6 +15,9 @@ export interface Config {
          */
         amount?: number;
       };
+    };
+    ingestion?: {
+      schedule?: SchedulerServiceTaskScheduleDefinitionConfig;
     };
   };
 }
