@@ -35,7 +35,8 @@
     "@backstage/cli": "backstage:^",
     "@backstage/plugin-catalog-backend": "backstage:^",
     "@sweetoburrito/backstage-plugin-ai-assistant-backend": "workspace:^",
-    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-ollama": "workspace:^"
+    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-ollama": "workspace:^",
+    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama": "workspace:^"
   },
   "files": [
     "dist"

@@ -61,3 +61,11 @@ aiAssistant:
       model: '<your-model>'
       apiKey: '<your-api-key>'
       baseUrl: '<your-base-url>'
+
+  models:
+    ollama:
+      baseUrl: '<your-base-url>'
+      apiKey: '<your-api-key>'
+      models:
+        - deepseek-r1:7b
+        - mistral:7b

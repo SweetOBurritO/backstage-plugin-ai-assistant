@@ -1,6 +1,7 @@
 import { createExtensionPoint } from '@backstage/backend-plugin-api';
 import { Ingestor } from './types/ingestor';
 import { Embeddings } from '@langchain/core/embeddings';
+import { BaseChatModel } from '@langchain/core/language_models/chat_models';
 
 export type DataIngestorExtensionPoint = {
   registerIngestor: (ingestor: Ingestor) => void;
@@ -22,4 +23,18 @@ export type EmbeddingsProviderExtensionPoint = {
 export const embeddingsProviderExtensionPoint =
   createExtensionPoint<EmbeddingsProviderExtensionPoint>({
     id: 'ai-assistant.embeddings-provider',
+  });
+
+export type Model = {
+  id: string;
+  chatModel: BaseChatModel;
+};
+
+export type ModelProviderExtensionPoint = {
+  register: (model: Model) => void;
+};
+
+export const modelProviderExtensionPoint =
+  createExtensionPoint<ModelProviderExtensionPoint>({
+    id: 'ai-assistant.model-provider',
   });

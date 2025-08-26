@@ -6900,6 +6900,19 @@ __metadata:
     "@backstage/plugin-catalog-node": "backstage:^"
     "@sweetoburrito/backstage-plugin-ai-assistant-backend": "workspace:^"
     "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-ollama": "workspace:^"
+    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama": "workspace:^"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "workspace:^"
+  languageName: unknown
+  linkType: soft
+
+"@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama@workspace:^, @sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama@workspace:plugins/ai-assistant-backend-module-model-provider-ollama":
+  version: 0.0.0-use.local
+  resolution: "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama@workspace:plugins/ai-assistant-backend-module-model-provider-ollama"
+  dependencies:
+    "@backstage/backend-plugin-api": "npm:^1.4.1"
+    "@backstage/backend-test-utils": "npm:^1.7.0"
+    "@backstage/cli": "npm:^0.33.1"
+    "@langchain/ollama": "npm:^0.2.3"
     "@sweetoburrito/backstage-plugin-ai-assistant-node": "workspace:^"
   languageName: unknown
   linkType: soft

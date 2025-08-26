@@ -15,6 +15,12 @@ backend.add(
   ),
 );
 
+backend.add(
+  import(
+    '@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama'
+  ),
+);
+
 backend.add(import('../src'));
 
 backend.start();
