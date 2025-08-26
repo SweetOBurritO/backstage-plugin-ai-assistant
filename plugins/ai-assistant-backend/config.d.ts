@@ -3,6 +3,11 @@ import { SchedulerServiceTaskScheduleDefinitionConfig } from '@backstage/backend
 
 export interface Config {
   aiAssistant: {
+    prompt?: {
+      system?: string;
+      prefix?: string;
+      suffix?: string;
+    };
     storage?: {
       pgVector?: {
         /**
