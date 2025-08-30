@@ -13,7 +13,8 @@
     "role": "backend-plugin",
     "pluginId": "ai-assistant",
     "pluginPackages": [
-      "@sweetoburrito/plugin-ai-assistant-backend"
+      "@sweetoburrito/backstage-plugin-ai-assistant-backend",
+      "@sweetoburrito/backstage-plugin-ai-assistant-node"
     ]
   },
   "scripts": {

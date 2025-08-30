@@ -12,7 +12,11 @@
   },
   "backstage": {
     "role": "node-library",
-    "pluginId": "ai-assistant"
+    "pluginId": "ai-assistant",
+    "pluginPackages": [
+      "@sweetoburrito/backstage-plugin-ai-assistant-backend",
+      "@sweetoburrito/backstage-plugin-ai-assistant-node"
+    ]
   },
   "scripts": {
     "build": "backstage-cli package build",

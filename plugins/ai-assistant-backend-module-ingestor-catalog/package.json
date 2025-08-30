@@ -12,7 +12,8 @@
   },
   "backstage": {
     "role": "backend-plugin-module",
-    "pluginId": "ai-assistant"
+    "pluginId": "ai-assistant",
+    "pluginPackage": "@sweetoburrito/backstage-plugin-ai-assistant-backend"
   },
   "scripts": {
     "start": "backstage-cli package start",
