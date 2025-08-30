@@ -6937,6 +6937,7 @@ __metadata:
     express-promise-router: "npm:^4.1.0"
     knex: "npm:^3.1.0"
     supertest: "npm:^6.2.4"
+    uuid: "npm:^11.1.0"
     zod: "npm:^3.22.4"
   languageName: unknown
   linkType: soft
@@ -21832,7 +21833,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:^11.0.0":
+"uuid@npm:^11.0.0, uuid@npm:^11.1.0":
   version: 11.1.0
   resolution: "uuid@npm:11.1.0"
   bin:

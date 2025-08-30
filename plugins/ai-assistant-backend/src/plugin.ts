@@ -2,7 +2,7 @@ import {
   coreServices,
   createBackendPlugin,
 } from '@backstage/backend-plugin-api';
-import { createRouter } from './router';
+import { createRouter } from './services/router';
 import {
   dataIngestorExtensionPoint,
   EmbeddingsProvider,
@@ -11,10 +11,11 @@ import {
   Model,
   modelProviderExtensionPoint,
 } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
-import { createPgVectorStore } from './database';
 import { createDataIngestionPipeline } from './services/ingestor';
 import { createChatService } from './services/chat';
 import { createPromptBuilder } from './services/prompt';
+import { applyDatabaseMigrations } from './database/migrations';
+import { PgVectorStore } from './database';
 
 /**
  * aiAssistantPlugin backend plugin
@@ -64,13 +65,17 @@ export const aiAssistantPlugin = createBackendPlugin({
         logger: coreServices.logger,
         config: coreServices.rootConfig,
         scheduler: coreServices.scheduler,
+        httpAuth: coreServices.httpAuth,
+        userInfo: coreServices.userInfo,
       },
 
       async init(options) {
-        const { httpRouter } = options;
-        const vectorStore = await createPgVectorStore({
-          ...options,
-        });
+        const { httpRouter, database } = options;
+        const client = await database.getClient();
+
+        await applyDatabaseMigrations(client);
+
+        const vectorStore = await PgVectorStore.fromConfig(options);
 
         if (!embeddingsProvider) {
           throw new Error('No Embeddings Provider was registered.');
@@ -86,14 +91,14 @@ export const aiAssistantPlugin = createBackendPlugin({
 
         const promptBuilder = createPromptBuilder(options);
 
-        const chatService = await createChatService({
+        const chat = await createChatService({
           ...options,
           models,
           vectorStore,
           promptBuilder,
         });
 
-        httpRouter.use(await createRouter());
+        httpRouter.use(await createRouter({ ...options, chat }));
         dataIngestionPipeline.start();
       },
     });

@@ -1,6 +1,6 @@
 import { RootConfigService } from '@backstage/backend-plugin-api';
 import {
-  ChatMessage,
+  Message,
   EmbeddingDocument,
 } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
 
@@ -10,9 +10,9 @@ type PromptBuilderOptions = {
 
 export type PromptBuilder = {
   buildPrompt: (
-    chatHistory: ChatMessage[],
+    chatHistory: Message[],
     promptContext: EmbeddingDocument[],
-  ) => ChatMessage[];
+  ) => Message[];
 };
 
 const DEFAULT_SYSTEM_PROMPT = `
@@ -40,20 +40,22 @@ export const createPromptBuilder = ({
     `;
   };
 
-  return {
-    buildPrompt: (
-      chatHistory: ChatMessage[],
-      promptContext: EmbeddingDocument[],
-    ): ChatMessage[] => {
-      const context = getContext(promptContext);
+  const buildPrompt: PromptBuilder['buildPrompt'] = (
+    chatHistory,
+    promptContext,
+  ) => {
+    const context = getContext(promptContext);
 
-      return [
-        {
-          role: 'system',
-          content: system.concat(context),
-        },
-        ...chatHistory,
-      ];
-    },
+    return [
+      {
+        role: 'system',
+        content: system.concat(context),
+      },
+      ...chatHistory,
+    ];
+  };
+
+  return {
+    buildPrompt,
   };
 };

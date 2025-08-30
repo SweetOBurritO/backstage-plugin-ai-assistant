@@ -61,8 +61,8 @@ export const createDataIngestionPipeline = ({
         );
 
         const splitter = new RecursiveCharacterTextSplitter({
-          chunkSize: 500,
-          chunkOverlap: 50,
+          chunkSize: 500, // TODO: Make chunk size configurable
+          chunkOverlap: 50, // TODO: Make chunk overlap configurable
         });
 
         const docs = await Promise.all(
