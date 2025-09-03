@@ -25,13 +25,13 @@
     "postpack": "backstage-cli package postpack"
   },
   "dependencies": {
-    "@backstage/backend-plugin-api": "^1.4.1",
+    "@backstage/backend-plugin-api": "backstage:^",
     "@langchain/ollama": "^0.2.3",
     "@sweetoburrito/backstage-plugin-ai-assistant-node": "workspace:^"
   },
   "devDependencies": {
-    "@backstage/backend-test-utils": "^1.7.0",
-    "@backstage/cli": "^0.33.1"
+    "@backstage/backend-test-utils": "backstage:^",
+    "@backstage/cli": "backstage:^"
   },
   "files": [
     "dist"
