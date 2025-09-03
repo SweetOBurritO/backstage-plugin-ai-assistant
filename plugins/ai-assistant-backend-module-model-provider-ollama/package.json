@@ -1,6 +1,6 @@
 {
   "name": "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "license": "Apache-2.0",
   "description": "The model-provider-ollama backend module for the ai-assistant plugin.",
   "main": "src/index.ts",
