@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama
 
+## 0.2.2
+
+### Patch Changes
+
+- 47bbcb4: pin backstage versions to project version
+
 ## 0.2.1
 
 ### Patch Changes
