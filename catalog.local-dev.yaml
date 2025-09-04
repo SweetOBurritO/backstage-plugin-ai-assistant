@@ -1,0 +1,284 @@
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: alice
+  title: Software Engineer
+  description: Frontend developer
+spec:
+  profile:
+    displayName: Alice Smith
+    email: alice@example.com
+    picture: https://randomuser.me/api/portraits/women/1.jpg
+  memberOf:
+    - engineering
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: bob
+  title: DevOps Engineer
+  description: Infrastructure specialist
+spec:
+  profile:
+    displayName: Bob Johnson
+    email: bob@example.com
+    picture: https://randomuser.me/api/portraits/men/2.jpg
+  memberOf:
+    - devops
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: carol
+  title: Product Manager
+  description: Product owner
+spec:
+  profile:
+    displayName: Carol Lee
+    email: carol@example.com
+    picture: https://randomuser.me/api/portraits/women/3.jpg
+  memberOf:
+    - product
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: dave
+  title: Backend Engineer
+  description: API developer
+spec:
+  profile:
+    displayName: Dave Kim
+    email: dave@example.com
+    picture: https://randomuser.me/api/portraits/men/4.jpg
+  memberOf:
+    - engineering
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: eve
+  title: QA Engineer
+  description: Quality assurance
+spec:
+  profile:
+    displayName: Eve Martinez
+    email: eve@example.com
+    picture: https://randomuser.me/api/portraits/women/5.jpg
+  memberOf:
+    - qa
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: frank
+  title: UX Designer
+  description: User experience designer
+spec:
+  profile:
+    displayName: Frank Brown
+    email: frank@example.com
+    picture: https://randomuser.me/api/portraits/men/6.jpg
+  memberOf:
+    - design
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: grace
+  title: Scrum Master
+  description: Agile facilitator
+spec:
+  profile:
+    displayName: Grace Wilson
+    email: grace@example.com
+    picture: https://randomuser.me/api/portraits/women/7.jpg
+  memberOf:
+    - product
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: henry
+  title: Security Engineer
+  description: Security specialist
+spec:
+  profile:
+    displayName: Henry Clark
+    email: henry@example.com
+    picture: https://randomuser.me/api/portraits/men/8.jpg
+  memberOf:
+    - security
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: irene
+  title: Data Scientist
+  description: Data analysis
+spec:
+  profile:
+    displayName: Irene Lewis
+    email: irene@example.com
+    picture: https://randomuser.me/api/portraits/women/9.jpg
+  memberOf:
+    - data
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: jack
+  title: Support Engineer
+  description: Customer support
+spec:
+  profile:
+    displayName: Jack Walker
+    email: jack@example.com
+    picture: https://randomuser.me/api/portraits/men/10.jpg
+  memberOf:
+    - support
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: engineering
+  description: Engineering team
+spec:
+  type: team
+  profile:
+    displayName: Engineering
+  children: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: devops
+  description: DevOps team
+spec:
+  type: team
+  profile:
+    displayName: DevOps
+  children: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: product
+  description: Product team
+spec:
+  type: team
+  profile:
+    displayName: Product
+  children: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: qa
+  description: Quality Assurance team
+spec:
+  type: team
+  profile:
+    displayName: QA
+  children: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: design
+  description: Design team
+spec:
+  type: team
+  profile:
+    displayName: Design
+  children: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: security
+  description: Security team
+spec:
+  type: team
+  profile:
+    displayName: Security
+  children: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: data
+  description: Data Science team
+spec:
+  type: team
+  profile:
+    displayName: Data
+  children: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: support
+  description: Support team
+spec:
+  type: team
+  profile:
+    displayName: Support
+  children: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: frontend-app
+  description: Frontend application for website
+spec:
+  type: service
+  lifecycle: production
+  owner: engineering
+  system: website-platform
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: data-pipeline
+  description: ETL pipeline for analytics
+spec:
+  type: service
+  lifecycle: production
+  owner: data
+  system: analytics-platform
+---
+apiVersion: backstage.io/v1alpha1
+kind: Domain
+metadata:
+  name: web
+  description: Web technologies domain
+spec:
+  owner: engineering
+---
+apiVersion: backstage.io/v1alpha1
+kind: Domain
+metadata:
+  name: data
+  description: Data and analytics domain
+spec:
+  owner: data
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: website-platform
+  description: Platform for hosting company websites
+spec:
+  domain: web
+  owner: engineering
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: analytics-platform
+  description: Platform for analytics and reporting
+spec:
+  domain: data
+  owner: data

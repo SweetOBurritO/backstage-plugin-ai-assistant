@@ -1,0 +1,44 @@
+{
+  "name": "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-catalog",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "description": "The ingestor-catalog backend module for the ai-assistant plugin.",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "publishConfig": {
+    "access": "public",
+    "main": "dist/index.cjs.js",
+    "types": "dist/index.d.ts"
+  },
+  "backstage": {
+    "role": "backend-plugin-module",
+    "pluginId": "ai-assistant"
+  },
+  "scripts": {
+    "start": "backstage-cli package start",
+    "build": "backstage-cli package build",
+    "lint": "backstage-cli package lint",
+    "test": "backstage-cli package test",
+    "clean": "backstage-cli package clean",
+    "prepack": "backstage-cli package prepack",
+    "postpack": "backstage-cli package postpack"
+  },
+  "dependencies": {
+    "@backstage/backend-plugin-api": "backstage:^",
+    "@backstage/catalog-model": "backstage:^",
+    "@backstage/plugin-catalog-node": "backstage:^",
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "workspace:^"
+  },
+  "devDependencies": {
+    "@backstage/backend-defaults": "backstage:^",
+    "@backstage/backend-test-utils": "backstage:^",
+    "@backstage/cli": "backstage:^",
+    "@backstage/plugin-catalog-backend": "backstage:^",
+    "@sweetoburrito/backstage-plugin-ai-assistant-backend": "workspace:^",
+    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-ollama": "workspace:^",
+    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama": "workspace:^"
+  },
+  "files": [
+    "dist"
+  ]
+}

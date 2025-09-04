@@ -1,0 +1,12 @@
+name: backstage-plugin-ai-assistant
+services:
+  database:
+    container_name: pgvector-postgres
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - /var/lib/postgresql/data
+    ports:
+      - '5432:5432'
