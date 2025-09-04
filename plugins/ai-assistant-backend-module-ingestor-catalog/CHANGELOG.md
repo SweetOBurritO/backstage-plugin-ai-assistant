@@ -1,5 +1,13 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-catalog
 
+## 0.2.1
+
+### Patch Changes
+
+- 0d8252e: Fix backstage plugin setup
+- Updated dependencies [0d8252e]
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.2.1
+
 ## 0.2.0
 
 ### Minor Changes
