@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-node
 
+## 0.2.1
+
+### Patch Changes
+
+- 0d8252e: Fix backstage plugin setup
+
 ## 0.2.0
 
 ### Minor Changes
