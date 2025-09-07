@@ -14,7 +14,9 @@
     "role": "node-library",
     "pluginId": "ai-assistant",
     "pluginPackages": [
+      "@sweetoburrito/backstage-plugin-ai-assistant",
       "@sweetoburrito/backstage-plugin-ai-assistant-backend",
+      "@sweetoburrito/backstage-plugin-ai-assistant-common",
       "@sweetoburrito/backstage-plugin-ai-assistant-node"
     ]
   },
