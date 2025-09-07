@@ -916,6 +916,36 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@azure-rest/ai-inference@npm:^1.0.0-beta.6":
+  version: 1.0.0-beta.6
+  resolution: "@azure-rest/ai-inference@npm:1.0.0-beta.6"
+  dependencies:
+    "@azure-rest/core-client": "npm:^2.1.0"
+    "@azure/abort-controller": "npm:^2.1.2"
+    "@azure/core-auth": "npm:^1.9.0"
+    "@azure/core-lro": "npm:^2.7.2"
+    "@azure/core-rest-pipeline": "npm:^1.18.2"
+    "@azure/core-tracing": "npm:^1.2.0"
+    "@azure/logger": "npm:^1.1.4"
+    tslib: "npm:^2.8.1"
+  checksum: 10c0/6540dadcae8ea8ac39c85e1cf28467bf3c3b2e3bcffcba027a9273e097b6e50ab2c6fd8ead3240f7eaaf5e03316790b4bd68bf1b99de83b8f01e33e4aabdb60f
+  languageName: node
+  linkType: hard
+
+"@azure-rest/core-client@npm:^2.1.0":
+  version: 2.5.0
+  resolution: "@azure-rest/core-client@npm:2.5.0"
+  dependencies:
+    "@azure/abort-controller": "npm:^2.0.0"
+    "@azure/core-auth": "npm:^1.9.0"
+    "@azure/core-rest-pipeline": "npm:^1.5.0"
+    "@azure/core-tracing": "npm:^1.0.1"
+    "@typespec/ts-http-runtime": "npm:^0.3.0"
+    tslib: "npm:^2.6.2"
+  checksum: 10c0/02da837ae71b6c0adb17945ba1979760bb3605e14463ecc35eaafc41e8bfd7d2d53cd0ce681042590abb9987ae32335eba34ef49460374bdf4fe65a2e874848e
+  languageName: node
+  linkType: hard
+
 "@azure/abort-controller@npm:^2.0.0, @azure/abort-controller@npm:^2.1.2":
   version: 2.1.2
   resolution: "@azure/abort-controller@npm:2.1.2"
@@ -925,7 +955,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@azure/core-auth@npm:^1.4.0, @azure/core-auth@npm:^1.8.0, @azure/core-auth@npm:^1.9.0":
+"@azure/core-auth@npm:^1.10.0, @azure/core-auth@npm:^1.4.0, @azure/core-auth@npm:^1.8.0, @azure/core-auth@npm:^1.9.0":
   version: 1.10.0
   resolution: "@azure/core-auth@npm:1.10.0"
   dependencies:
@@ -962,7 +992,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@azure/core-lro@npm:^2.2.0":
+"@azure/core-lro@npm:^2.2.0, @azure/core-lro@npm:^2.7.2":
   version: 2.7.2
   resolution: "@azure/core-lro@npm:2.7.2"
   dependencies:
@@ -983,7 +1013,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@azure/core-rest-pipeline@npm:^1.17.0, @azure/core-rest-pipeline@npm:^1.19.1, @azure/core-rest-pipeline@npm:^1.20.0":
+"@azure/core-rest-pipeline@npm:^1.17.0, @azure/core-rest-pipeline@npm:^1.18.2, @azure/core-rest-pipeline@npm:^1.19.1, @azure/core-rest-pipeline@npm:^1.20.0, @azure/core-rest-pipeline@npm:^1.5.0":
   version: 1.22.0
   resolution: "@azure/core-rest-pipeline@npm:1.22.0"
   dependencies:
@@ -995,6 +1025,15 @@ __metadata:
     "@typespec/ts-http-runtime": "npm:^0.3.0"
     tslib: "npm:^2.6.2"
   checksum: 10c0/b760e9e8728bd09fa84104c9e806068f5e404b668111e7e37ec7229d8f723a18cd0916f68584a39fa3ffe226859fb1b7969a2da51e95fc5d9f02b19f58619d0a
+  languageName: node
+  linkType: hard
+
+"@azure/core-sse@npm:^2.3.0":
+  version: 2.3.0
+  resolution: "@azure/core-sse@npm:2.3.0"
+  dependencies:
+    tslib: "npm:^2.6.2"
+  checksum: 10c0/dd87ef9a2f719b03098305c8a8163b1fdf45635d30536939fd29df8958ed885aa61ec34090935b69f2b691ae29eda92dcca977a6e5569e1117c0f43a26be2f10
   languageName: node
   linkType: hard
 
@@ -8061,6 +8100,21 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai@workspace:^, @sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai@workspace:plugins/ai-assistant-backend-module-model-provider-azure-ai":
+  version: 0.0.0-use.local
+  resolution: "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai@workspace:plugins/ai-assistant-backend-module-model-provider-azure-ai"
+  dependencies:
+    "@azure-rest/ai-inference": "npm:^1.0.0-beta.6"
+    "@azure/core-auth": "npm:^1.10.0"
+    "@azure/core-sse": "npm:^2.3.0"
+    "@backstage/backend-plugin-api": "npm:^1.4.1"
+    "@backstage/backend-test-utils": "npm:^1.7.0"
+    "@backstage/cli": "npm:^0.33.1"
+    "@langchain/core": "npm:^0.3.72"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "workspace:^"
+  languageName: unknown
+  linkType: soft
+
 "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama@workspace:^, @sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama@workspace:plugins/ai-assistant-backend-module-model-provider-ollama":
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama@workspace:plugins/ai-assistant-backend-module-model-provider-ollama"
@@ -8093,6 +8147,7 @@ __metadata:
     "@langchain/textsplitters": "npm:^0.1.0"
     "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-ollama": "workspace:^"
     "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-catalog": "workspace:^"
+    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai": "workspace:^"
     "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama": "workspace:^"
     "@sweetoburrito/backstage-plugin-ai-assistant-common": "workspace:^"
     "@sweetoburrito/backstage-plugin-ai-assistant-node": "workspace:^"

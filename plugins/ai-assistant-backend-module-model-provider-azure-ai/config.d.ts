@@ -1,13 +1,15 @@
 export interface Config {
   aiAssistant: {
     models: {
-      ollama: {
-        baseUrl: string;
+      azureAiInference: {
         /**
          * @visibility secret
          */
         apiKey: string;
-        models: string[];
+        models: {
+          modelName: string;
+          endpoint: string;
+        };
       };
     };
   };

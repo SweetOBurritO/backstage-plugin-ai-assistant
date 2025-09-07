@@ -1,8 +1,8 @@
 {
-  "name": "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama",
-  "version": "0.2.1",
+  "name": "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai",
+  "version": "0.1.0",
   "license": "Apache-2.0",
-  "description": "The model-provider-ollama backend module for the ai-assistant plugin.",
+  "description": "The model-provider-azure-ai backend module for the ai-assistant plugin.",
   "main": "src/index.ts",
   "types": "src/index.ts",
   "publishConfig": {
@@ -12,8 +12,7 @@
   },
   "backstage": {
     "role": "backend-plugin-module",
-    "pluginId": "ai-assistant",
-    "pluginPackage": "@sweetoburrito/backstage-plugin-ai-assistant-backend"
+    "pluginId": "ai-assistant"
   },
   "scripts": {
     "start": "backstage-cli package start",
@@ -25,13 +24,16 @@
     "postpack": "backstage-cli package postpack"
   },
   "dependencies": {
-    "@backstage/backend-plugin-api": "backstage:^",
-    "@langchain/ollama": "^0.2.3",
+    "@azure-rest/ai-inference": "^1.0.0-beta.6",
+    "@azure/core-auth": "^1.10.0",
+    "@azure/core-sse": "^2.3.0",
+    "@backstage/backend-plugin-api": "^1.4.1",
+    "@langchain/core": "^0.3.72",
     "@sweetoburrito/backstage-plugin-ai-assistant-node": "workspace:^"
   },
   "devDependencies": {
-    "@backstage/backend-test-utils": "backstage:^",
-    "@backstage/cli": "backstage:^"
+    "@backstage/backend-test-utils": "^1.7.0",
+    "@backstage/cli": "^0.33.1"
   },
   "files": [
     "dist",

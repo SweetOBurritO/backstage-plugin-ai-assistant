@@ -71,3 +71,8 @@ aiAssistant:
       apiKey: '<your-api-key>'
       models:
         - '<your-model>'
+    azureAiInference:
+      apiKey: <your-api-key>
+      models:
+        - endpoint: <your-azure-ai-foundry-endpoint>
+          modelName: '<your-model>'
