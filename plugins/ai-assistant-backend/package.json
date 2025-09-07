@@ -13,7 +13,9 @@
     "role": "backend-plugin",
     "pluginId": "ai-assistant",
     "pluginPackages": [
+      "@sweetoburrito/backstage-plugin-ai-assistant",
       "@sweetoburrito/backstage-plugin-ai-assistant-backend",
+      "@sweetoburrito/backstage-plugin-ai-assistant-common",
       "@sweetoburrito/backstage-plugin-ai-assistant-node"
     ]
   },
@@ -31,8 +33,10 @@
     "@backstage/backend-plugin-api": "backstage:^",
     "@backstage/catalog-client": "backstage:^",
     "@backstage/errors": "backstage:^",
+    "@backstage/plugin-signals-node": "backstage:^",
     "@langchain/core": "^0.3.72",
     "@langchain/textsplitters": "^0.1.0",
+    "@sweetoburrito/backstage-plugin-ai-assistant-common": "workspace:^",
     "@sweetoburrito/backstage-plugin-ai-assistant-node": "workspace:^",
     "express": "^4.17.1",
     "express-promise-router": "^4.1.0",
@@ -43,7 +47,14 @@
   "devDependencies": {
     "@backstage/backend-test-utils": "backstage:^",
     "@backstage/cli": "backstage:^",
+    "@backstage/plugin-auth-backend": "backstage:^",
+    "@backstage/plugin-auth-backend-module-guest-provider": "backstage:^",
+    "@backstage/plugin-catalog-backend": "backstage:^",
+    "@backstage/plugin-signals-backend": "backstage:^",
     "@backstage/types": "backstage:^",
+    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-ollama": "workspace:^",
+    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-catalog": "workspace:^",
+    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama": "workspace:^",
     "@types/express": "^4.0.0",
     "@types/supertest": "^2.0.12",
     "supertest": "^6.2.4"

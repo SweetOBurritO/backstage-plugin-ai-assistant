@@ -22,7 +22,10 @@ backend:
 
 auth:
   providers:
-    guest: {}
+    guest:
+      userEntityRef: user:default/bob
+      ownershipEntityRefs: [group:default/devops]
+      dangerouslyAllowOutsideDevelopment: false
 
 # see https://backstage.io/docs/permissions/getting-started for more on the permission framework
 permission:
@@ -53,9 +56,9 @@ aiAssistant:
   ingestion:
     schedule:
       frequency:
-        minutes: 1
+        days: 1
       timeout:
-        minutes: 1
+        hours: 1
   embeddings:
     ollama:
       model: '<your-model>'
@@ -67,5 +70,4 @@ aiAssistant:
       baseUrl: '<your-base-url>'
       apiKey: '<your-api-key>'
       models:
-        - deepseek-r1:7b
-        - mistral:7b
+        - '<your-model>'

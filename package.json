@@ -38,6 +38,9 @@
     "@commitlint/config-conventional": "^19.8.1",
     "husky": "^9.1.7",
     "prettier": "^2.3.2",
+    "react": "^18.0.0",
+    "react-dom": " ^18.0.0",
+    "react-router-dom": "^7.0.0",
     "typescript": "~5.8.0"
   },
   "resolutions": {

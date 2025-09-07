@@ -11,7 +11,6 @@ export async function createModelRouter(
 ): Promise<express.Router> {
   const { chat } = options;
   const router = Router();
-  router.use(express.json());
 
   router.get('/', async (_req, res) => {
     const models = await chat.getAvailableModels();

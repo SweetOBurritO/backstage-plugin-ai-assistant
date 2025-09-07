@@ -1,5 +1,5 @@
 import { DatabaseService } from '@backstage/backend-plugin-api';
-import { Message } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
+import { Message } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 
 import { Knex } from 'knex';
 
@@ -64,5 +64,12 @@ export class ChatStore {
     }));
 
     await this.table().insert(rows);
+  }
+
+  async updateMessage(message: Required<Message>) {
+    await this.table().where({ id: message.id }).update({
+      role: message.role,
+      content: message.content,
+    });
   }
 }

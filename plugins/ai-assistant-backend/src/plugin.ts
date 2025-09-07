@@ -16,6 +16,7 @@ import { createChatService } from './services/chat';
 import { createPromptBuilder } from './services/prompt';
 import { applyDatabaseMigrations } from './database/migrations';
 import { PgVectorStore } from './database';
+import { signalsServiceRef } from '@backstage/plugin-signals-node';
 
 /**
  * aiAssistantPlugin backend plugin
@@ -67,6 +68,7 @@ export const aiAssistantPlugin = createBackendPlugin({
         scheduler: coreServices.scheduler,
         httpAuth: coreServices.httpAuth,
         userInfo: coreServices.userInfo,
+        signals: signalsServiceRef,
       },
 
       async init(options) {

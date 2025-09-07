@@ -23,7 +23,6 @@ export async function createChatRouter(
   const { chat, httpAuth, userInfo } = options;
 
   const router = Router();
-  router.use(express.json());
 
   const messageSchema = z.object({
     messages: z.array(
@@ -35,7 +34,7 @@ export async function createChatRouter(
     ),
     modelId: z.string(),
     conversationId: z.string().uuid().optional().default(uuid),
-    stream: z.boolean().optional().default(false),
+    stream: z.boolean().optional(),
   });
 
   router.post(
@@ -66,8 +65,8 @@ export async function createChatRouter(
     id: z.string().uuid(),
   });
 
-  router.get('/', validation(chatSchema, 'body'), async (req, res) => {
-    const { id } = req.body;
+  router.get('/:id', validation(chatSchema, 'params'), async (req, res) => {
+    const { id } = req.params;
 
     const credentials = await httpAuth.credentials(req);
     const { userEntityRef } = await userInfo.getUserInfo(credentials);
@@ -76,6 +75,7 @@ export async function createChatRouter(
       conversationId: id,
       userEntityRef,
     });
+
     res.json({ conversation });
   });
 

@@ -1,5 +1,4 @@
 import {
-  Message,
   Model,
   VectorStore,
 } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
@@ -11,6 +10,8 @@ import {
 import { PromptBuilder } from './prompt';
 import { v4 as uuid } from 'uuid';
 import { ChatStore } from '../database/chat-store';
+import { Message } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
+import { SignalsService } from '@backstage/plugin-signals-node';
 
 export type ChatServiceOptions = {
   models: Model[];
@@ -19,13 +20,21 @@ export type ChatServiceOptions = {
   config: RootConfigService;
   promptBuilder: PromptBuilder;
   database: DatabaseService;
+  signals: SignalsService;
+};
+
+type StreamOptions = {
+  modelId: string;
+  messages: Message[];
+  messageId: string;
+  userEntityRef: string;
 };
 
 type PromptOptions = {
   modelId: string;
   messages: Message[];
   conversationId: string;
-  stream: boolean;
+  stream?: boolean;
   userEntityRef: string;
 };
 
@@ -48,6 +57,7 @@ export const createChatService = async ({
   vectorStore,
   promptBuilder,
   database,
+  signals,
 }: ChatServiceOptions): Promise<ChatService> => {
   logger.info(`Available models: ${models.map(m => m.id).join(', ')}`);
 
@@ -57,11 +67,47 @@ export const createChatService = async ({
     return models.find(model => model.id === id)?.chatModel;
   };
 
+  const streamMessage = async ({
+    modelId,
+    messages,
+    messageId,
+    userEntityRef,
+  }: StreamOptions) => {
+    const model = getChatModelById(modelId);
+
+    if (!model) {
+      throw new Error(`Model with id ${modelId} not found`);
+    }
+
+    const promptStream = await model.stream(messages);
+
+    const aiMessage: Required<Message> = {
+      id: messageId,
+      role: 'assistant',
+      content: '',
+    };
+
+    for await (const chunk of promptStream) {
+      aiMessage.content += chunk.content ?? '';
+
+      chatStore.updateMessage(aiMessage);
+
+      signals.publish({
+        channel: `ai-assistant.chat.message-stream:${messageId}`,
+        message: aiMessage,
+        recipients: {
+          type: 'user',
+          entityRef: userEntityRef,
+        },
+      });
+    }
+  };
+
   const prompt: ChatService['prompt'] = async ({
     conversationId,
     messages,
     modelId,
-    stream,
+    stream = true,
     userEntityRef,
   }: PromptOptions) => {
     const model = getChatModelById(modelId);
@@ -90,26 +136,33 @@ export const createChatService = async ({
       context,
     );
 
-    const responseId: string = uuid();
+    const messageId: string = uuid();
+
+    const aiMessage: Required<Message> = {
+      id: messageId,
+      role: 'assistant',
+      content: '',
+    };
+
+    await chatStore.addChatMessage([aiMessage], userEntityRef, conversationId);
 
     if (stream) {
-      // Handle streaming response
-      throw new Error('Not Implemented');
+      streamMessage({
+        modelId,
+        messages: promptMessages,
+        messageId,
+        userEntityRef,
+      });
+
+      return [aiMessage];
     }
+    const { text } = await model.invoke(promptMessages);
 
-    const response = await model.invoke(promptMessages);
+    aiMessage.content = text;
 
-    const aiMessages: Required<Message>[] = [
-      {
-        id: responseId,
-        role: 'assistant',
-        content: response.text,
-      },
-    ];
+    await chatStore.updateMessage(aiMessage);
 
-    chatStore.addChatMessage(aiMessages, userEntityRef, conversationId);
-
-    return aiMessages;
+    return [aiMessage];
   };
 
   const getAvailableModels: ChatService['getAvailableModels'] = async () => {
