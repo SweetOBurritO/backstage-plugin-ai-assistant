@@ -1,4 +1,5 @@
 import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
 import { PropsWithChildren } from 'react';
 import { useTheme } from '@mui/material/styles';
 
@@ -15,25 +16,16 @@ export const Card = ({ children, role }: CardProps) => {
         maxWidth: '70%',
         width: '70%',
         borderRadius: 2,
-        overflow: 'hidden',
         border: 'double transparent',
         borderWidth: role !== 'user' ? '2px' : 0,
-        backgroundImage: `linear-gradient(white, white), linear-gradient(to right, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+        backgroundImage: `linear-gradient(${theme.palette.background.paper}, ${theme.palette.background.paper}), linear-gradient(to right, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
         backgroundOrigin: 'border-box',
         backgroundClip: 'content-box, border-box',
+        wordBreak: 'break-word',
       }}
       elevation={2}
     >
-      <Paper
-        sx={{
-          width: '100%',
-          wordBreak: 'break-word',
-          padding: 1,
-          borderRadius: 0,
-        }}
-      >
-        {children}
-      </Paper>
+      <Box p={1}>{children}</Box>
     </Paper>
   );
 };

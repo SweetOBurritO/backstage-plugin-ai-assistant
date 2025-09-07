@@ -139,6 +139,12 @@ export const Conversation = () => {
     setConversationId(messageResponse.conversationId);
   }, [messageResponse, setConversationId, conversationId]);
 
+  const messageEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
   if (loadingHistory && loadingModels) {
     return <Typography>Loading...</Typography>;
   }
@@ -148,7 +154,13 @@ export const Conversation = () => {
   }
 
   return (
-    <Stack padding={2} spacing={2} flex={1} height="100vh">
+    <Stack
+      padding={2}
+      spacing={2}
+      flex={1}
+      height="100vh"
+      boxSizing="border-box"
+    >
       <Stack direction="row" spacing={2} alignItems="center">
         <Autocomplete
           options={models}
@@ -159,14 +171,28 @@ export const Conversation = () => {
         />
       </Stack>
       {messages && (
-        <Stack spacing={1} flex={1}>
+        <Stack
+          spacing={1}
+          flex={1}
+          sx={{
+            overflowY: 'auto',
+            pr: 1,
+            '&::-webkit-scrollbar': {
+              background: 'transparent',
+            },
+            '&::-webkit-scrollbar-track': {
+              background: 'transparent',
+            },
+          }}
+        >
           {messages.map(message => (
             <MessageCard key={message.id} message={message} />
           ))}
+          <div ref={messageEndRef} />
         </Stack>
       )}
 
-      <Paper elevation={2} sx={{ padding: 1, justifySelf: 'flex-end' }}>
+      <Paper elevation={2} sx={{ padding: 1 }}>
         <Stack
           direction="row"
           spacing={1}
