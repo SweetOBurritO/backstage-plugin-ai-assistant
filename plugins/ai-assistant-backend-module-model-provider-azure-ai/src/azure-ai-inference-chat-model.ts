@@ -82,12 +82,7 @@ export class AzureAiInferenceChatModel
 
     for await (const event of sseStream) {
       if (event.data === '[DONE]') {
-        yield new ChatGenerationChunk({
-          text: '',
-          message: new AIMessageChunk({
-            content: '',
-          }),
-        });
+        return;
       }
 
       for (const choice of JSON.parse(event.data).choices) {
