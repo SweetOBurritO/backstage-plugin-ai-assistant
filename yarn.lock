@@ -5542,6 +5542,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@langchain/openai@npm:^0.6.11":
+  version: 0.6.11
+  resolution: "@langchain/openai@npm:0.6.11"
+  dependencies:
+    js-tiktoken: "npm:^1.0.12"
+    openai: "npm:5.12.2"
+    zod: "npm:^3.25.32"
+  peerDependencies:
+    "@langchain/core": ">=0.3.68 <0.4.0"
+  checksum: 10c0/d95bc7f4f4a66c82f031800d1196d1e13a536b3f647480209d8432bb4d2ebfbc53dddb43d86e6d2de0f4d94050ca4b8002e50ab1813552faba24d4045c00feda
+  languageName: node
+  linkType: hard
+
 "@langchain/textsplitters@npm:^0.1.0":
   version: 0.1.0
   resolution: "@langchain/textsplitters@npm:0.1.0"
@@ -8069,6 +8082,18 @@ __metadata:
   checksum: 10c0/4ca95a338f070f48303e705996bacfc1219f606c45274bed4f6e3488b86b7b20397bd52792e58fdea0fa924fc939695b5eb5ff7f3ff4737382148fe6097e235a
   languageName: node
   linkType: hard
+
+"@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-azure-open-ai@workspace:plugins/ai-assistant-backend-module-embeddings-provider-azure-open-ai":
+  version: 0.0.0-use.local
+  resolution: "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-azure-open-ai@workspace:plugins/ai-assistant-backend-module-embeddings-provider-azure-open-ai"
+  dependencies:
+    "@backstage/backend-plugin-api": "npm:^1.4.1"
+    "@backstage/backend-test-utils": "npm:^1.7.0"
+    "@backstage/cli": "npm:^0.33.1"
+    "@langchain/openai": "npm:^0.6.11"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "workspace:^"
+  languageName: unknown
+  linkType: soft
 
 "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-ollama@workspace:^, @sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-ollama@workspace:plugins/ai-assistant-backend-module-embeddings-provider-ollama":
   version: 0.0.0-use.local
@@ -20437,6 +20462,23 @@ __metadata:
     is-docker: "npm:^2.1.1"
     is-wsl: "npm:^2.2.0"
   checksum: 10c0/bb6b3a58401dacdb0aad14360626faf3fb7fba4b77816b373495988b724fb48941cad80c1b65d62bb31a17609b2cd91c41a181602caea597ca80dfbcc27e84c9
+  languageName: node
+  linkType: hard
+
+"openai@npm:5.12.2":
+  version: 5.12.2
+  resolution: "openai@npm:5.12.2"
+  peerDependencies:
+    ws: ^8.18.0
+    zod: ^3.23.8
+  peerDependenciesMeta:
+    ws:
+      optional: true
+    zod:
+      optional: true
+  bin:
+    openai: bin/cli
+  checksum: 10c0/7737b9b24edc81fcf9e6dcfb18a196cc0f8e29b6e839adf06a2538558c03908e3aa4cd94901b1a7f4a9dd62676fe9e34d6202281b2395090d998618ea1614c0c
   languageName: node
   linkType: hard
 
