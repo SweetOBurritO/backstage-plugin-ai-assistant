@@ -8,7 +8,7 @@ import { AzureOpenAIEmbeddings } from '@langchain/openai';
 export const aiAssistantModuleEmbeddingsProviderAzureOpenAi =
   createBackendModule({
     pluginId: 'ai-assistant',
-    moduleId: 'embeddings-provider-ollama',
+    moduleId: 'embeddings-provider-azure-openai',
     register(reg) {
       reg.registerInit({
         deps: {
