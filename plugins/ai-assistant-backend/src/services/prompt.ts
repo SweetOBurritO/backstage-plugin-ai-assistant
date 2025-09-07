@@ -1,8 +1,7 @@
 import { RootConfigService } from '@backstage/backend-plugin-api';
-import {
-  Message,
-  EmbeddingDocument,
-} from '@sweetoburrito/backstage-plugin-ai-assistant-node';
+import { EmbeddingDocument } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
+
+import { Message } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 
 type PromptBuilderOptions = {
   config: RootConfigService;
