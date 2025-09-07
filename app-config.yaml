@@ -65,7 +65,8 @@ aiAssistant:
       apiKey: '<your-api-key>'
       baseUrl: '<your-base-url>'
     azureOpenAi:
-      deployment: '<your-deployment-name>'
+      deploymentName: '<your-deployment-name>'
+      instanceName: '<your-instance-name>'
       apiKey: '<your-api-key>'
       endpoint: '<your-azure-openai-endpoint>'
 

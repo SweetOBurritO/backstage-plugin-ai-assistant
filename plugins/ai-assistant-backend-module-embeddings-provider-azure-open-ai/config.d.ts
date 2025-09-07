@@ -3,7 +3,8 @@ export interface Config {
     embeddings: {
       azureOpenAi: {
         endpoint: string;
-        deployment: string;
+        deploymentName: string;
+        instanceName: string;
         /**
          * @visibility secret
          */

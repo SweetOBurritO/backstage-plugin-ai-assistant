@@ -17,8 +17,12 @@ export const aiAssistantModuleEmbeddingsProviderAzureOpenAi =
           embeddingsProvider: embeddingsProviderExtensionPoint,
         },
         async init({ embeddingsProvider, config }) {
-          const deployment = config.getString(
-            'aiAssistant.embeddings.azureOpenAi.deployment',
+          const deploymentName = config.getString(
+            'aiAssistant.embeddings.azureOpenAi.deploymentName',
+          );
+
+          const instanceName = config.getString(
+            'aiAssistant.embeddings.azureOpenAi.instanceName',
           );
           const apiKey = config.getString(
             'aiAssistant.embeddings.azureOpenAi.apiKey',
@@ -28,7 +32,8 @@ export const aiAssistantModuleEmbeddingsProviderAzureOpenAi =
           );
 
           const embeddings = new AzureOpenAIEmbeddings({
-            azureOpenAIApiEmbeddingsDeploymentName: deployment,
+            azureOpenAIApiEmbeddingsDeploymentName: deploymentName,
+            azureOpenAIApiInstanceName: instanceName,
             azureOpenAIEndpoint: endpoint,
             azureOpenAIApiKey: apiKey,
           });
