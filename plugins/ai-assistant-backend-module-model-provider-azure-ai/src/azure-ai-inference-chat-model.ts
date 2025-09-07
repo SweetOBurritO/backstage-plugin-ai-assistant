@@ -60,6 +60,7 @@ export class AzureAiInferenceChatModel
         body: {
           stream: true,
           messages: aiInferenceMessages,
+          model: this.modelName,
         },
       })
       .asNodeStream();
