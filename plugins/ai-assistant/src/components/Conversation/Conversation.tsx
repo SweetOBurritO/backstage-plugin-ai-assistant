@@ -2,7 +2,6 @@ import { useApi, errorApiRef } from '@backstage/core-plugin-api';
 import { chatApiRef } from '../../api/chat';
 import { useAsync, useAsyncFn, useList, useLocalStorage } from 'react-use';
 import { useEffect, useRef, useState } from 'react';
-import { useTheme } from '@mui/material/styles';
 import {
   signalApiRef,
   SignalSubscriber,
@@ -16,9 +15,9 @@ import Paper from '@mui/material/Paper';
 import NorthIcon from '@mui/icons-material/North';
 import Button from '@mui/material/Button';
 import { Message } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
+import { MessageCard } from '../MessageCard';
 
 export const Conversation = () => {
-  const theme = useTheme();
   const chatApi = useApi(chatApiRef);
   const errorApi = useApi(errorApiRef);
   const signalApi = useApi(signalApiRef);
@@ -161,33 +160,8 @@ export const Conversation = () => {
       </Stack>
       {messages && (
         <Stack spacing={1} flex={1}>
-          {messages.map((message, idx) => (
-            <Paper
-              key={idx}
-              sx={{
-                alignSelf: message.role === 'user' ? 'end' : 'start',
-                maxWidth: '70%',
-                borderRadius: 2,
-                overflow: 'hidden',
-                border: 'double transparent',
-                borderWidth: message.role !== 'user' ? '2px' : 0,
-                backgroundImage: `linear-gradient(white, white), linear-gradient(to right, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                backgroundOrigin: 'border-box',
-                backgroundClip: 'content-box, border-box',
-              }}
-              elevation={2}
-            >
-              <Paper
-                sx={{
-                  width: 'fit-content',
-                  wordBreak: 'break-word',
-                  padding: 1,
-                  borderRadius: 0,
-                }}
-              >
-                <Typography variant="body1">{message.content}</Typography>
-              </Paper>
-            </Paper>
+          {messages.map(message => (
+            <MessageCard key={message.id} message={message} />
           ))}
         </Stack>
       )}

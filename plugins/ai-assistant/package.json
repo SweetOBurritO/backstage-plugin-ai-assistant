@@ -38,6 +38,7 @@
     "@mui/icons-material": "^6.5.0",
     "@mui/material": "^6.5.0",
     "@sweetoburrito/backstage-plugin-ai-assistant-common": "workspace:^",
+    "react-markdown": "^10.1.0",
     "react-use": "^17.2.4"
   },
   "peerDependencies": {
