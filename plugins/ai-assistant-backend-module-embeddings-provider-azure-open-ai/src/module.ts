@@ -31,11 +31,16 @@ export const aiAssistantModuleEmbeddingsProviderAzureOpenAi =
             'aiAssistant.embeddings.azureOpenAi.endpoint',
           );
 
+          const openAIApiVersion = config.getString(
+            'aiAssistant.embeddings.azureOpenAi.openAIApiVersion',
+          );
+
           const embeddings = new AzureOpenAIEmbeddings({
             azureOpenAIApiEmbeddingsDeploymentName: deploymentName,
             azureOpenAIApiInstanceName: instanceName,
             azureOpenAIEndpoint: endpoint,
             azureOpenAIApiKey: apiKey,
+            openAIApiVersion: openAIApiVersion,
           });
 
           return embeddingsProvider.register({

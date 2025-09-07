@@ -69,6 +69,7 @@ aiAssistant:
       instanceName: '<your-instance-name>'
       apiKey: '<your-api-key>'
       endpoint: '<your-azure-openai-endpoint>'
+      openAIApiVersion: <your-deployments-openai-version>
 
   models:
     ollama:
