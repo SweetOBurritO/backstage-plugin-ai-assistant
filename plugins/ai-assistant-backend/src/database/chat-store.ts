@@ -32,7 +32,8 @@ export class ChatStore {
   ): Promise<Required<Message>[]> {
     let query = this.table()
       .where({ conversation_id: conversationId, userRef })
-      .select('*');
+      .select('*')
+      .orderBy('created_at', 'asc');
 
     if (typeof limit === 'number') {
       query = query.limit(limit).orderBy('created_at', 'desc');
