@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-node
 
+## 0.2.2
+
+### Patch Changes
+
+- d0b919b: remove types now in common package
+
 ## 0.2.1
 
 ### Patch Changes

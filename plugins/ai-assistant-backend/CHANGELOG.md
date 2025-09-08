@@ -1,5 +1,19 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend
 
+## 0.3.0
+
+### Minor Changes
+
+- d0b919b: add mechanism for messages to be streamed to the frontend
+- ef4391b: fix issue where order of chats were not preserved
+
+### Patch Changes
+
+- Updated dependencies [d0b919b]
+- Updated dependencies [d0b919b]
+  - @sweetoburrito/backstage-plugin-ai-assistant-common@0.1.1
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.2.2
+
 ## 0.2.1
 
 ### Patch Changes
