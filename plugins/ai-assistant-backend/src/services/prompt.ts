@@ -30,7 +30,9 @@ Rules:
 export const createPromptBuilder = ({
   config,
 }: PromptBuilderOptions): PromptBuilder => {
-  const system = config.getOptionalString('system') || DEFAULT_SYSTEM_PROMPT;
+  const system =
+    config.getOptionalString('aiAssistant.prompt.system') ||
+    DEFAULT_SYSTEM_PROMPT;
 
   const getContext = (context: EmbeddingDocument[]) => {
     return `

@@ -23,12 +23,6 @@ backend.add(
 
 backend.add(
   import(
-    '@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai'
-  ),
-);
-
-backend.add(
-  import(
     '@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-catalog'
   ),
 );
