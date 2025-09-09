@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-azure-open-ai
 
+## 0.2.2
+
+### Patch Changes
+
+- bef49a2: Fix publish settings
+
 ## 0.2.1
 
 ### Patch Changes
