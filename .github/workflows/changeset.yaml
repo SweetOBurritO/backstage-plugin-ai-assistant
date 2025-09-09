@@ -36,8 +36,8 @@ jobs:
 
       - uses: changesets/action@v1
         with:
-          version: yarn changeset version
-          publish: yarn changeset publish
+          version: yarn release
+          publish: yarn publish
           title: 'chore(release): release plugins'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -20,7 +20,9 @@
     "prettier:check": "prettier --check .",
     "prettier:write": "prettier --write .",
     "new": "backstage-cli new --scope sweetoburrito --no-private",
-    "prepare": "husky"
+    "prepare": "husky",
+    "release": "changeset version && yarn install --mode=update-lockfile",
+    "publish": "changeset publish"
   },
   "workspaces": {
     "packages": [

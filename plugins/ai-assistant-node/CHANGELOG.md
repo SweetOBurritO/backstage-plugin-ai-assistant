@@ -1,5 +1,17 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-node
 
+## 0.3.2
+
+### Patch Changes
+
+- a65c303: Try fix pipeline
+
+## 0.3.1
+
+### Patch Changes
+
+- 62152f7: Fix incorrect version resolution of dependancies
+
 ## 0.3.0
 
 ### Minor Changes

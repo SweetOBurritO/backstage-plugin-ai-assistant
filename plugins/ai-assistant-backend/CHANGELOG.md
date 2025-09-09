@@ -1,5 +1,23 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend
 
+## 0.4.2
+
+### Patch Changes
+
+- a65c303: Try fix pipeline
+- Updated dependencies [a65c303]
+  - @sweetoburrito/backstage-plugin-ai-assistant-common@0.2.2
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.3.2
+
+## 0.4.1
+
+### Patch Changes
+
+- 62152f7: Fix incorrect version resolution of dependancies
+- Updated dependencies [62152f7]
+  - @sweetoburrito/backstage-plugin-ai-assistant-common@0.2.1
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.3.1
+
 ## 0.4.0
 
 ### Minor Changes
