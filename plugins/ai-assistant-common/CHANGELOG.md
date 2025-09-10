@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-common
 
+## 0.2.1
+
+### Patch Changes
+
+- ed1fa11: Fix incorrect version resolution of dependancies
+
 ## 0.2.0
 
 ### Minor Changes
