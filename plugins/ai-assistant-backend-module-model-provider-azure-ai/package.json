@@ -1,6 +1,6 @@
 {
   "name": "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "license": "Apache-2.0",
   "description": "The model-provider-azure-ai backend module for the ai-assistant plugin.",
   "main": "src/index.ts",
