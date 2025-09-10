@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-common
 
+## 0.2.2
+
+### Patch Changes
+
+- a65c303: Try fix pipeline
+
 ## 0.2.1
 
 ### Patch Changes
