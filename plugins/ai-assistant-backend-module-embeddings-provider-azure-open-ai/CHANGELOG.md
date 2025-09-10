@@ -1,5 +1,13 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-azure-open-ai
 
+## 0.3.1
+
+### Patch Changes
+
+- 62152f7: Fix incorrect version resolution of dependancies
+- Updated dependencies [62152f7]
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.3.1
+
 ## 0.3.0
 
 ### Minor Changes
