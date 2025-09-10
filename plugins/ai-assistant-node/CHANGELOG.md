@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-node
 
+## 0.3.0
+
+### Minor Changes
+
+- 6594f18: Fix breaking dependnacy resolution preventing installs
+
 ## 0.2.2
 
 ### Patch Changes
