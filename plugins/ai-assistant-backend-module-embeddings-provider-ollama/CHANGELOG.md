@@ -1,5 +1,13 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-ollama
 
+## 0.3.2
+
+### Patch Changes
+
+- a65c303: Try fix pipeline
+- Updated dependencies [a65c303]
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.3.2
+
 ## 0.3.1
 
 ### Patch Changes

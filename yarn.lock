@@ -8091,11 +8091,11 @@ __metadata:
     "@backstage/backend-test-utils": "backstage:^"
     "@backstage/cli": "backstage:^"
     "@langchain/openai": "npm:^0.6.11"
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.3.1"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.3.2"
   languageName: unknown
   linkType: soft
 
-"@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-ollama@npm:^0.3.1, @sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-ollama@workspace:plugins/ai-assistant-backend-module-embeddings-provider-ollama":
+"@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-ollama@npm:^0.3.2, @sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-ollama@workspace:plugins/ai-assistant-backend-module-embeddings-provider-ollama":
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-ollama@workspace:plugins/ai-assistant-backend-module-embeddings-provider-ollama"
   dependencies:
@@ -8103,11 +8103,11 @@ __metadata:
     "@backstage/backend-test-utils": "backstage:^"
     "@backstage/cli": "backstage:^"
     "@langchain/ollama": "npm:^0.2.3"
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.3.1"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.3.2"
   languageName: unknown
   linkType: soft
 
-"@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-catalog@npm:^0.3.1, @sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-catalog@workspace:plugins/ai-assistant-backend-module-ingestor-catalog":
+"@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-catalog@npm:^0.3.2, @sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-catalog@workspace:plugins/ai-assistant-backend-module-ingestor-catalog":
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-catalog@workspace:plugins/ai-assistant-backend-module-ingestor-catalog"
   dependencies:
@@ -8118,11 +8118,11 @@ __metadata:
     "@backstage/cli": "backstage:^"
     "@backstage/plugin-catalog-backend": "backstage:^"
     "@backstage/plugin-catalog-node": "backstage:^"
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.3.1"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.3.2"
   languageName: unknown
   linkType: soft
 
-"@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai@npm:^0.3.1, @sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai@workspace:plugins/ai-assistant-backend-module-model-provider-azure-ai":
+"@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai@npm:^0.3.2, @sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai@workspace:plugins/ai-assistant-backend-module-model-provider-azure-ai":
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai@workspace:plugins/ai-assistant-backend-module-model-provider-azure-ai"
   dependencies:
@@ -8133,11 +8133,11 @@ __metadata:
     "@backstage/backend-test-utils": "backstage:^"
     "@backstage/cli": "backstage:^"
     "@langchain/core": "npm:^0.3.72"
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.3.1"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.3.2"
   languageName: unknown
   linkType: soft
 
-"@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama@npm:^0.3.1, @sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama@workspace:plugins/ai-assistant-backend-module-model-provider-ollama":
+"@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama@npm:^0.3.2, @sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama@workspace:plugins/ai-assistant-backend-module-model-provider-ollama":
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama@workspace:plugins/ai-assistant-backend-module-model-provider-ollama"
   dependencies:
@@ -8145,7 +8145,7 @@ __metadata:
     "@backstage/backend-test-utils": "backstage:^"
     "@backstage/cli": "backstage:^"
     "@langchain/ollama": "npm:^0.2.3"
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.3.1"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.3.2"
   languageName: unknown
   linkType: soft
 
@@ -8167,12 +8167,12 @@ __metadata:
     "@backstage/types": "backstage:^"
     "@langchain/core": "npm:^0.3.72"
     "@langchain/textsplitters": "npm:^0.1.0"
-    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-ollama": "npm:^0.3.1"
-    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-catalog": "npm:^0.3.1"
-    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai": "npm:^0.3.1"
-    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama": "npm:^0.3.1"
-    "@sweetoburrito/backstage-plugin-ai-assistant-common": "npm:^0.2.1"
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.3.1"
+    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-ollama": "npm:^0.3.2"
+    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-catalog": "npm:^0.3.2"
+    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai": "npm:^0.3.2"
+    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama": "npm:^0.3.2"
+    "@sweetoburrito/backstage-plugin-ai-assistant-common": "npm:^0.2.2"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.3.2"
     "@types/express": "npm:^4.0.0"
     "@types/supertest": "npm:^2.0.12"
     express: "npm:^4.17.1"
@@ -8184,7 +8184,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@sweetoburrito/backstage-plugin-ai-assistant-common@npm:^0.2.1, @sweetoburrito/backstage-plugin-ai-assistant-common@workspace:plugins/ai-assistant-common":
+"@sweetoburrito/backstage-plugin-ai-assistant-common@npm:^0.2.2, @sweetoburrito/backstage-plugin-ai-assistant-common@workspace:plugins/ai-assistant-common":
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-common@workspace:plugins/ai-assistant-common"
   dependencies:
@@ -8192,7 +8192,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@sweetoburrito/backstage-plugin-ai-assistant-node@npm:^0.3.1, @sweetoburrito/backstage-plugin-ai-assistant-node@workspace:plugins/ai-assistant-node":
+"@sweetoburrito/backstage-plugin-ai-assistant-node@npm:^0.3.2, @sweetoburrito/backstage-plugin-ai-assistant-node@workspace:plugins/ai-assistant-node":
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-node@workspace:plugins/ai-assistant-node"
   dependencies:
@@ -8216,7 +8216,7 @@ __metadata:
     "@backstage/theme": "backstage:^"
     "@mui/icons-material": "npm:^6.5.0"
     "@mui/material": "npm:^6.5.0"
-    "@sweetoburrito/backstage-plugin-ai-assistant-common": "npm:^0.2.1"
+    "@sweetoburrito/backstage-plugin-ai-assistant-common": "npm:^0.2.2"
     react-markdown: "npm:^10.1.0"
     react-use: "npm:^17.2.4"
   peerDependencies:
