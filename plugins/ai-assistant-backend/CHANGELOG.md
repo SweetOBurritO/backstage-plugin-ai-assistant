@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend
 
+## 0.4.3
+
+### Patch Changes
+
+- 76ce717: fix an issue where the system prompt was incorrectly setup and caused it not to be used
+
 ## 0.4.2
 
 ### Patch Changes
