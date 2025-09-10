@@ -37,7 +37,7 @@
     "@backstage/theme": "backstage:^",
     "@mui/icons-material": "^6.5.0",
     "@mui/material": "^6.5.0",
-    "@sweetoburrito/backstage-plugin-ai-assistant-common": "workspace:^",
+    "@sweetoburrito/backstage-plugin-ai-assistant-common": "^0.2.0",
     "react-markdown": "^10.1.0",
     "react-use": "^17.2.4"
   },

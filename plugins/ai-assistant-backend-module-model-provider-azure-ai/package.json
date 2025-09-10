@@ -30,7 +30,7 @@
     "@azure/core-sse": "^2.3.0",
     "@backstage/backend-plugin-api": "backstage:^",
     "@langchain/core": "^0.3.72",
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "workspace:^"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "^0.3.0"
   },
   "devDependencies": {
     "@backstage/backend-test-utils": "backstage:^",
