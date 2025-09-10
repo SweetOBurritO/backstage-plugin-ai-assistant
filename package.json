@@ -21,7 +21,7 @@
     "prettier:write": "prettier --write .",
     "new": "backstage-cli new --scope sweetoburrito --no-private",
     "prepare": "husky",
-    "version": "changeset version && yarn install",
+    "release": "changeset version && yarn install",
     "publish": "changeset publish"
   },
   "workspaces": {
