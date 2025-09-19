@@ -13,7 +13,7 @@ export const dataIngestorExtensionPoint =
   });
 
 export type EmbeddingsProvider = {
-  getEmbeddings: () => Promise<Embeddings>;
+  getEmbeddings: () => Promise<Omit<Embeddings, 'caller'>>;
 };
 
 export type EmbeddingsProviderExtensionPoint = {
