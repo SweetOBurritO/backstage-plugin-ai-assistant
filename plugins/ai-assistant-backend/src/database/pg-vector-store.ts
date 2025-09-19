@@ -19,7 +19,7 @@ export type PgVectorStoreOptions = {
 
 export class PgVectorStore implements VectorStore {
   private readonly tableName: string = 'embeddings';
-  private embeddings?: Embeddings;
+  private embeddings?: Omit<Embeddings, 'caller'>;
 
   /**
    * Creates an instance of PgVectorStore.
@@ -46,7 +46,7 @@ export class PgVectorStore implements VectorStore {
     return new PgVectorStore(client, logger, amount, chunkSize);
   }
 
-  connectEmbeddings(embeddings: Embeddings) {
+  connectEmbeddings(embeddings: Omit<Embeddings, 'caller'>) {
     if (this.embeddings) {
       this.logger.warn('Embeddings already connected, overwriting.');
     }
