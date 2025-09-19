@@ -1,5 +1,12 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai
 
+## 0.4.0
+
+### Minor Changes
+
+- 90f6327: - Update azure ai model provider to allow customizing which sdk is used
+  - Add open ai sdk to azure ai model provider
+
 ## 0.3.2
 
 ### Patch Changes
