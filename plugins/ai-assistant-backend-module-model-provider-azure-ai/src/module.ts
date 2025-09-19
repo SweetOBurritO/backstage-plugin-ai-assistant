@@ -7,9 +7,7 @@ import {
   Model,
   modelProviderExtensionPoint,
 } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
-import { AzureAiInferenceChatModel } from './azure-ai-inference-chat-model';
-
-import { BaseChatModel } from '@langchain/core/language_models/chat_models';
+import { createChatModeForSdk } from './services/chat-model';
 
 export const aiAssistantModuleModelProviderAzureAi = createBackendModule({
   pluginId: 'ai-assistant',
@@ -21,9 +19,7 @@ export const aiAssistantModuleModelProviderAzureAi = createBackendModule({
         modelProvider: modelProviderExtensionPoint,
       },
       async init({ config, modelProvider }) {
-        const azureConfig = config.getConfig(
-          'aiAssistant.models.azureAiInference',
-        );
+        const azureConfig = config.getConfig('aiAssistant.models.azureAi');
 
         const apiKey = azureConfig.getString('apiKey');
         const modelConfigs = azureConfig.getOptionalConfigArray('models');
@@ -32,8 +28,9 @@ export const aiAssistantModuleModelProviderAzureAi = createBackendModule({
           modelConfigs?.map<Model>(modelConfig => {
             const endpoint = modelConfig.getString('endpoint');
             const modelName = modelConfig.getString('modelName');
+            const sdk = modelConfig.getOptionalString('sdk') ?? 'openai';
 
-            const chatModel: BaseChatModel = new AzureAiInferenceChatModel({
+            const chatModel = createChatModeForSdk(sdk, {
               apiKey,
               endpoint,
               modelName,

@@ -1,7 +1,9 @@
+import { SdkType } from './src/types/chat-model';
+
 export interface Config {
   aiAssistant: {
     models: {
-      azureAiInference: {
+      azureAi: {
         /**
          * @visibility secret
          */
@@ -9,7 +11,8 @@ export interface Config {
         models: {
           modelName: string;
           endpoint: string;
-        };
+          sdk?: SdkType;
+        }[];
       };
     };
   };

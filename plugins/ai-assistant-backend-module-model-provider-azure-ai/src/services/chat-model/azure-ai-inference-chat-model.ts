@@ -12,8 +12,9 @@ import {
 import { CallbackManagerForLLMRun } from '@langchain/core/callbacks/manager';
 import { concat } from '@langchain/core/utils/stream';
 import { ChatGenerationChunk, ChatResult } from '@langchain/core/outputs';
-import { convertToAzureAiInferenceMessages } from './utils';
+import { convertToAzureAiInferenceMessages } from '../../utils';
 import { createSseStream } from '@azure/core-sse';
+import { CreateChatModelFunction } from '../../types/chat-model';
 
 export interface ChatAzureAiInferenceInputs extends BaseChatModelParams {
   modelName: string;
@@ -140,3 +141,8 @@ export class AzureAiInferenceChatModel
     };
   }
 }
+
+export const createAzureAiInferenceChatModel: CreateChatModelFunction =
+  options => {
+    return new AzureAiInferenceChatModel(options);
+  };

@@ -2778,14 +2778,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@backstage/backend-openapi-utils@npm:^0.6.0":
-  version: 0.6.0
-  resolution: "@backstage/backend-openapi-utils@npm:0.6.0"
+"@backstage/backend-openapi-utils@npm:^0.6.0, @backstage/backend-openapi-utils@npm:^0.6.1":
+  version: 0.6.1
+  resolution: "@backstage/backend-openapi-utils@npm:0.6.1"
   dependencies:
     "@apidevtools/swagger-parser": "npm:^10.1.0"
-    "@backstage/backend-plugin-api": "npm:^1.4.2"
+    "@backstage/backend-plugin-api": "npm:^1.4.3"
     "@backstage/errors": "npm:^1.2.7"
-    "@backstage/types": "npm:^1.2.1"
+    "@backstage/types": "npm:^1.2.2"
     "@types/express": "npm:^4.17.6"
     "@types/express-serve-static-core": "npm:^4.17.5"
     ajv: "npm:^8.16.0"
@@ -2798,21 +2798,21 @@ __metadata:
     mockttp: "npm:^3.13.0"
     openapi-merge: "npm:^1.3.2"
     openapi3-ts: "npm:^3.1.2"
-  checksum: 10c0/f763a0ef41714fafec92c414b182f7f45079f1dc67366c4c248432df3df381752c180d06d6ce16ee71849d4ac5b5ec08b5ba74002e58dd4c5f394d791501093c
+  checksum: 10c0/e8def70924f5044087cfd96b3ffa7a1237ca405051759fc195e530f66508d7835860c05cf4f7c85cfcb77fb72f2d7be40fd181519442ceaff3d009d8d42b808c
   languageName: node
   linkType: hard
 
-"@backstage/backend-plugin-api@backstage:^::backstage=1.41.2&npm=1.4.1, @backstage/backend-plugin-api@npm:^1.4.1, @backstage/backend-plugin-api@npm:^1.4.2":
-  version: 1.4.2
-  resolution: "@backstage/backend-plugin-api@npm:1.4.2"
+"@backstage/backend-plugin-api@backstage:^::backstage=1.41.2&npm=1.4.1, @backstage/backend-plugin-api@npm:^1.4.1, @backstage/backend-plugin-api@npm:^1.4.2, @backstage/backend-plugin-api@npm:^1.4.3":
+  version: 1.4.3
+  resolution: "@backstage/backend-plugin-api@npm:1.4.3"
   dependencies:
     "@backstage/cli-common": "npm:^0.1.15"
     "@backstage/config": "npm:^1.3.3"
     "@backstage/errors": "npm:^1.2.7"
-    "@backstage/plugin-auth-node": "npm:^0.6.6"
+    "@backstage/plugin-auth-node": "npm:^0.6.7"
     "@backstage/plugin-permission-common": "npm:^0.9.1"
-    "@backstage/plugin-permission-node": "npm:^0.10.3"
-    "@backstage/types": "npm:^1.2.1"
+    "@backstage/plugin-permission-node": "npm:^0.10.4"
+    "@backstage/types": "npm:^1.2.2"
     "@types/express": "npm:^4.17.6"
     "@types/json-schema": "npm:^7.0.6"
     "@types/luxon": "npm:^3.0.0"
@@ -2820,7 +2820,7 @@ __metadata:
     knex: "npm:^3.0.0"
     luxon: "npm:^3.0.0"
     zod: "npm:^3.22.4"
-  checksum: 10c0/8106a2dd40301ac5fac86439654544548864468b96f094a410672734810ce45a4433af072213fd0e90c96e0acd54c07b50d17d128687f5f902f91f4f1a365adb
+  checksum: 10c0/c4216edba8aac3bea587007705aa7d73ea8cc0cd4a08b57969bf14e14f3eca102b0b244c5fa8134167b62aa10c8afcc4de768d39a6d15bac30cfb4cf1fbe9cff
   languageName: node
   linkType: hard
 
@@ -2863,15 +2863,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@backstage/catalog-client@backstage:^::backstage=1.41.2&npm=1.10.2, @backstage/catalog-client@npm:^1.10.2, @backstage/catalog-client@npm:^1.11.0":
-  version: 1.11.0
-  resolution: "@backstage/catalog-client@npm:1.11.0"
+"@backstage/catalog-client@backstage:^::backstage=1.41.2&npm=1.10.2, @backstage/catalog-client@npm:^1.10.2, @backstage/catalog-client@npm:^1.11.0, @backstage/catalog-client@npm:^1.12.0":
+  version: 1.12.0
+  resolution: "@backstage/catalog-client@npm:1.12.0"
   dependencies:
     "@backstage/catalog-model": "npm:^1.7.5"
     "@backstage/errors": "npm:^1.2.7"
     cross-fetch: "npm:^4.0.0"
     uri-template: "npm:^2.0.0"
-  checksum: 10c0/f4378d558e16413f6503eb58c7473dfee5dda2b660c94bf740dc3886174cd5042087d24c1fbe7d39eb9e18d0983b8bbc55c4ce0945691b74110fefc57950dd41
+  checksum: 10c0/c403212c1af786e17b31103b25b682640533c14e1af54e3a6fdbbb9b001ab2fe8dd03346062b4f444ace1f6cbd7d17b6b6d2d3be1f5cd24e9f056c025bbe94ad
   languageName: node
   linkType: hard
 
@@ -3533,16 +3533,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@backstage/plugin-auth-node@npm:^0.6.5, @backstage/plugin-auth-node@npm:^0.6.6":
-  version: 0.6.6
-  resolution: "@backstage/plugin-auth-node@npm:0.6.6"
+"@backstage/plugin-auth-node@npm:^0.6.5, @backstage/plugin-auth-node@npm:^0.6.6, @backstage/plugin-auth-node@npm:^0.6.7":
+  version: 0.6.7
+  resolution: "@backstage/plugin-auth-node@npm:0.6.7"
   dependencies:
-    "@backstage/backend-plugin-api": "npm:^1.4.2"
-    "@backstage/catalog-client": "npm:^1.11.0"
+    "@backstage/backend-plugin-api": "npm:^1.4.3"
+    "@backstage/catalog-client": "npm:^1.12.0"
     "@backstage/catalog-model": "npm:^1.7.5"
     "@backstage/config": "npm:^1.3.3"
     "@backstage/errors": "npm:^1.2.7"
-    "@backstage/types": "npm:^1.2.1"
+    "@backstage/types": "npm:^1.2.2"
     "@types/express": "npm:^4.17.6"
     "@types/passport": "npm:^1.0.3"
     express: "npm:^4.17.1"
@@ -3552,7 +3552,7 @@ __metadata:
     zod: "npm:^3.22.4"
     zod-to-json-schema: "npm:^3.21.4"
     zod-validation-error: "npm:^3.4.0"
-  checksum: 10c0/d662fb26047c4e54456f10232c25c00a8b8cdaa52f312f55b8b2bc9c18429169d9bc124bf8a3bdadf6d1bbe2e7c6b8d0625c1b4154f87c2f90c71f0f91ad48dd
+  checksum: 10c0/31628f32389603376266ce099a4cf2c15e1c3cd61ba45c6c8a1f36b787b27ecb56084582f946254d3e15e2d0806f062cbcbb1fc2e8849fea4fbc5502a2bba3aa
   languageName: node
   linkType: hard
 
@@ -3665,20 +3665,39 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@backstage/plugin-events-node@npm:^0.4.13, @backstage/plugin-events-node@npm:^0.4.14":
-  version: 0.4.14
-  resolution: "@backstage/plugin-events-node@npm:0.4.14"
+"@backstage/plugin-events-backend@backstage:^::backstage=1.41.2&npm=0.5.4, @backstage/plugin-events-backend@npm:^0.5.4":
+  version: 0.5.6
+  resolution: "@backstage/plugin-events-backend@npm:0.5.6"
   dependencies:
-    "@backstage/backend-plugin-api": "npm:^1.4.2"
+    "@backstage/backend-openapi-utils": "npm:^0.6.1"
+    "@backstage/backend-plugin-api": "npm:^1.4.3"
+    "@backstage/config": "npm:^1.3.3"
     "@backstage/errors": "npm:^1.2.7"
-    "@backstage/types": "npm:^1.2.1"
+    "@backstage/plugin-events-node": "npm:^0.4.15"
+    "@backstage/types": "npm:^1.2.2"
+    "@types/express": "npm:^4.17.6"
+    content-type: "npm:^1.0.5"
+    express: "npm:^4.17.1"
+    express-promise-router: "npm:^4.1.0"
+    knex: "npm:^3.0.0"
+  checksum: 10c0/cc41c610d071193efc0e4d59bba66f08563ee30cd34e37aa7beeaef816b1fae214b8f58ac8f9508a298ccfaf8e7254a320238c9d61025b67c081756e39d0d9c0
+  languageName: node
+  linkType: hard
+
+"@backstage/plugin-events-node@npm:^0.4.13, @backstage/plugin-events-node@npm:^0.4.14, @backstage/plugin-events-node@npm:^0.4.15":
+  version: 0.4.15
+  resolution: "@backstage/plugin-events-node@npm:0.4.15"
+  dependencies:
+    "@backstage/backend-plugin-api": "npm:^1.4.3"
+    "@backstage/errors": "npm:^1.2.7"
+    "@backstage/types": "npm:^1.2.2"
     "@types/content-type": "npm:^1.1.8"
     "@types/express": "npm:^4.17.6"
     content-type: "npm:^1.0.5"
     cross-fetch: "npm:^4.0.0"
     express: "npm:^4.17.1"
     uri-template: "npm:^2.0.0"
-  checksum: 10c0/6754c7c848d03e7634ad67d6bebed416fd6f3980faffb3223b9cc8c773b4f61ea9e9db4083b63d8a7e20affbd2556e41da6e1dc404e87bb7490108db0f701c6c
+  checksum: 10c0/561cd37ca2e6825f02e8fb643b44a9fb203bbb39d0e3d9855cbdca84b2a375be3f776670e3f2f6ecf03b67ca457b13126460bae84ba5eecd5d66dc38c526e7b2
   languageName: node
   linkType: hard
 
@@ -3697,21 +3716,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@backstage/plugin-permission-node@npm:^0.10.2, @backstage/plugin-permission-node@npm:^0.10.3":
-  version: 0.10.3
-  resolution: "@backstage/plugin-permission-node@npm:0.10.3"
+"@backstage/plugin-permission-node@npm:^0.10.2, @backstage/plugin-permission-node@npm:^0.10.3, @backstage/plugin-permission-node@npm:^0.10.4":
+  version: 0.10.4
+  resolution: "@backstage/plugin-permission-node@npm:0.10.4"
   dependencies:
-    "@backstage/backend-plugin-api": "npm:^1.4.2"
+    "@backstage/backend-plugin-api": "npm:^1.4.3"
     "@backstage/config": "npm:^1.3.3"
     "@backstage/errors": "npm:^1.2.7"
-    "@backstage/plugin-auth-node": "npm:^0.6.6"
+    "@backstage/plugin-auth-node": "npm:^0.6.7"
     "@backstage/plugin-permission-common": "npm:^0.9.1"
     "@types/express": "npm:^4.17.6"
     express: "npm:^4.17.1"
     express-promise-router: "npm:^4.1.0"
     zod: "npm:^3.22.4"
     zod-to-json-schema: "npm:^3.20.4"
-  checksum: 10c0/c041ce1a8fdff7485543be4c1f791824ca3cf1ed346a81c1d1b61d35c6d4f40c0c5bce882ffefb91397da47ee35c325be3c8c3b1eb1b455ad9052436444edf23
+  checksum: 10c0/cdd5e16604c1badae5de259e3b554d1cae6ef0e3cbe053460e8132c21682227b925749fc26053f6d2245466cd898213ff41b699cfd5664666692af409944d149
   languageName: node
   linkType: hard
 
@@ -3885,10 +3904,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@backstage/types@backstage:^::backstage=1.41.2&npm=1.2.1, @backstage/types@npm:^1.2.1":
-  version: 1.2.1
-  resolution: "@backstage/types@npm:1.2.1"
-  checksum: 10c0/e7ed5ee0c4e6afa997a3885b7851ce51fc8c1c99cec98a2724da79dbc626f3f9055c5c72f097a2e2f762293e74ecd6b5d30617c27c3b27aa9a63a436f07b576d
+"@backstage/types@backstage:^::backstage=1.41.2&npm=1.2.1, @backstage/types@npm:^1.2.1, @backstage/types@npm:^1.2.2":
+  version: 1.2.2
+  resolution: "@backstage/types@npm:1.2.2"
+  checksum: 10c0/3c947cf83c058a56b0cfd90d91483e9a5c1c913f7978a0d5a3c0fd9b502d08e9bdf279afba626826eee84159e698ee4cdaa70040789ac47fc8a25df9f1925612
   languageName: node
   linkType: hard
 
@@ -5542,16 +5561,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@langchain/openai@npm:^0.6.11":
-  version: 0.6.11
-  resolution: "@langchain/openai@npm:0.6.11"
+"@langchain/openai@npm:^0.6.11, @langchain/openai@npm:^0.6.13":
+  version: 0.6.13
+  resolution: "@langchain/openai@npm:0.6.13"
   dependencies:
     js-tiktoken: "npm:^1.0.12"
     openai: "npm:5.12.2"
     zod: "npm:^3.25.32"
   peerDependencies:
     "@langchain/core": ">=0.3.68 <0.4.0"
-  checksum: 10c0/d95bc7f4f4a66c82f031800d1196d1e13a536b3f647480209d8432bb4d2ebfbc53dddb43d86e6d2de0f4d94050ca4b8002e50ab1813552faba24d4045c00feda
+  checksum: 10c0/0dd0d48505330a01e1f7f28400e86cdff1cd52a5ad47f5424cff46f0e9123641f6809662ce96a75f5ac7e77a1d7b5e1129a0c51fee394f065e3580ef4cf6498c
   languageName: node
   linkType: hard
 
@@ -8083,7 +8102,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-azure-open-ai@workspace:plugins/ai-assistant-backend-module-embeddings-provider-azure-open-ai":
+"@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-azure-open-ai@workspace:^, @sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-azure-open-ai@workspace:plugins/ai-assistant-backend-module-embeddings-provider-azure-open-ai":
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-azure-open-ai@workspace:plugins/ai-assistant-backend-module-embeddings-provider-azure-open-ai"
   dependencies:
@@ -8095,7 +8114,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-ollama@npm:^0.3.2, @sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-ollama@workspace:plugins/ai-assistant-backend-module-embeddings-provider-ollama":
+"@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-ollama@workspace:^, @sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-ollama@workspace:plugins/ai-assistant-backend-module-embeddings-provider-ollama":
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-ollama@workspace:plugins/ai-assistant-backend-module-embeddings-provider-ollama"
   dependencies:
@@ -8107,7 +8126,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-catalog@npm:^0.3.2, @sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-catalog@workspace:plugins/ai-assistant-backend-module-ingestor-catalog":
+"@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-catalog@workspace:^, @sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-catalog@workspace:plugins/ai-assistant-backend-module-ingestor-catalog":
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-catalog@workspace:plugins/ai-assistant-backend-module-ingestor-catalog"
   dependencies:
@@ -8122,7 +8141,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai@npm:^0.3.2, @sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai@workspace:plugins/ai-assistant-backend-module-model-provider-azure-ai":
+"@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai@workspace:^, @sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai@workspace:plugins/ai-assistant-backend-module-model-provider-azure-ai":
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai@workspace:plugins/ai-assistant-backend-module-model-provider-azure-ai"
   dependencies:
@@ -8133,11 +8152,12 @@ __metadata:
     "@backstage/backend-test-utils": "backstage:^"
     "@backstage/cli": "backstage:^"
     "@langchain/core": "npm:^0.3.72"
+    "@langchain/openai": "npm:^0.6.13"
     "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.3.2"
   languageName: unknown
   linkType: soft
 
-"@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama@npm:^0.3.2, @sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama@workspace:plugins/ai-assistant-backend-module-model-provider-ollama":
+"@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama@workspace:^, @sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama@workspace:plugins/ai-assistant-backend-module-model-provider-ollama":
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama@workspace:plugins/ai-assistant-backend-module-model-provider-ollama"
   dependencies:
@@ -8162,15 +8182,17 @@ __metadata:
     "@backstage/plugin-auth-backend": "backstage:^"
     "@backstage/plugin-auth-backend-module-guest-provider": "backstage:^"
     "@backstage/plugin-catalog-backend": "backstage:^"
+    "@backstage/plugin-events-backend": "backstage:^"
     "@backstage/plugin-signals-backend": "backstage:^"
     "@backstage/plugin-signals-node": "backstage:^"
     "@backstage/types": "backstage:^"
     "@langchain/core": "npm:^0.3.72"
     "@langchain/textsplitters": "npm:^0.1.0"
-    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-ollama": "npm:^0.3.2"
-    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-catalog": "npm:^0.3.2"
-    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai": "npm:^0.3.2"
-    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama": "npm:^0.3.2"
+    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-azure-open-ai": "workspace:^"
+    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-ollama": "workspace:^"
+    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-catalog": "workspace:^"
+    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai": "workspace:^"
+    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama": "workspace:^"
     "@sweetoburrito/backstage-plugin-ai-assistant-common": "npm:^0.2.2"
     "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.3.2"
     "@types/express": "npm:^4.0.0"
