@@ -8,6 +8,10 @@ export interface Config {
       prefix?: string;
       suffix?: string;
     };
+    conversation?: {
+      summaryModel?: string;
+      summaryPrompt?: string;
+    };
     storage?: {
       pgVector?: {
         /**

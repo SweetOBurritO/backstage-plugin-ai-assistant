@@ -1,9 +1,13 @@
 import { DatabaseService } from '@backstage/backend-plugin-api';
-import { Message } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
+import {
+  Message,
+  Conversation,
+} from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 
 import { Knex } from 'knex';
 
-const TABLE_NAME = 'conversation';
+const MESSAGE_TABLE_NAME = 'message';
+const CONVERSATION_TABLE_NAME = 'conversation';
 
 export type ChatStoreOptions = {
   database: DatabaseService;
@@ -21,8 +25,12 @@ export class ChatStore {
     return new ChatStore(client);
   }
 
-  table() {
-    return this.client(TABLE_NAME);
+  messageTable() {
+    return this.client(MESSAGE_TABLE_NAME);
+  }
+
+  conversationTable() {
+    return this.client(CONVERSATION_TABLE_NAME);
   }
 
   async getChatMessages(
@@ -30,7 +38,7 @@ export class ChatStore {
     userRef: string,
     limit?: number,
   ): Promise<Required<Message>[]> {
-    let query = this.table()
+    let query = this.messageTable()
       .where({ conversation_id: conversationId, userRef })
       .select('*')
       .orderBy('created_at', 'asc');
@@ -64,13 +72,58 @@ export class ChatStore {
       created_at: this.client.fn.now(),
     }));
 
-    await this.table().insert(rows);
+    await this.messageTable().insert(rows);
   }
 
   async updateMessage(message: Required<Message>) {
-    await this.table().where({ id: message.id }).update({
+    await this.messageTable().where({ id: message.id }).update({
       role: message.role,
       content: message.content,
+    });
+  }
+
+  async getConversationSize(conversationId: string) {
+    const count = await this.messageTable()
+      .where({ conversation_id: conversationId })
+      .count('* as count')
+      .first();
+
+    return count?.count ? Number(count.count) : 0;
+  }
+
+  async getConversation(
+    conversationId: string,
+    userRef: string,
+  ): Promise<Conversation> {
+    const row = await this.conversationTable()
+      .where({ id: conversationId, userRef })
+      .first();
+
+    if (!row) {
+      throw new Error('Conversation not found');
+    }
+
+    const conversation: Conversation = {
+      id: row.id,
+      title: row.title,
+      userRef: row.userRef,
+    };
+
+    return conversation;
+  }
+
+  async createConversation(conversation: Conversation) {
+    await this.conversationTable().insert({
+      id: conversation.id,
+      title: conversation.title,
+      userRef: conversation.userRef,
+    });
+  }
+
+  async updateConversation(conversation: Conversation) {
+    await this.conversationTable().where({ id: conversation.id }).update({
+      title: conversation.title,
+      userRef: conversation.userRef,
     });
   }
 }

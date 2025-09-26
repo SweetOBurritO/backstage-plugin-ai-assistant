@@ -12,6 +12,7 @@ import { v4 as uuid } from 'uuid';
 import { ChatStore } from '../database/chat-store';
 import { Message } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { SignalsService } from '@backstage/plugin-signals-node';
+import { DEFAULT_SUMMARY_PROMPT } from '../constants/prompts';
 
 export type ChatServiceOptions = {
   models: Model[];
@@ -58,6 +59,7 @@ export const createChatService = async ({
   promptBuilder,
   database,
   signals,
+  config,
 }: ChatServiceOptions): Promise<ChatService> => {
   logger.info(`Available models: ${models.map(m => m.id).join(', ')}`);
 
@@ -103,6 +105,74 @@ export const createChatService = async ({
     }
   };
 
+  const addChatMessage: (typeof chatStore)['addChatMessage'] = async (
+    messages,
+    userRef,
+    conversationId,
+  ) => {
+    const conversationSize = await chatStore.getConversationSize(
+      conversationId,
+    );
+
+    if (conversationSize < 1) {
+      await chatStore.createConversation({
+        id: conversationId,
+        userRef,
+        title: 'New Conversation',
+      });
+
+      await chatStore.addChatMessage(messages, userRef, conversationId);
+      return;
+    }
+
+    const conversation = await chatStore.getConversation(
+      conversationId,
+      userRef,
+    );
+
+    if (conversationSize + messages.length < 5) {
+      await chatStore.addChatMessage(messages, userRef, conversationId);
+      return;
+    }
+
+    if (conversation.title !== 'New Conversation') {
+      await chatStore.addChatMessage(messages, userRef, conversationId);
+      return;
+    }
+
+    const summaryModelId =
+      config.getOptionalString('aiAssistant.conversation.summaryModel') ??
+      models[0].id;
+    const summaryModel = getChatModelById(summaryModelId);
+
+    if (!summaryModel) {
+      throw new Error(`Model with id ${summaryModelId} not found`);
+    }
+
+    const conversationMessages = await chatStore.getChatMessages(
+      conversationId,
+      userRef,
+      5,
+    );
+
+    const summaryPrompt =
+      config.getOptionalString('aiAssistant.conversation.summaryPrompt') ??
+      DEFAULT_SUMMARY_PROMPT;
+
+    const { text } = await summaryModel.invoke([
+      ...conversationMessages,
+      {
+        role: 'system',
+        content: summaryPrompt,
+      },
+    ]);
+
+    conversation.title = text.trim();
+
+    await chatStore.updateConversation(conversation);
+    await chatStore.addChatMessage(messages, userRef, conversationId);
+  };
+
   const prompt: ChatService['prompt'] = async ({
     conversationId,
     messages,
@@ -116,7 +186,9 @@ export const createChatService = async ({
       throw new Error(`Model with id ${modelId} not found`);
     }
 
-    chatStore.addChatMessage(messages, userEntityRef, conversationId);
+    await addChatMessage(messages, userEntityRef, conversationId);
+
+    console.log('after chat messagr add');
 
     const context = await vectorStore.similaritySearch(
       messages
@@ -125,11 +197,15 @@ export const createChatService = async ({
         .join('\n'),
     );
 
+    console.log('after similarity search');
+
     const recentConversationMessages = await chatStore.getChatMessages(
       conversationId,
       userEntityRef,
       10,
     );
+
+    console.log('after get chat messages');
 
     const promptMessages = promptBuilder.buildPrompt(
       [...recentConversationMessages, ...messages],
@@ -144,7 +220,7 @@ export const createChatService = async ({
       content: '',
     };
 
-    await chatStore.addChatMessage([aiMessage], userEntityRef, conversationId);
+    await addChatMessage([aiMessage], userEntityRef, conversationId);
 
     if (stream) {
       streamMessage({
