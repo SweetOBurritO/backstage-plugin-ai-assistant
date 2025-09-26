@@ -188,8 +188,6 @@ export const createChatService = async ({
 
     await addChatMessage(messages, userEntityRef, conversationId);
 
-    console.log('after chat messagr add');
-
     const context = await vectorStore.similaritySearch(
       messages
         .filter(m => m.role === 'user')
@@ -197,15 +195,11 @@ export const createChatService = async ({
         .join('\n'),
     );
 
-    console.log('after similarity search');
-
     const recentConversationMessages = await chatStore.getChatMessages(
       conversationId,
       userEntityRef,
       10,
     );
-
-    console.log('after get chat messages');
 
     const promptMessages = promptBuilder.buildPrompt(
       [...recentConversationMessages, ...messages],
