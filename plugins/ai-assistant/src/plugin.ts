@@ -30,7 +30,7 @@ export const AiAssistantPage = aiAssistantPlugin.provide(
   createRoutableExtension({
     name: 'AiAssistantPage',
     component: () =>
-      import('./components/Conversation').then(m => m.Conversation),
+      import('./components/AiAssistantPage').then(m => m.AiAssistantPage),
     mountPoint: rootRouteRef,
   }),
 );

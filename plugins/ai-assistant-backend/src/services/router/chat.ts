@@ -65,6 +65,17 @@ export async function createChatRouter(
     id: z.string().uuid(),
   });
 
+  router.get('/conversations', async (req, res) => {
+    const credentials = await httpAuth.credentials(req);
+    const { userEntityRef } = await userInfo.getUserInfo(credentials);
+
+    const conversations = await chat.getConversations({
+      userEntityRef,
+    });
+
+    res.json({ conversations });
+  });
+
   router.get('/:id', validation(chatSchema, 'params'), async (req, res) => {
     const { id } = req.params;
 

@@ -1,6 +1,9 @@
 import { createApiRef } from '@backstage/core-plugin-api';
 import { DiscoveryApi, FetchApi } from '@backstage/core-plugin-api';
-import { Message } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
+import {
+  Conversation,
+  Message,
+} from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 
 type SendMessageOptions = {
   conversationId?: string;
@@ -16,6 +19,7 @@ export type ChatApi = {
     messages: Message[];
     conversationId: string;
   }>;
+  getConversations: () => Promise<Conversation[]>;
 };
 
 type ChatApiOptions = {
@@ -78,5 +82,17 @@ export const createChatService = ({
     };
   };
 
-  return { getModels, getConversation, sendMessage };
+  const getConversations: ChatApi['getConversations'] = async () => {
+    const assistantBaseUrl = await discoveryApi.getBaseUrl('ai-assistant');
+
+    const response = await fetchApi.fetch(
+      `${assistantBaseUrl}/chat/conversations`,
+    );
+
+    const data = await response.json();
+
+    return data.conversations as Conversation[];
+  };
+
+  return { getModels, getConversation, sendMessage, getConversations };
 };
