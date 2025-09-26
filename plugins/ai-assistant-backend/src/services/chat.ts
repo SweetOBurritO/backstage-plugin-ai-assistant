@@ -10,7 +10,10 @@ import {
 import { PromptBuilder } from './prompt';
 import { v4 as uuid } from 'uuid';
 import { ChatStore } from '../database/chat-store';
-import { Message } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
+import {
+  Conversation,
+  Message,
+} from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { SignalsService } from '@backstage/plugin-signals-node';
 import { DEFAULT_SUMMARY_PROMPT } from '../constants/prompts';
 
@@ -44,12 +47,19 @@ type GetConversationOptions = {
   userEntityRef: string;
 };
 
+type GetConversationsOptions = {
+  userEntityRef: string;
+};
+
 export type ChatService = {
   prompt: (options: PromptOptions) => Promise<Required<Message>[]>;
   getAvailableModels: () => Promise<string[]>;
   getConversation: (
     options: GetConversationOptions,
   ) => Promise<Required<Message>[]>;
+  getConversations: (
+    options: GetConversationsOptions,
+  ) => Promise<Conversation[]>;
 };
 
 export const createChatService = async ({
@@ -252,9 +262,17 @@ export const createChatService = async ({
     return conversation;
   };
 
+  const getConversations: ChatService['getConversations'] = async ({
+    userEntityRef,
+  }: GetConversationsOptions) => {
+    const conversations = await chatStore.getConversations(userEntityRef);
+
+    return conversations;
+  };
   return {
     prompt,
     getAvailableModels,
     getConversation,
+    getConversations,
   };
 };

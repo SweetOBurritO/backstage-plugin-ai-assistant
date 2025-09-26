@@ -17,17 +17,21 @@ import Button from '@mui/material/Button';
 import { Message } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { MessageCard } from '../MessageCard';
 
-export const Conversation = () => {
+type ConversationOptions = {
+  conversationId: string | undefined;
+  setConversationId: (id: string) => void;
+};
+
+export const Conversation = ({
+  conversationId,
+  setConversationId,
+}: ConversationOptions) => {
   const chatApi = useApi(chatApiRef);
   const errorApi = useApi(errorApiRef);
   const signalApi = useApi(signalApiRef);
 
   const [input, setInput] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const [conversationId, setConversationId] = useLocalStorage<
-    string | undefined
-  >('conversationId', undefined);
 
   const [modelId, setModelId] = useLocalStorage<string | undefined>(
     'modelId',
@@ -132,7 +136,11 @@ export const Conversation = () => {
     ]);
 
   useEffect(() => {
-    if (!messageResponse || conversationId === messageResponse.conversationId) {
+    if (
+      !messageResponse ||
+      !conversationId ||
+      conversationId === messageResponse.conversationId
+    ) {
       return;
     }
 
@@ -158,8 +166,9 @@ export const Conversation = () => {
       padding={2}
       spacing={2}
       flex={1}
-      height="100vh"
       boxSizing="border-box"
+      height="100%"
+      minHeight={0}
     >
       <Stack direction="row" spacing={2} alignItems="center">
         <Autocomplete

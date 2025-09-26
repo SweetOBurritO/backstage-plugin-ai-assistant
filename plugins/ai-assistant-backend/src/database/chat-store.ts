@@ -126,4 +126,19 @@ export class ChatStore {
       userRef: conversation.userRef,
     });
   }
+
+  async getConversations(userRef: string): Promise<Conversation[]> {
+    const rows = await this.conversationTable()
+      .where({ userRef })
+      .select('*')
+      .orderBy('created_at', 'desc');
+
+    const conversations: Conversation[] = rows.map(row => ({
+      id: row.id,
+      title: row.title,
+      userRef: row.userRef,
+    }));
+
+    return conversations;
+  }
 }
