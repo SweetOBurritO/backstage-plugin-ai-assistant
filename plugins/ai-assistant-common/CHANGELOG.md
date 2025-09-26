@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-common
 
+## 0.3.0
+
+### Minor Changes
+
+- 388531c: Added ability for conversations to be summarized and the summary set as a conversation title
+
 ## 0.2.2
 
 ### Patch Changes

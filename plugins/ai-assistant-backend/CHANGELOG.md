@@ -1,5 +1,17 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend
 
+## 0.5.0
+
+### Minor Changes
+
+- 2c2e6b4: Added conversation switching
+- 388531c: Added ability for conversations to be summarized and the summary set as a conversation title
+
+### Patch Changes
+
+- Updated dependencies [388531c]
+  - @sweetoburrito/backstage-plugin-ai-assistant-common@0.3.0
+
 ## 0.4.3
 
 ### Patch Changes

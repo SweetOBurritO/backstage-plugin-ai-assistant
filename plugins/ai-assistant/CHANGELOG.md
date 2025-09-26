@@ -1,5 +1,16 @@
 # @sweetoburrito/backstage-plugin-ai-assistant
 
+## 0.4.0
+
+### Minor Changes
+
+- 2c2e6b4: Added conversation switching
+
+### Patch Changes
+
+- Updated dependencies [388531c]
+  - @sweetoburrito/backstage-plugin-ai-assistant-common@0.3.0
+
 ## 0.3.2
 
 ### Patch Changes
