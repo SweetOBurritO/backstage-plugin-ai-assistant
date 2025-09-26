@@ -96,7 +96,7 @@ export const AiAssistantPage = () => {
               >
                 <ListItemButton
                   sx={{
-                    justifyContent: 'start !important',
+                    justifyContent: 'flex-start !important',
                     padding: `${theme.spacing(1)} !important`,
                     borderRadius: `${theme.spacing(1)} !important`,
                     backgroundColor:
