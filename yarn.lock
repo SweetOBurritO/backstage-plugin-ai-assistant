@@ -8126,6 +8126,16 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-azure-devops@workspace:plugins/ai-assistant-backend-module-ingestor-azure-devops":
+  version: 0.0.0-use.local
+  resolution: "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-azure-devops@workspace:plugins/ai-assistant-backend-module-ingestor-azure-devops"
+  dependencies:
+    "@backstage/backend-plugin-api": "npm:^1.4.1"
+    "@backstage/backend-test-utils": "npm:^1.7.0"
+    "@backstage/cli": "npm:^0.33.1"
+  languageName: unknown
+  linkType: soft
+
 "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-catalog@workspace:^, @sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-catalog@workspace:plugins/ai-assistant-backend-module-ingestor-catalog":
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-catalog@workspace:plugins/ai-assistant-backend-module-ingestor-catalog"
