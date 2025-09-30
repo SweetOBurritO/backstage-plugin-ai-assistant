@@ -2,15 +2,23 @@ import {
   coreServices,
   createBackendModule,
 } from '@backstage/backend-plugin-api';
+import { createAzureDevOpsIngestor } from './services/ingestor';
+import { dataIngestorExtensionPoint } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
 
 export const aiAssistantModuleIngestorAzureDevops = createBackendModule({
   pluginId: 'ai-assistant',
   moduleId: 'ingestor-azure-devops',
   register(reg) {
     reg.registerInit({
-      deps: { logger: coreServices.logger },
-      async init({ logger }) {
-        logger.info('Hello World!');
+      deps: {
+        dataIngestor: dataIngestorExtensionPoint,
+        config: coreServices.rootConfig,
+        logger: coreServices.logger,
+      },
+      async init({ config, logger, dataIngestor }) {
+        dataIngestor.registerIngestor(
+          await createAzureDevOpsIngestor({ config, logger }),
+        );
       },
     });
   },

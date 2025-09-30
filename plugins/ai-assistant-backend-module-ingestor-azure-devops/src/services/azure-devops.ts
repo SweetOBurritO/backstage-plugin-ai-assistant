@@ -88,5 +88,5 @@ export const createAzureDevOpsService = ({
     return itemContent;
   };
 
-  return { getRepos, getRepoItems, getRepoItemContent };
+  return { organization, project, getRepos, getRepoItems, getRepoItemContent };
 };
