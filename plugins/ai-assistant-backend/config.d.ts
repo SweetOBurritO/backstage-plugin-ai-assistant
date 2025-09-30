@@ -28,5 +28,17 @@ export interface Config {
     ingestion?: {
       schedule?: SchedulerServiceTaskScheduleDefinitionConfig;
     };
+    ingestors?: {
+      azureDevOps?: {
+        organization: string;
+        project: string;
+        token: string;
+        fileTypes?: string[];
+        repositories?: {
+          name: string;
+          fileTypes?: string[];
+        }[];
+      };
+    };
   };
 }
