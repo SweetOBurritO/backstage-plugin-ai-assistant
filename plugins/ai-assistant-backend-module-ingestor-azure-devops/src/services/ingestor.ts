@@ -19,8 +19,10 @@ export const createAzureDevOpsIngestor = async ({
   config: RootConfigService;
   logger: LoggerService;
 }): Promise<Ingestor> => {
+  // Default to common file types if none are specified
   const defaultFileTypes = ['.md', '.json'];
 
+  // Get configuration values
   const repositoriesFilter: AzureDevOpsIngestorConfig['repositories'] =
     config.get('aiAssistant.ingestors.azureDevOps.repositories');
 
@@ -29,8 +31,10 @@ export const createAzureDevOpsIngestor = async ({
       'aiAssistant.ingestors.azureDevOps.fileTypes',
     ) ?? defaultFileTypes;
 
+  // Create Azure DevOps service
   const adoService = await createAzureDevOpsService({ config, logger });
 
+  /** Ingest Azure DevOps repositories in batches */
   const ingestAzureDevOpsBatch = async (
     saveDocumentsBatch: IngestorOptions['saveDocumentsBatch'],
   ) => {
@@ -41,6 +45,7 @@ export const createAzureDevOpsIngestor = async ({
       return;
     }
 
+    // Filter repositories if a filter is provided in the config
     const repositoriesToIngest = repositoriesFilter
       ? repositoriesList.filter(repo =>
           repositoriesFilter?.some(
@@ -50,6 +55,7 @@ export const createAzureDevOpsIngestor = async ({
         )
       : repositoriesList;
 
+    // Get items from each repository and create documents to be embedded
     for (const repo of repositoriesToIngest) {
       logger.info(
         `Beginning ingestion for repository: ${repo.name} (${repo.id})`,
@@ -67,14 +73,28 @@ export const createAzureDevOpsIngestor = async ({
         }: [${repositoryFileTypesFilter.join(', ')}]`,
       );
 
-      // Get the items in the repository
+      // Get the items to be ingested from the repository based on the file types filter
       const items = await adoService.getRepoItems(
         repo.id!,
         repositoryFileTypesFilter,
       );
 
+      if (items.length === 0) {
+        logger.warn(
+          `No items found for ingestion in the Azure DevOps repository ${
+            repo.name
+          } (${
+            repo.id
+          }) with the specified file types filter: [${repositoryFileTypesFilter.join(
+            ', ',
+          )}]`,
+        );
+        continue;
+      }
+
       logger.debug(`Items: ${JSON.stringify(items, null, 2)}`);
 
+      // Generate embedding documents for each item
       const documents: EmbeddingDocument[] = [];
 
       for (const item of items) {
@@ -101,6 +121,7 @@ export const createAzureDevOpsIngestor = async ({
         documents.push(document);
       }
 
+      // Save the documents in batches
       await saveDocumentsBatch(documents);
 
       logger.info(
