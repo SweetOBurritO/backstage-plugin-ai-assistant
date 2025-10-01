@@ -5,12 +5,12 @@ import {
 import { streamToString } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { createAzureDevOpsService } from './azure-devops';
 import {
-  AzureDevOpsIngestorConfig,
   EmbeddingDocument,
   Ingestor,
   IngestorOptions,
 } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
 import { MODULE_ID } from '../constants/module';
+import { Config } from '../../config';
 
 export const createAzureDevOpsIngestor = async ({
   config,
@@ -24,7 +24,7 @@ export const createAzureDevOpsIngestor = async ({
 
   // Get configuration values
   const repositoriesFilter = config.getOptional<
-    AzureDevOpsIngestorConfig['repositories']
+    Config['aiAssistant']['ingestors']['azureDevOps']['repositories']
   >('aiAssistant.ingestors.azureDevOps.repositories');
 
   const fileTypes =

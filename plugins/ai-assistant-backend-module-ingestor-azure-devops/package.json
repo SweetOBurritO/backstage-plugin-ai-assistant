@@ -34,6 +34,7 @@
     "@backstage/cli": "^0.33.1"
   },
   "files": [
-    "dist"
+    "dist",
+    "config.d.ts"
   ]
 }
