@@ -12,12 +12,14 @@ export const createAzureDevOpsService = ({
   config: RootConfigService;
   logger: LoggerService;
 }) => {
+  // Get configuration values
   const organization = config.getString(
     'aiAssistant.ingestors.azureDevOps.organization',
   );
   const project = config.getString('aiAssistant.ingestors.azureDevOps.project');
   const token = config.getString('aiAssistant.ingestors.azureDevOps.token');
 
+  // Construct organization URL
   const orgUrl = `https://dev.azure.com/${organization}`;
 
   logger.info(
@@ -30,10 +32,15 @@ export const createAzureDevOpsService = ({
     );
   }
 
+  // Create authentication handler and connection
   const authHandler = getPersonalAccessTokenHandler(token);
 
   const connection = new WebApi(orgUrl, authHandler);
 
+  /**
+   * Get a list of repositories in the specified Azure DevOps project
+   * @returns List of repositories in the specified Azure DevOps project
+   */
   const getRepos = async () => {
     const gitApi = await connection.getGitApi();
 
@@ -44,6 +51,12 @@ export const createAzureDevOpsService = ({
     return repos;
   };
 
+  /**
+   * Get a list of items in the specified Azure DevOps repository
+   * @param repoId The ID of the repository
+   * @param fileTypes Optional list of file types to filter by
+   * @returns List of items in the specified Azure DevOps repository
+   */
   const getRepoItems = async (repoId: string, fileTypes?: string[]) => {
     const gitApi = await connection.getGitApi();
 
@@ -74,6 +87,12 @@ export const createAzureDevOpsService = ({
     return items;
   };
 
+  /**
+   * Get the content of a specific item in an Azure DevOps repository
+   * @param repoId The ID of the repository
+   * @param path The path of the item
+   * @returns The content of the item
+   */
   const getRepoItemContent = async (repoId: string, path: string) => {
     const gitApi = await connection.getGitApi();
 
