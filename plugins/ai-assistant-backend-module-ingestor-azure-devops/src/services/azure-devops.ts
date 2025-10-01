@@ -5,7 +5,7 @@ import {
 import { getPersonalAccessTokenHandler, WebApi } from 'azure-devops-node-api';
 import { VersionControlRecursionType } from 'azure-devops-node-api/interfaces/GitInterfaces';
 
-export const createAzureDevOpsService = ({
+export const createAzureDevOpsService = async ({
   config,
   logger,
 }: {
@@ -37,13 +37,14 @@ export const createAzureDevOpsService = ({
 
   const connection = new WebApi(orgUrl, authHandler);
 
+  // Get Git API for repository operations
+  const gitApi = await connection.getGitApi();
+
   /**
    * Get a list of repositories in the specified Azure DevOps project
    * @returns List of repositories in the specified Azure DevOps project
    */
   const getRepos = async () => {
-    const gitApi = await connection.getGitApi();
-
     const repos = await gitApi.getRepositories(project);
 
     logger.info(`Found ${repos.length} repositories in project ${project}`);
@@ -58,8 +59,6 @@ export const createAzureDevOpsService = ({
    * @returns List of items in the specified Azure DevOps repository
    */
   const getRepoItems = async (repoId: string, fileTypes?: string[]) => {
-    const gitApi = await connection.getGitApi();
-
     const items = await gitApi.getItems(
       repoId,
       project,
@@ -94,8 +93,6 @@ export const createAzureDevOpsService = ({
    * @returns The content of the item
    */
   const getRepoItemContent = async (repoId: string, path: string) => {
-    const gitApi = await connection.getGitApi();
-
     const itemContent = await gitApi.getItemContent(
       repoId,
       path,
