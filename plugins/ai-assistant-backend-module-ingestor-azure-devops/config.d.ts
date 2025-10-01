@@ -20,6 +20,11 @@ export interface Config {
          */
         token: string;
         /**
+         * The types of resources to ingest from Azure DevOps
+         * Currently supports 'repository' and 'wiki' resources
+         */
+        resourceTypes: ('repository' | 'wiki')[];
+        /**
          * Optional list of file types to ingest (e.g., .md, .json). Defaults to .md and .json if not specified.
          */
         fileTypes?: string[];
@@ -33,6 +38,20 @@ export interface Config {
           name: string;
           /**
            * Optional list of file types to ingest for this repository. Overrides the global fileTypes setting for this repository only.
+           */
+          fileTypes?: string[];
+        }[];
+
+        /**
+         * Optional list of wikis to ingest. If not specified, all wikis in the project will be ingested.
+         */
+        wikis?: {
+          /**
+           * The name of the wiki to ingest
+           */
+          name: string;
+          /**
+           * Optional list of file types to ingest for this wiki. Overrides the global fileTypes setting for this wiki only.
            */
           fileTypes?: string[];
         }[];
