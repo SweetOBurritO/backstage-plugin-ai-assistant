@@ -8130,9 +8130,18 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-azure-devops@workspace:plugins/ai-assistant-backend-module-ingestor-azure-devops"
   dependencies:
+    "@backstage/backend-defaults": "backstage:^"
     "@backstage/backend-plugin-api": "npm:^1.4.1"
     "@backstage/backend-test-utils": "npm:^1.7.0"
     "@backstage/cli": "npm:^0.33.1"
+    "@backstage/plugin-auth-backend": "backstage:^"
+    "@backstage/plugin-auth-backend-module-guest-provider": "backstage:^"
+    "@backstage/plugin-catalog-backend": "backstage:^"
+    "@backstage/plugin-events-backend": "backstage:^"
+    "@backstage/plugin-signals-backend": "backstage:^"
+    "@sweetoburrito/backstage-plugin-ai-assistant-backend": "workspace:^"
+    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-azure-open-ai": "workspace:^"
+    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai": "workspace:^"
     "@sweetoburrito/backstage-plugin-ai-assistant-common": "workspace:^"
     "@sweetoburrito/backstage-plugin-ai-assistant-node": "workspace:^"
     azure-devops-node-api: "npm:^15.1.1"
@@ -8182,7 +8191,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@sweetoburrito/backstage-plugin-ai-assistant-backend@workspace:plugins/ai-assistant-backend":
+"@sweetoburrito/backstage-plugin-ai-assistant-backend@workspace:^, @sweetoburrito/backstage-plugin-ai-assistant-backend@workspace:plugins/ai-assistant-backend":
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-backend@workspace:plugins/ai-assistant-backend"
   dependencies:
