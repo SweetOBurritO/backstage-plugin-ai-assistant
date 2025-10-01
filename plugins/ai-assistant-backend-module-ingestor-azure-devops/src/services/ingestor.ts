@@ -2,7 +2,7 @@ import {
   LoggerService,
   RootConfigService,
 } from '@backstage/backend-plugin-api';
-import { streamToString } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
+import { streamToString } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
 import { createAzureDevOpsService } from './azure-devops';
 import {
   EmbeddingDocument,
