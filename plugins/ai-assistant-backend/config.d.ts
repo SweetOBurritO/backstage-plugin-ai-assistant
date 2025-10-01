@@ -1,6 +1,5 @@
 import { HumanDuration } from '@backstage/types';
 import { SchedulerServiceTaskScheduleDefinitionConfig } from '@backstage/backend-plugin-api';
-import { AzureDevOpsIngestorConfig } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
 
 export interface Config {
   aiAssistant: {
