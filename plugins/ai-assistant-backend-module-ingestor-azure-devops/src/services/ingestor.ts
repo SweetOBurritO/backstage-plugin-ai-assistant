@@ -46,6 +46,12 @@ export const createAzureDevOpsIngestor = async ({
       return;
     }
 
+    logger.info(
+      `Filtering for repositories: ${repositoriesFilter
+        ?.map(repo => repo.name)
+        .join(', ')}`,
+    );
+
     // Filter repositories if a filter is provided in the config
     const repositoriesToIngest = repositoriesFilter
       ? repositoriesList.filter(repo =>
@@ -55,6 +61,17 @@ export const createAzureDevOpsIngestor = async ({
           ),
         )
       : repositoriesList;
+
+    if (repositoriesToIngest.length === 0) {
+      logger.warn(
+        'No repositories found for ingestion after applying the filter',
+      );
+      return;
+    }
+
+    logger.info(
+      `Ingesting ${repositoriesToIngest.length} repositories from Azure DevOps`,
+    );
 
     // Get items from each repository and create documents to be embedded
     for (const repo of repositoriesToIngest) {

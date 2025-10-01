@@ -37,6 +37,10 @@ export const createAzureDevOpsService = async ({
 
   const connection = new WebApi(orgUrl, authHandler);
 
+  logger.info(
+    `Connected to Azure DevOps organization: ${organization}, project: ${project}`,
+  );
+
   // Get Git API for repository operations
   const gitApi = await connection.getGitApi();
 
