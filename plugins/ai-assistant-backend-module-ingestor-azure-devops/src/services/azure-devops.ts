@@ -2,8 +2,11 @@ import {
   LoggerService,
   RootConfigService,
 } from '@backstage/backend-plugin-api';
+import { streamToString } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
 import { getPersonalAccessTokenHandler, WebApi } from 'azure-devops-node-api';
 import { VersionControlRecursionType } from 'azure-devops-node-api/interfaces/GitInterfaces';
+import { WikiPage } from 'azure-devops-node-api/interfaces/WikiInterfaces';
+import { flattenWikiPages } from '../utils/flatten-wiki-pages';
 
 export type AzureDevOpsService = Awaited<
   ReturnType<typeof createAzureDevOpsService>
@@ -47,6 +50,9 @@ export const createAzureDevOpsService = async ({
 
   // Get Git API for repository operations
   const gitApi = await connection.getGitApi();
+
+  // Get Wiki API for wiki operations
+  const wikiApi = await connection.getWikiApi();
 
   /**
    * Get a list of repositories in the specified Azure DevOps project
@@ -112,5 +118,66 @@ export const createAzureDevOpsService = async ({
     return itemContent;
   };
 
-  return { organization, project, getRepos, getRepoItems, getRepoItemContent };
+  /* Gets all wikis in the specified Azure DevOps project */
+  const getWikis = async () => {
+    const wikis = await wikiApi.getAllWikis(project);
+    logger.info(`Found ${wikis.length} wikis in project ${project}`);
+    return wikis;
+  };
+
+  /**
+   * Retrieves all pages and subpages in a specific Azure DevOps wiki and flattens them into a single list
+   * @param wikiName The name of the wiki to get pages from
+   * @returns A list of all pages in the specified wiki
+   */
+  const getWikiPages = async (wikiName: string) => {
+    const pagesStream = await wikiApi.getPageText(
+      project,
+      wikiName,
+      undefined,
+      VersionControlRecursionType.Full,
+    );
+
+    const rootPage = JSON.parse(await streamToString(pagesStream)) as WikiPage;
+
+    // Flatten all pages including subpages into a single array
+    const allPages = flattenWikiPages(rootPage);
+
+    logger.info(
+      `Found ${allPages.length} pages in Azure DevOps wiki: ${wikiName}`,
+    );
+
+    return allPages;
+  };
+
+  /**
+   * Get the content of a specific page in an Azure DevOps wiki
+   * @param wikiName The name of the wiki
+   * @param pageId The ID of the page
+   * @returns The content of the specified wiki page
+   */
+  const getWikiPageContent = async (wikiName: string, pageId: number) => {
+    const pageStream = await wikiApi.getPageByIdText(
+      project,
+      wikiName,
+      pageId,
+      VersionControlRecursionType.None,
+      true,
+    );
+
+    const pageContent = await streamToString(pageStream);
+
+    return pageContent;
+  };
+
+  return {
+    organization,
+    project,
+    getRepos,
+    getRepoItems,
+    getRepoItemContent,
+    getWikis,
+    getWikiPages,
+    getWikiPageContent,
+  };
 };
