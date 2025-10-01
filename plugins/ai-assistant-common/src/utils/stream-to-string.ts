@@ -5,9 +5,13 @@ export async function streamToString(
     return '';
   }
   return new Promise((resolve, reject) => {
-    const chunks: Uint8Array[] = [];
+    const chunks: Buffer[] = [];
     readableStream.on('data', chunk => {
-      chunks.push(chunk);
+      if (typeof chunk === 'string') {
+        chunks.push(Buffer.from(chunk, 'utf-8'));
+      } else {
+        chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+      }
     });
     readableStream.on('end', () => {
       resolve(Buffer.concat(chunks).toString('utf-8'));
