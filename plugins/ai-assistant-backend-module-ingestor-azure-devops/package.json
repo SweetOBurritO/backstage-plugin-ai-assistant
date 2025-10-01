@@ -30,17 +30,8 @@
     "azure-devops-node-api": "^15.1.1"
   },
   "devDependencies": {
-    "@backstage/backend-defaults": "backstage:^",
     "@backstage/backend-test-utils": "^1.7.0",
-    "@backstage/cli": "^0.33.1",
-    "@backstage/plugin-auth-backend": "backstage:^",
-    "@backstage/plugin-auth-backend-module-guest-provider": "backstage:^",
-    "@backstage/plugin-catalog-backend": "backstage:^",
-    "@backstage/plugin-events-backend": "backstage:^",
-    "@backstage/plugin-signals-backend": "backstage:^",
-    "@sweetoburrito/backstage-plugin-ai-assistant-backend": "workspace:^",
-    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-azure-open-ai": "workspace:^",
-    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai": "workspace:^"
+    "@backstage/cli": "^0.33.1"
   },
   "files": [
     "dist"
