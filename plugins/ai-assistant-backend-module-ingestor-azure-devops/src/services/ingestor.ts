@@ -23,8 +23,9 @@ export const createAzureDevOpsIngestor = async ({
   const defaultFileTypes = ['.md', '.json'];
 
   // Get configuration values
-  const repositoriesFilter: AzureDevOpsIngestorConfig['repositories'] =
-    config.get('aiAssistant.ingestors.azureDevOps.repositories');
+  const repositoriesFilter = config.getOptional<
+    AzureDevOpsIngestorConfig['repositories']
+  >('aiAssistant.ingestors.azureDevOps.repositories');
 
   const fileTypes =
     config.getOptionalStringArray(
