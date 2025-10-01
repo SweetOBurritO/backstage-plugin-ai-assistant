@@ -5,6 +5,10 @@ import {
 import { getPersonalAccessTokenHandler, WebApi } from 'azure-devops-node-api';
 import { VersionControlRecursionType } from 'azure-devops-node-api/interfaces/GitInterfaces';
 
+export type AzureDevOpsService = Awaited<
+  ReturnType<typeof createAzureDevOpsService>
+>;
+
 export const createAzureDevOpsService = async ({
   config,
   logger,
