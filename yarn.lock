@@ -8126,7 +8126,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-azure-devops@workspace:plugins/ai-assistant-backend-module-ingestor-azure-devops":
+"@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-azure-devops@workspace:^, @sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-azure-devops@workspace:plugins/ai-assistant-backend-module-ingestor-azure-devops":
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-azure-devops@workspace:plugins/ai-assistant-backend-module-ingestor-azure-devops"
   dependencies:
@@ -8203,6 +8203,7 @@ __metadata:
     "@langchain/textsplitters": "npm:^0.1.0"
     "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-azure-open-ai": "workspace:^"
     "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-ollama": "workspace:^"
+    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-azure-devops": "workspace:^"
     "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-catalog": "workspace:^"
     "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai": "workspace:^"
     "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama": "workspace:^"

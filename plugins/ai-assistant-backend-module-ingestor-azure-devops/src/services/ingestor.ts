@@ -4,8 +4,8 @@ import {
 } from '@backstage/backend-plugin-api';
 import { streamToString } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { createAzureDevOpsService } from './azure-devops';
-import { Config } from '@sweetoburrito/backstage-plugin-ai-assistant-backend/config';
 import {
+  AzureDevOpsIngestorConfig,
   EmbeddingDocument,
   Ingestor,
   IngestorOptions,
@@ -21,7 +21,7 @@ export const createAzureDevOpsIngestor = async ({
 }): Promise<Ingestor> => {
   const defaultFileTypes = ['.md', '.json'];
 
-  const repositoriesFilter: Config['aiAssistant']['ingestors']['azureDevOps']['repositories'] =
+  const repositoriesFilter: AzureDevOpsIngestorConfig['repositories'] =
     config.get('aiAssistant.ingestors.azureDevOps.repositories');
 
   const fileTypes =
@@ -43,7 +43,7 @@ export const createAzureDevOpsIngestor = async ({
 
     const repositoriesToIngest = repositoriesFilter
       ? repositoriesList.filter(repo =>
-          repositoriesFilter.some(
+          repositoriesFilter?.some(
             filteredRepo =>
               filteredRepo.name.toLowerCase() === repo.name!.toLowerCase(),
           ),
@@ -57,8 +57,8 @@ export const createAzureDevOpsIngestor = async ({
 
       // Determine the file types to use for this repository or use default
       const repositoryFileTypesFilter =
-        repositoriesFilter.find(
-          r => r.name.toLowerCase() === repo.name.toLowerCase(),
+        repositoriesFilter?.find(
+          r => r.name.toLowerCase() === repo.name!.toLowerCase(),
         )?.fileTypes ?? fileTypes;
 
       logger.info(
