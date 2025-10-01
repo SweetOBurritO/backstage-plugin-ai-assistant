@@ -8133,8 +8133,8 @@ __metadata:
     "@backstage/backend-plugin-api": "npm:^1.4.1"
     "@backstage/backend-test-utils": "npm:^1.7.0"
     "@backstage/cli": "npm:^0.33.1"
-    "@sweetoburrito/backstage-plugin-ai-assistant-common": "workspace:^"
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "workspace:^"
+    "@sweetoburrito/backstage-plugin-ai-assistant-common": "npm:^0.3.0"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.3.2"
     azure-devops-node-api: "npm:^15.1.1"
   languageName: unknown
   linkType: soft
@@ -8220,7 +8220,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@sweetoburrito/backstage-plugin-ai-assistant-common@npm:^0.3.0, @sweetoburrito/backstage-plugin-ai-assistant-common@workspace:^, @sweetoburrito/backstage-plugin-ai-assistant-common@workspace:plugins/ai-assistant-common":
+"@sweetoburrito/backstage-plugin-ai-assistant-common@npm:^0.3.0, @sweetoburrito/backstage-plugin-ai-assistant-common@workspace:plugins/ai-assistant-common":
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-common@workspace:plugins/ai-assistant-common"
   dependencies:
@@ -8228,7 +8228,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@sweetoburrito/backstage-plugin-ai-assistant-node@npm:^0.3.2, @sweetoburrito/backstage-plugin-ai-assistant-node@workspace:^, @sweetoburrito/backstage-plugin-ai-assistant-node@workspace:plugins/ai-assistant-node":
+"@sweetoburrito/backstage-plugin-ai-assistant-node@npm:^0.3.2, @sweetoburrito/backstage-plugin-ai-assistant-node@workspace:plugins/ai-assistant-node":
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-node@workspace:plugins/ai-assistant-node"
   dependencies:

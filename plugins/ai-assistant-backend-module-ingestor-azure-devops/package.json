@@ -25,8 +25,8 @@
   },
   "dependencies": {
     "@backstage/backend-plugin-api": "^1.4.1",
-    "@sweetoburrito/backstage-plugin-ai-assistant-common": "workspace:^",
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "workspace:^",
+    "@sweetoburrito/backstage-plugin-ai-assistant-common": "^0.3.0",
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "^0.3.2",
     "azure-devops-node-api": "^15.1.1"
   },
   "devDependencies": {
