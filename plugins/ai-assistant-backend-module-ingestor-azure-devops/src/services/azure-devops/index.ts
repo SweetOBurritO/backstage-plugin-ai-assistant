@@ -6,7 +6,7 @@ import { streamToString } from '@sweetoburrito/backstage-plugin-ai-assistant-nod
 import { getPersonalAccessTokenHandler, WebApi } from 'azure-devops-node-api';
 import { VersionControlRecursionType } from 'azure-devops-node-api/interfaces/GitInterfaces';
 import { WikiPage } from 'azure-devops-node-api/interfaces/WikiInterfaces';
-import { flattenWikiPages } from '../utils/flatten-wiki-pages';
+import { flattenWikiPages } from '../../utils/flatten-wiki-pages';
 
 export type AzureDevOpsService = Awaited<
   ReturnType<typeof createAzureDevOpsService>

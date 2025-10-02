@@ -2,12 +2,12 @@ import {
   LoggerService,
   RootConfigService,
 } from '@backstage/backend-plugin-api';
-import { createAzureDevOpsService } from './azure-devops';
+import { createAzureDevOpsService } from '../azure-devops';
 import { Ingestor } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
-import { MODULE_ID } from '../constants/module';
-import { createRepositoryIngestor } from './ingestor/repository';
-import { createWikiIngestor } from './ingestor/wiki';
-import { Config } from '../../config';
+import { MODULE_ID } from '../../constants/module';
+import { createRepositoryIngestor } from './repository';
+import { createWikiIngestor } from './wiki';
+import { Config } from '../../../config';
 
 export const createAzureDevOpsIngestor = async ({
   config,
