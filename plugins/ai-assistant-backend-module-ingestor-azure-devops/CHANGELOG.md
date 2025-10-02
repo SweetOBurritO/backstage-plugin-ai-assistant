@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-azure-devops
 
+## 0.2.1
+
+### Patch Changes
+
+- dc492ea: fix package config
+
 ## 0.2.0
 
 ### Minor Changes
