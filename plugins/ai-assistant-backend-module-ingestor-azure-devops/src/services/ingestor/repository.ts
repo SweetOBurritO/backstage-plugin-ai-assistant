@@ -2,7 +2,7 @@ import {
   LoggerService,
   RootConfigService,
 } from '@backstage/backend-plugin-api';
-import { defaultFileTypes } from '../../constants/default-file-types';
+import { DEFAULT_FILE_TYPES } from '../../constants/default-file-types';
 import {
   EmbeddingDocument,
   IngestorOptions,
@@ -33,7 +33,7 @@ export const createRepositoryIngestor = async ({
   const fileTypes =
     config.getOptionalStringArray(
       'aiAssistant.ingestors.azureDevOps.fileTypes',
-    ) ?? defaultFileTypes;
+    ) ?? DEFAULT_FILE_TYPES;
 
   /** Ingest Azure DevOps repositories in batches */
   const ingestRepositoriesBatch = async (

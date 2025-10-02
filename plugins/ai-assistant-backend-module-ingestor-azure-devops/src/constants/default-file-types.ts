@@ -1,1 +1,1 @@
-export const defaultFileTypes = ['.md', '.json'];
+export const DEFAULT_FILE_TYPES = ['.md', '.json'];

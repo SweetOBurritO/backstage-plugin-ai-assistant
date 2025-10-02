@@ -55,6 +55,12 @@ export interface Config {
            */
           fileTypes?: string[];
         }[];
+
+        /**
+         * Optional batch size for processing wiki pages. Defaults to 50 pages per batch.
+         * Lower values use less memory but may be slower, higher values are faster but use more memory.
+         */
+        pagesBatchSize?: number;
       };
     };
   };
