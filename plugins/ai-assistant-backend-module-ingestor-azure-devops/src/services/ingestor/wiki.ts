@@ -12,6 +12,10 @@ import { Config } from '../../../config';
 import { MODULE_ID } from '../../constants/module';
 import { getProgressStats } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { DEFAULT_WIKI_PAGE_BATCH_SIZE } from '../../constants/default-wiki-page-batch-size';
+import {
+  WikiPage,
+  WikiV2,
+} from 'azure-devops-node-api/interfaces/WikiInterfaces';
 
 type WikiIngestorOptions = {
   config: RootConfigService;
@@ -34,6 +38,94 @@ export const createWikiIngestor = async ({
     config.getOptionalNumber(
       'aiAssistant.ingestors.azureDevOps.pagesBatchSize',
     ) ?? DEFAULT_WIKI_PAGE_BATCH_SIZE;
+
+  /** Ingest Azure DevOps wiki pages in batches
+   * @param wiki - The wiki to ingest pages from
+   * @param pages - The list of pages to ingest from the wiki
+   * @param saveDocumentsBatch - Function to save a batch of embedding documents
+   * @returns Total number of documents ingested and sent for embedding from the wiki
+   */
+  const ingestWikiByPageBatch = async ({
+    wiki,
+    pages,
+    saveDocumentsBatch,
+  }: {
+    wiki: WikiV2;
+    pages: WikiPage[];
+    saveDocumentsBatch: IngestorOptions['saveDocumentsBatch'];
+  }) => {
+    logger.info(
+      `Processing ${pages.length} pages from wiki "${wiki.name}" in batches of ${pagesBatchSize}`,
+    );
+
+    let totalDocumentsIngested = 0;
+
+    // Process pages in batches to manage memory and performance
+
+    // Calculate total number of batches
+    const totalBatches = Math.ceil(pages.length / pagesBatchSize);
+
+    // Process each batch
+    for (
+      let batchStart = 0;
+      batchStart < pages.length;
+      batchStart += pagesBatchSize
+    ) {
+      const batchEnd = Math.min(batchStart + pagesBatchSize, pages.length);
+      const pagesBatch = pages.slice(batchStart, batchEnd);
+      const batchNumber = Math.floor(batchStart / pagesBatchSize) + 1;
+
+      logger.info(
+        `Processing batch ${batchNumber}/${totalBatches} (${pagesBatch.length} pages) for wiki "${wiki.name}"`,
+      );
+
+      // Generate embedding documents for each page in the current batch
+      const documents: EmbeddingDocument[] = [];
+
+      for (let index = 0; index < pagesBatch.length; index++) {
+        const page = pagesBatch[index];
+        const globalIndex = batchStart + index;
+
+        const content = await azureDevOpsService.getWikiPageContent(
+          wiki.id!,
+          page.id!,
+        );
+
+        const completionStats = getProgressStats(globalIndex + 1, pages.length);
+
+        logger.info(
+          `Retrieved content for Azure DevOps page: "${page.path}" in wiki: "${wiki.name}" [Progress: ${completionStats.completed}/${completionStats.total} (${completionStats.percentage}%) completed of wiki]`,
+        );
+
+        const text = await streamToString(content);
+
+        const document: EmbeddingDocument = {
+          metadata: {
+            source: MODULE_ID,
+            id: `${wiki.id}:${page.path}`,
+            url: page.url,
+            organization: azureDevOpsService.organization,
+            project: azureDevOpsService.project,
+            wiki: wiki.name!,
+          },
+          content: text,
+        };
+
+        documents.push(document);
+      }
+
+      // Save the current batch of documents
+      await saveDocumentsBatch(documents);
+
+      totalDocumentsIngested += documents.length;
+
+      logger.info(
+        `Batch ${batchNumber}/${totalBatches} completed: ${documents.length} documents ingested for Azure DevOps wiki: ${wiki.name}`,
+      );
+    }
+
+    return { totalDocumentsIngested };
+  };
 
   /** Ingest Azure DevOps wikis in batches */
   const ingestWikisBatch = async (
@@ -81,81 +173,21 @@ export const createWikiIngestor = async ({
         continue;
       }
 
-      logger.info(
-        `Processing ${pages.length} pages from wiki "${wiki.name}" in batches of ${pagesBatchSize}`,
-      );
+      const { totalDocumentsIngested } = await ingestWikiByPageBatch({
+        wiki,
+        pages,
+        saveDocumentsBatch,
+      });
 
-      let totalDocumentsIngested = 0;
-
-      // Process pages in batches to manage memory and performance
-
-      // Calculate total number of batches
-      const totalBatches = Math.ceil(pages.length / pagesBatchSize);
-
-      // Process each batch
-      for (
-        let batchStart = 0;
-        batchStart < pages.length;
-        batchStart += pagesBatchSize
-      ) {
-        const batchEnd = Math.min(batchStart + pagesBatchSize, pages.length);
-        const pagesBatch = pages.slice(batchStart, batchEnd);
-        const batchNumber = Math.floor(batchStart / pagesBatchSize) + 1;
-
-        logger.info(
-          `Processing batch ${batchNumber}/${totalBatches} (${pagesBatch.length} pages) for wiki "${wiki.name}"`,
+      if (totalDocumentsIngested === 0) {
+        logger.warn(
+          `No documents were ingested and sent for embedding from the Azure DevOps wiki ${wiki.name} (${wiki.id})`,
         );
-
-        // Generate embedding documents for each page in the current batch
-        const documents: EmbeddingDocument[] = [];
-
-        for (let index = 0; index < pagesBatch.length; index++) {
-          const page = pagesBatch[index];
-          const globalIndex = batchStart + index;
-
-          const content = await azureDevOpsService.getWikiPageContent(
-            wiki.id!,
-            page.id!,
-          );
-
-          const completionStats = getProgressStats(
-            globalIndex + 1,
-            pages.length,
-          );
-
-          logger.info(
-            `Retrieved content for Azure DevOps page: "${page.path}" in wiki: "${wiki.name}" [Progress: ${completionStats.completed}/${completionStats.total} (${completionStats.percentage}%) completed of wiki]`,
-          );
-
-          const text = await streamToString(content);
-
-          const document: EmbeddingDocument = {
-            metadata: {
-              source: MODULE_ID,
-              id: `${wiki.id}:${page.path}`,
-              url: page.url,
-              organization: azureDevOpsService.organization,
-              project: azureDevOpsService.project,
-              wiki: wiki.name!,
-            },
-            content: text,
-          };
-
-          documents.push(document);
-        }
-
-        // Save the current batch of documents
-        await saveDocumentsBatch(documents);
-
-        totalDocumentsIngested += documents.length;
-
-        logger.info(
-          `Batch ${batchNumber}/${totalBatches} completed: ${documents.length} documents ingested for Azure DevOps wiki: ${wiki.name}`,
-        );
+        continue;
       }
 
       logger.info(
-        `Wiki ingestion completed: ${totalDocumentsIngested} total documents ingested for Azure DevOps wiki: ${wiki.name}`,
+        `Wiki ingestion completed: ${totalDocumentsIngested} total documents ingested and sent for embedding for Azure DevOps wiki: ${wiki.name}`,
       );
     }
   };
