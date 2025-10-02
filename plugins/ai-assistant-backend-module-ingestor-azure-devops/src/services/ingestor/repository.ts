@@ -150,7 +150,7 @@ export const createRepositoryIngestor = async ({
       await saveDocumentsBatch(documents);
 
       logger.info(
-        `${documents.length} documents ingested for Azure DevOps repository: ${repo.name}`,
+        `${documents.length} documents ingested and sent for embedding for Azure DevOps repository: ${repo.name}`,
       );
     }
   };
