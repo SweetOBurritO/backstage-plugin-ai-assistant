@@ -50,10 +50,6 @@ export interface Config {
            * The name of the wiki to ingest
            */
           name: string;
-          /**
-           * Optional list of file types to ingest for this wiki. Overrides the global fileTypes setting for this wiki only.
-           */
-          fileTypes?: string[];
         }[];
 
         /**
