@@ -6,6 +6,8 @@ import { createAzureDevOpsService } from './azure-devops';
 import { Ingestor } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
 import { MODULE_ID } from '../constants/module';
 import { createRepositoryIngestor } from './ingestor/repository';
+import { createWikiIngestor } from './ingestor/wiki';
+import { Config } from '../../config';
 
 export const createAzureDevOpsIngestor = async ({
   config,
@@ -14,6 +16,11 @@ export const createAzureDevOpsIngestor = async ({
   config: RootConfigService;
   logger: LoggerService;
 }): Promise<Ingestor> => {
+  // Get configuration values
+  const resourceTypes = config.get<
+    Config['aiAssistant']['ingestors']['azureDevOps']['resourceTypes']
+  >('aiAssistant.ingestors.azureDevOps.resourceTypes');
+
   // Create Azure DevOps service
   const azureDevOpsService = await createAzureDevOpsService({ config, logger });
 
@@ -24,8 +31,22 @@ export const createAzureDevOpsIngestor = async ({
     azureDevOpsService,
   });
 
+  // Create wiki ingestor
+  const wikiIngestor = await createWikiIngestor({
+    config,
+    logger,
+    azureDevOpsService,
+  });
+
   const ingest: Ingestor['ingest'] = async ({ saveDocumentsBatch }) => {
-    await repositoryIngestor.ingestRepositoriesBatch(saveDocumentsBatch);
+    if (resourceTypes.includes('repository')) {
+      logger.info('Initializing Azure DevOps repository resource ingestor');
+      await repositoryIngestor.ingestRepositoriesBatch(saveDocumentsBatch);
+    }
+    if (resourceTypes.includes('wiki')) {
+      logger.info('Initializing Azure DevOps wiki resource ingestor');
+      await wikiIngestor.ingestWikisBatch(saveDocumentsBatch);
+    }
   };
 
   return {

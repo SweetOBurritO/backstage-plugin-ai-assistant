@@ -165,9 +165,7 @@ export const createAzureDevOpsService = async ({
       true,
     );
 
-    const pageContent = await streamToString(pageStream);
-
-    return pageContent;
+    return pageStream;
   };
 
   return {
