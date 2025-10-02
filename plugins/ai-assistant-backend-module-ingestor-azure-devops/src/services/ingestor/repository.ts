@@ -11,6 +11,7 @@ import {
 import { AzureDevOpsService } from '../azure-devops';
 import { Config } from '../../../config';
 import { MODULE_ID } from '../../constants/module';
+import { getProgressStats } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 
 type RepositoryIngestorOptions = {
   config: RootConfigService;
@@ -114,12 +115,19 @@ export const createRepositoryIngestor = async ({
       // Generate embedding documents for each item
       const documents: EmbeddingDocument[] = [];
 
-      for (const item of items) {
+      for (let index = 0; index < items.length; index++) {
+        const item = items[index];
+
         const content = await azureDevOpsService.getRepoItemContent(
           repo.id!,
           item.path!,
         );
-        logger.info(`Retrieved content for Azure DevOps item: ${item.path}`);
+
+        const completionStats = getProgressStats(index + 1, items.length);
+
+        logger.info(
+          `Retrieved content for Azure DevOps item: ${item.path} in repository: "${repo.name}" [Progress: ${completionStats.completed}/${completionStats.total} (${completionStats.percentage}%) completed of repository]`,
+        );
 
         const text = await streamToString(content);
 

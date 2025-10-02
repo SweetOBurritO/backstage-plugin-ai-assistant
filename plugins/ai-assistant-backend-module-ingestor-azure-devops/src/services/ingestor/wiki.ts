@@ -10,6 +10,7 @@ import {
 import { AzureDevOpsService } from '../azure-devops';
 import { Config } from '../../../config';
 import { MODULE_ID } from '../../constants/module';
+import { getProgressStats } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 
 type WikiIngestorOptions = {
   config: RootConfigService;
@@ -86,14 +87,10 @@ export const createWikiIngestor = async ({
           page.id!,
         );
 
-        const completionStats = {
-          percentage: Math.round(((index + 1) / pages.length) * 100),
-          current: index + 1,
-          total: pages.length,
-        };
+        const completionStats = getProgressStats(index + 1, pages.length);
 
         logger.info(
-          `Retrieved content for Azure DevOps page: "${page.path}" in wiki: "${wiki.name}" [${completionStats.current}/${completionStats.total} (${completionStats.percentage}%) completed of wiki]`,
+          `Retrieved content for Azure DevOps page: "${page.path}" in wiki: "${wiki.name}" [Progress: ${completionStats.completed}/${completionStats.total} (${completionStats.percentage}%) completed of wiki]`,
         );
 
         const text = await streamToString(content);
