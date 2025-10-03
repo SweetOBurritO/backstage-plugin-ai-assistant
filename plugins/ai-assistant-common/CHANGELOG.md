@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-common
 
+## 0.4.0
+
+### Minor Changes
+
+- ac8745a: add Azure DevOps wiki ingestion functionality
+
 ## 0.3.0
 
 ### Minor Changes
