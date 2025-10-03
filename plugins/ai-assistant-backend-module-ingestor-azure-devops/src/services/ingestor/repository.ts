@@ -2,44 +2,44 @@ import {
   LoggerService,
   RootConfigService,
 } from '@backstage/backend-plugin-api';
-import { streamToString } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
-import { createAzureDevOpsService } from './azure-devops';
+import { DEFAULT_FILE_TYPES } from '../../constants/default-file-types';
 import {
   EmbeddingDocument,
-  Ingestor,
   IngestorOptions,
+  streamToString,
 } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
-import { MODULE_ID } from '../constants/module';
-import { Config } from '../../config';
+import { AzureDevOpsService } from '../azure-devops';
+import { Config } from '../../../config';
+import { MODULE_ID } from '../../constants/module';
+import { getProgressStats } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 
-export const createAzureDevOpsIngestor = async ({
-  config,
-  logger,
-}: {
+type RepositoryIngestorOptions = {
   config: RootConfigService;
   logger: LoggerService;
-}): Promise<Ingestor> => {
-  // Default to common file types if none are specified
-  const defaultFileTypes = ['.md', '.json'];
+  azureDevOpsService: AzureDevOpsService;
+};
 
+export const createRepositoryIngestor = async ({
+  config,
+  logger,
+  azureDevOpsService,
+}: RepositoryIngestorOptions) => {
   // Get configuration values
   const repositoriesFilter = config.getOptional<
     Config['aiAssistant']['ingestors']['azureDevOps']['repositories']
   >('aiAssistant.ingestors.azureDevOps.repositories');
 
+  // Default to common file types if none are specified
   const fileTypes =
     config.getOptionalStringArray(
       'aiAssistant.ingestors.azureDevOps.fileTypes',
-    ) ?? defaultFileTypes;
-
-  // Create Azure DevOps service
-  const adoService = await createAzureDevOpsService({ config, logger });
+    ) ?? DEFAULT_FILE_TYPES;
 
   /** Ingest Azure DevOps repositories in batches */
-  const ingestAzureDevOpsBatch = async (
+  const ingestRepositoriesBatch = async (
     saveDocumentsBatch: IngestorOptions['saveDocumentsBatch'],
   ) => {
-    const repositoriesList = await adoService.getRepos();
+    const repositoriesList = await azureDevOpsService.getRepos();
 
     if (repositoriesList.length === 0) {
       logger.warn('No repositories found in the Azure DevOps project');
@@ -92,7 +92,7 @@ export const createAzureDevOpsIngestor = async ({
       );
 
       // Get the items to be ingested from the repository based on the file types filter
-      const items = await adoService.getRepoItems(
+      const items = await azureDevOpsService.getRepoItems(
         repo.id!,
         repositoryFileTypesFilter,
       );
@@ -115,12 +115,19 @@ export const createAzureDevOpsIngestor = async ({
       // Generate embedding documents for each item
       const documents: EmbeddingDocument[] = [];
 
-      for (const item of items) {
-        const content = await adoService.getRepoItemContent(
+      for (let index = 0; index < items.length; index++) {
+        const item = items[index];
+
+        const content = await azureDevOpsService.getRepoItemContent(
           repo.id!,
           item.path!,
         );
-        logger.info(`Retrieved content for Azure DevOps item: ${item.path}`);
+
+        const completionStats = getProgressStats(index + 1, items.length);
+
+        logger.info(
+          `Retrieved content for Azure DevOps item: ${item.path} in repository: "${repo.name}" [Progress: ${completionStats.completed}/${completionStats.total} (${completionStats.percentage}%) completed of repository]`,
+        );
 
         const text = await streamToString(content);
 
@@ -129,8 +136,8 @@ export const createAzureDevOpsIngestor = async ({
             source: MODULE_ID,
             id: `${repo.id}:${item.path}`,
             url: item.url,
-            organization: adoService.organization,
-            project: adoService.project,
+            organization: azureDevOpsService.organization,
+            project: azureDevOpsService.project,
             repository: repo.name!,
           },
           content: text,
@@ -143,17 +150,10 @@ export const createAzureDevOpsIngestor = async ({
       await saveDocumentsBatch(documents);
 
       logger.info(
-        `${documents.length} documents ingested for Azure DevOps repository: ${repo.name}`,
+        `${documents.length} documents ingested and sent for embedding for Azure DevOps repository: ${repo.name}`,
       );
     }
   };
 
-  const ingest: Ingestor['ingest'] = async ({ saveDocumentsBatch }) => {
-    await ingestAzureDevOpsBatch(saveDocumentsBatch);
-  };
-
-  return {
-    id: MODULE_ID,
-    ingest,
-  };
+  return { ingestRepositoriesBatch };
 };

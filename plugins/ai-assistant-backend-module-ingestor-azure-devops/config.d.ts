@@ -20,6 +20,11 @@ export interface Config {
          */
         token: string;
         /**
+         * The types of resources to ingest from Azure DevOps
+         * Currently supports 'repository' and 'wiki' resources
+         */
+        resourceTypes: ('repository' | 'wiki')[];
+        /**
          * Optional list of file types to ingest (e.g., .md, .json). Defaults to .md and .json if not specified.
          */
         fileTypes?: string[];
@@ -36,6 +41,22 @@ export interface Config {
            */
           fileTypes?: string[];
         }[];
+
+        /**
+         * Optional list of wikis to ingest. If not specified, all wikis in the project will be ingested.
+         */
+        wikis?: {
+          /**
+           * The name of the wiki to ingest
+           */
+          name: string;
+        }[];
+
+        /**
+         * Optional batch size for processing wiki pages. Defaults to 50 pages per batch.
+         * Lower values use less memory but may be slower, higher values are faster but use more memory.
+         */
+        pagesBatchSize?: number;
       };
     };
   };
