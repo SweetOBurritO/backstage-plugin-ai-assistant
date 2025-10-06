@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-azure-devops
 
+## 0.4.0
+
+### Minor Changes
+
+- dae4eda: add repository file batching
+
 ## 0.3.0
 
 ### Minor Changes
