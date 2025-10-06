@@ -2,7 +2,6 @@ import {
   LoggerService,
   RootConfigService,
 } from '@backstage/backend-plugin-api';
-import { App } from 'octokit';
 
 export const createGitHubService = async ({
   config,
@@ -11,6 +10,8 @@ export const createGitHubService = async ({
   config: RootConfigService;
   logger: LoggerService;
 }) => {
+  // Dynamic import for ESM-only octokit v5
+  const { App } = await import('octokit');
   // Get configuration values
   const owner = config.getString('aiAssistant.ingestors.github.owner');
   const appId = config.getString('aiAssistant.ingestors.github.appId');
