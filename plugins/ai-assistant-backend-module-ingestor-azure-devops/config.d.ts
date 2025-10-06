@@ -41,6 +41,11 @@ export interface Config {
            */
           fileTypes?: string[];
         }[];
+        /**
+         * Optional batch size for processing repository files. Defaults to 50 files per batch.
+         * Lower values use less memory but may be slower, higher values are faster but use more memory.
+         */
+        filesBatchSize?: number;
 
         /**
          * Optional list of wikis to ingest. If not specified, all wikis in the project will be ingested.
