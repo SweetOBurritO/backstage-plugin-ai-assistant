@@ -12,6 +12,11 @@ import { AzureDevOpsService } from '../azure-devops';
 import { Config } from '../../../config';
 import { MODULE_ID } from '../../constants/module';
 import { getProgressStats } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
+import { DEFAULT_REPO_FILE_BATCH_SIZE } from '../../constants/default-repo-file-batch-size';
+import {
+  GitItem,
+  GitRepository,
+} from 'azure-devops-node-api/interfaces/GitInterfaces';
 
 type RepositoryIngestorOptions = {
   config: RootConfigService;
@@ -35,7 +40,104 @@ export const createRepositoryIngestor = async ({
       'aiAssistant.ingestors.azureDevOps.fileTypes',
     ) ?? DEFAULT_FILE_TYPES;
 
-  /** Ingest Azure DevOps repositories in batches */
+  // Get batch size for processing repository items (default to 50 items per batch)
+  const itemsBatchSize =
+    config.getOptionalNumber(
+      'aiAssistant.ingestors.azureDevOps.filesBatchSize', // Reuse the same config for consistency
+    ) ?? DEFAULT_REPO_FILE_BATCH_SIZE;
+
+  /**
+   * Ingest Azure DevOps repository items in batches
+   * @param repository - The repository to ingest items from
+   * @param items - The list of items to ingest from the repository
+   * @param saveDocumentsBatch - Function to save a batch of embedding documents
+   * @returns Total number of documents ingested and sent for embedding from the repository
+   */
+  const ingestRepoByFileBatch = async ({
+    repository,
+    items,
+    saveDocumentsBatch,
+  }: {
+    repository: GitRepository;
+    items: GitItem[];
+    saveDocumentsBatch: IngestorOptions['saveDocumentsBatch'];
+  }) => {
+    logger.info(
+      `Processing ${items.length} items from repository "${repository.name}" in batches of ${itemsBatchSize}`,
+    );
+
+    logger.debug(`Items: ${JSON.stringify(items, null, 2)}`);
+
+    let totalDocumentsIngested = 0;
+
+    // Process items in batches to manage memory and performance
+    const totalBatches = Math.ceil(items.length / itemsBatchSize);
+
+    for (
+      let batchStart = 0;
+      batchStart < items.length;
+      batchStart += itemsBatchSize
+    ) {
+      const batchEnd = Math.min(batchStart + itemsBatchSize, items.length);
+      const itemsBatch = items.slice(batchStart, batchEnd);
+      const batchNumber = Math.floor(batchStart / itemsBatchSize) + 1;
+
+      logger.info(
+        `Processing batch ${batchNumber}/${totalBatches} (${itemsBatch.length} items) for repository "${repository.name}"`,
+      );
+
+      // Generate embedding documents for each item in the current batch
+      const documents: EmbeddingDocument[] = [];
+
+      for (let index = 0; index < itemsBatch.length; index++) {
+        const item = itemsBatch[index];
+        const globalIndex = batchStart + index;
+
+        const content = await azureDevOpsService.getRepoItemContent(
+          repository.id!,
+          item.path!,
+        );
+
+        const completionStats = getProgressStats(globalIndex + 1, items.length);
+
+        logger.info(
+          `Retrieved content for Azure DevOps item: ${item.path} in repository: "${repository.name}" [Progress: ${completionStats.completed}/${completionStats.total} (${completionStats.percentage}%) completed of repository]`,
+        );
+
+        const text = await streamToString(content);
+
+        const document: EmbeddingDocument = {
+          metadata: {
+            source: MODULE_ID,
+            id: `${repository.id}:${item.path}`,
+            url: item.url,
+            organization: azureDevOpsService.organization,
+            project: azureDevOpsService.project,
+            repository: repository.name!,
+          },
+          content: text,
+        };
+
+        documents.push(document);
+      }
+
+      // Save the current batch of documents
+      await saveDocumentsBatch(documents);
+
+      totalDocumentsIngested += documents.length;
+
+      logger.info(
+        `Batch ${batchNumber}/${totalBatches} completed: ${documents.length} documents ingested for Azure DevOps repository: ${repository.name}`,
+      );
+    }
+
+    return { totalDocumentsIngested };
+  };
+
+  /** Ingest Azure DevOps repositories in batches
+   * @param saveDocumentsBatch - Function to save a batch of embedding documents
+   * @returns void
+   */
   const ingestRepositoriesBatch = async (
     saveDocumentsBatch: IngestorOptions['saveDocumentsBatch'],
   ) => {
@@ -110,47 +212,21 @@ export const createRepositoryIngestor = async ({
         continue;
       }
 
-      logger.debug(`Items: ${JSON.stringify(items, null, 2)}`);
+      const { totalDocumentsIngested } = await ingestRepoByFileBatch({
+        repository: repo,
+        items,
+        saveDocumentsBatch,
+      });
 
-      // Generate embedding documents for each item
-      const documents: EmbeddingDocument[] = [];
-
-      for (let index = 0; index < items.length; index++) {
-        const item = items[index];
-
-        const content = await azureDevOpsService.getRepoItemContent(
-          repo.id!,
-          item.path!,
+      if (totalDocumentsIngested === 0) {
+        logger.warn(
+          `No documents were ingested and sent for embedding from the Azure DevOps repository ${repo.name} (${repo.id})`,
         );
-
-        const completionStats = getProgressStats(index + 1, items.length);
-
-        logger.info(
-          `Retrieved content for Azure DevOps item: ${item.path} in repository: "${repo.name}" [Progress: ${completionStats.completed}/${completionStats.total} (${completionStats.percentage}%) completed of repository]`,
-        );
-
-        const text = await streamToString(content);
-
-        const document: EmbeddingDocument = {
-          metadata: {
-            source: MODULE_ID,
-            id: `${repo.id}:${item.path}`,
-            url: item.url,
-            organization: azureDevOpsService.organization,
-            project: azureDevOpsService.project,
-            repository: repo.name!,
-          },
-          content: text,
-        };
-
-        documents.push(document);
+        continue;
       }
 
-      // Save the documents in batches
-      await saveDocumentsBatch(documents);
-
       logger.info(
-        `${documents.length} documents ingested and sent for embedding for Azure DevOps repository: ${repo.name}`,
+        `Repository ingestion completed: ${totalDocumentsIngested} total documents ingested and sent for embedding for Azure DevOps repository: ${repo.name}`,
       );
     }
   };
