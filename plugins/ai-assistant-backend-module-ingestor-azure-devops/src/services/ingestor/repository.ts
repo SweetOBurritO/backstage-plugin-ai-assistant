@@ -48,22 +48,22 @@ export const createRepositoryIngestor = async ({
 
   /**
    * Ingest Azure DevOps repository items in batches
-   * @param repo - The repository to ingest items from
+   * @param repository - The repository to ingest items from
    * @param items - The list of items to ingest from the repository
    * @param saveDocumentsBatch - Function to save a batch of embedding documents
    * @returns Total number of documents ingested and sent for embedding from the repository
    */
   const ingestRepoByFileBatch = async ({
-    repo,
+    repository,
     items,
     saveDocumentsBatch,
   }: {
-    repo: GitRepository;
+    repository: GitRepository;
     items: GitItem[];
     saveDocumentsBatch: IngestorOptions['saveDocumentsBatch'];
   }) => {
     logger.info(
-      `Processing ${items.length} items from repository "${repo.name}" in batches of ${itemsBatchSize}`,
+      `Processing ${items.length} items from repository "${repository.name}" in batches of ${itemsBatchSize}`,
     );
 
     logger.debug(`Items: ${JSON.stringify(items, null, 2)}`);
@@ -83,7 +83,7 @@ export const createRepositoryIngestor = async ({
       const batchNumber = Math.floor(batchStart / itemsBatchSize) + 1;
 
       logger.info(
-        `Processing batch ${batchNumber}/${totalBatches} (${itemsBatch.length} items) for repository "${repo.name}"`,
+        `Processing batch ${batchNumber}/${totalBatches} (${itemsBatch.length} items) for repository "${repository.name}"`,
       );
 
       // Generate embedding documents for each item in the current batch
@@ -94,14 +94,14 @@ export const createRepositoryIngestor = async ({
         const globalIndex = batchStart + index;
 
         const content = await azureDevOpsService.getRepoItemContent(
-          repo.id!,
+          repository.id!,
           item.path!,
         );
 
         const completionStats = getProgressStats(globalIndex + 1, items.length);
 
         logger.info(
-          `Retrieved content for Azure DevOps item: ${item.path} in repository: "${repo.name}" [Progress: ${completionStats.completed}/${completionStats.total} (${completionStats.percentage}%) completed of repository]`,
+          `Retrieved content for Azure DevOps item: ${item.path} in repository: "${repository.name}" [Progress: ${completionStats.completed}/${completionStats.total} (${completionStats.percentage}%) completed of repository]`,
         );
 
         const text = await streamToString(content);
@@ -109,11 +109,11 @@ export const createRepositoryIngestor = async ({
         const document: EmbeddingDocument = {
           metadata: {
             source: MODULE_ID,
-            id: `${repo.id}:${item.path}`,
+            id: `${repository.id}:${item.path}`,
             url: item.url,
             organization: azureDevOpsService.organization,
             project: azureDevOpsService.project,
-            repository: repo.name!,
+            repository: repository.name!,
           },
           content: text,
         };
@@ -127,7 +127,7 @@ export const createRepositoryIngestor = async ({
       totalDocumentsIngested += documents.length;
 
       logger.info(
-        `Batch ${batchNumber}/${totalBatches} completed: ${documents.length} documents ingested for Azure DevOps repository: ${repo.name}`,
+        `Batch ${batchNumber}/${totalBatches} completed: ${documents.length} documents ingested for Azure DevOps repository: ${repository.name}`,
       );
     }
 
@@ -213,7 +213,7 @@ export const createRepositoryIngestor = async ({
       }
 
       const { totalDocumentsIngested } = await ingestRepoByFileBatch({
-        repo,
+        repository: repo,
         items,
         saveDocumentsBatch,
       });
