@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@backstage/backend-plugin-api": "^1.4.1",
+    "@sweetoburrito/backstage-plugin-ai-assistant-common": "^0.4.0",
     "@sweetoburrito/backstage-plugin-ai-assistant-node": "^0.4.0",
     "octokit": "^3.1.2"
   },
