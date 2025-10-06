@@ -10,6 +10,8 @@ import {
 } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
 import { MODULE_ID } from '../constants/module';
 import { Config } from '../../config';
+import { getProgressStats } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
+import { DEFAULT_FILE_BATCH_SIZE } from '../constants/default-file-batch-size';
 
 export const createGitHubIngestor = async ({
   config,
@@ -31,8 +33,123 @@ export const createGitHubIngestor = async ({
       'aiAssistant.ingestors.github.fileTypes',
     ) ?? defaultFileTypes;
 
+  // Get batch size for processing files (default to 50 files per batch)
+  const filesBatchSize =
+    config.getOptionalNumber(
+      'aiAssistant.ingestors.github.filesBatchSize',
+    ) ?? DEFAULT_FILE_BATCH_SIZE;
+
   // Create GitHub service
   const githubService = await createGitHubService({ config, logger });
+
+  /** Ingest GitHub repository files in batches
+   * @param repo - The repository to ingest files from
+   * @param files - The list of files to ingest from the repository
+   * @param saveDocumentsBatch - Function to save a batch of embedding documents
+   * @returns Total number of documents ingested and sent for embedding from the repository
+   */
+  const ingestRepositoryByFileBatch = async ({
+    repo,
+    files,
+    saveDocumentsBatch,
+  }: {
+    repo: any;
+    files: any[];
+    saveDocumentsBatch: IngestorOptions['saveDocumentsBatch'];
+  }) => {
+    logger.info(
+      `Processing ${files.length} files from repository "${repo.name}" in batches of ${filesBatchSize}`,
+    );
+
+    let totalDocumentsIngested = 0;
+
+    // Process files in batches to manage memory and performance
+
+    // Calculate total number of batches
+    const totalBatches = Math.ceil(files.length / filesBatchSize);
+
+    // Process each batch
+    for (
+      let batchStart = 0;
+      batchStart < files.length;
+      batchStart += filesBatchSize
+    ) {
+      const batchEnd = Math.min(batchStart + filesBatchSize, files.length);
+      const filesBatch = files.slice(batchStart, batchEnd);
+      const batchNumber = Math.floor(batchStart / filesBatchSize) + 1;
+
+      logger.info(
+        `Processing batch ${batchNumber}/${totalBatches} (${filesBatch.length} files) for repository "${repo.name}"`,
+      );
+
+      // Generate embedding documents for each file in the current batch
+      const documents: EmbeddingDocument[] = [];
+
+      for (let index = 0; index < filesBatch.length; index++) {
+        const file = filesBatch[index];
+        const globalIndex = batchStart + index;
+
+        try {
+          const content = await githubService.getRepoFileContent(
+            repo.name,
+            file.path!,
+          );
+
+          const completionStats = getProgressStats(globalIndex + 1, files.length);
+
+          logger.info(
+            `Retrieved content for GitHub file: "${file.path}" in repository: "${repo.name}" [Progress: ${completionStats.completed}/${completionStats.total} (${completionStats.percentage}%) completed of repository]`,
+          );
+
+          // Generate proper GitHub URL for the file
+          const githubUrl = `https://github.com/${githubService.owner}/${repo.name}/blob/${repo.default_branch || 'main'}/${file.path}`;
+          
+          // Create enhanced content with URL reference and metadata
+          const enhancedContent = `Repository: ${repo.name}
+          File Path: ${file.path}
+          GitHub URL: ${githubUrl}
+          ${repo.description ? `Repository Description: ${repo.description}` : ''}
+          
+          Content:
+          ${content}`;
+
+          const document: EmbeddingDocument = {
+            metadata: {
+              source: MODULE_ID,
+              id: `${repo.id}:${file.path}`,
+              url: githubUrl,
+              owner: githubService.owner,
+              repository: repo.name,
+              filePath: file.path,
+              fileName: file.path?.split('/').pop() || '',
+              branch: repo.default_branch || 'main',
+              repositoryDescription: repo.description || '',
+            },
+            content: enhancedContent,
+          };
+
+          documents.push(document);
+        } catch (error) {
+          logger.warn(
+            `Failed to retrieve content for GitHub file: ${file.path}. Error: ${error}`,
+          );
+          // Continue with other files even if one fails
+          continue;
+        }
+      }
+
+      // Save the current batch of documents
+      await saveDocumentsBatch(documents);
+
+      totalDocumentsIngested += documents.length;
+
+      logger.info(
+        `Batch ${batchNumber}/${totalBatches} completed: ${documents.length} documents ingested for GitHub repository: ${repo.name}`,
+      );
+    }
+
+    return { totalDocumentsIngested };
+  };
 
   /** Ingest GitHub repositories in batches */
   const ingestGitHubBatch = async (
@@ -111,43 +228,21 @@ export const createGitHubIngestor = async ({
 
       logger.debug(`Files: ${JSON.stringify(files, null, 2)}`);
 
-      // Generate embedding documents for each file
-      const documents: EmbeddingDocument[] = [];
+      const { totalDocumentsIngested } = await ingestRepositoryByFileBatch({
+        repo,
+        files,
+        saveDocumentsBatch,
+      });
 
-      for (const file of files) {
-        try {
-          const content = await githubService.getRepoFileContent(
-            repo.name,
-            file.path!,
-          );
-          logger.info(`Retrieved content for GitHub file: ${file.path}`);
-
-          const document: EmbeddingDocument = {
-            metadata: {
-              source: MODULE_ID,
-              id: `${repo.id}:${file.path}`,
-              url: file.url || `https://github.com/${githubService.owner}/${repo.name}/blob/main/${file.path}`,
-              owner: githubService.owner,
-              repository: repo.name,
-            },
-            content,
-          };
-
-          documents.push(document);
-        } catch (error) {
-          logger.warn(
-            `Failed to retrieve content for GitHub file: ${file.path}. Error: ${error}`,
-          );
-          // Continue with other files even if one fails
-          continue;
-        }
+      if (totalDocumentsIngested === 0) {
+        logger.warn(
+          `No documents were ingested and sent for embedding from the GitHub repository ${repo.name} (${repo.id})`,
+        );
+        continue;
       }
 
-      // Save the documents in batches
-      await saveDocumentsBatch(documents);
-
       logger.info(
-        `${documents.length} documents ingested for GitHub repository: ${repo.name}`,
+        `Repository ingestion completed: ${totalDocumentsIngested} total documents ingested and sent for embedding for GitHub repository: ${repo.name}`,
       );
     }
   };

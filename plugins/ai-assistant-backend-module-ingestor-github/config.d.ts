@@ -34,6 +34,10 @@ export interface Config {
          */
         fileTypes?: string[];
         /**
+         * Optional batch size for processing files. Defaults to 50 files per batch if not specified.
+         */
+        filesBatchSize?: number;
+        /**
          * Optional list of repositories to ingest. If not specified, all repositories for the owner will be ingested.
          */
         repositories?: {
