@@ -10,24 +10,28 @@ import {
   Ingestor,
   Model,
   modelProviderExtensionPoint,
+  Tool,
+  toolExtensionPoint,
 } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
 import { createDataIngestionPipeline } from './services/ingestor';
 import { createChatService } from './services/chat';
-import { createPromptBuilder } from './services/prompt';
 import { applyDatabaseMigrations } from './database/migrations';
 import { PgVectorStore } from './database';
 import { signalsServiceRef } from '@backstage/plugin-signals-node';
+import { createSearchKnowledgeTool } from './services/tools/searchKnowledge';
 
 /**
  * aiAssistantPlugin backend plugin
  *
  * @public
  */
+
 export const aiAssistantPlugin = createBackendPlugin({
   pluginId: 'ai-assistant',
   register(env) {
     const ingestors: Ingestor[] = [];
     const models: Model[] = [];
+    const tools: Tool[] = [];
 
     let embeddingsProvider: EmbeddingsProvider;
 
@@ -56,6 +60,16 @@ export const aiAssistantPlugin = createBackendPlugin({
           throw new Error(`Model with id ${model.id} is already registered.`);
         }
         models.push(model);
+      },
+    });
+
+    env.registerExtensionPoint(toolExtensionPoint, {
+      register: tool => {
+        const existingTool = tools.find(t => t.name === tool.name);
+        if (existingTool) {
+          throw new Error(`Tool with name ${tool.name} is already registered.`);
+        }
+        tools.push(tool);
       },
     });
 
@@ -91,13 +105,13 @@ export const aiAssistantPlugin = createBackendPlugin({
           ingestors,
         });
 
-        const promptBuilder = createPromptBuilder(options);
+        const searchKnowledgeTool = createSearchKnowledgeTool({ vectorStore });
+        tools.push(searchKnowledgeTool);
 
         const chat = await createChatService({
           ...options,
           models,
-          vectorStore,
-          promptBuilder,
+          tools,
         });
 
         httpRouter.use(await createRouter({ ...options, chat }));

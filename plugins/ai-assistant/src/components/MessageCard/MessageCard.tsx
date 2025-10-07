@@ -29,7 +29,7 @@ export const MessageCard = ({ message }: MessageCardProps) => {
 
   const thinking = useMemo<boolean>(() => {
     return (
-      role === 'assistant' &&
+      role === 'ai' &&
       content.includes('<think>') &&
       !content.includes('</think>')
     );
@@ -56,7 +56,7 @@ export const MessageCard = ({ message }: MessageCardProps) => {
   }, [content, hasThinking]);
 
   const loading = useMemo(() => {
-    return role === 'assistant' && content === '';
+    return role === 'ai' && content === '';
   }, [content, role]);
 
   if (loading) {
@@ -98,7 +98,15 @@ export const MessageCard = ({ message }: MessageCardProps) => {
           </AccordionDetails>
         </Accordion>
       )}
-      <Markdown>{response}</Markdown>
+      {message.content ? (
+        <Markdown>{message.content}</Markdown>
+      ) : (
+        <Skeleton
+          variant="text"
+          height={theme.typography.caption.fontSize}
+          width={40}
+        />
+      )}
       <br />
     </Card>
   );

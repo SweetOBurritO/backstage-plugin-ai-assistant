@@ -1,8 +1,23 @@
-export type Message = {
+type BaseMessage = {
   id?: string;
-  role: string;
+  role:
+    | 'human'
+    | 'ai'
+    | 'generic'
+    | 'developer'
+    | 'system'
+    | 'function'
+    | 'tool'
+    | 'remove';
   content: string;
 };
+
+export type ToolMessage = BaseMessage & {
+  role: 'tool';
+  name: string;
+};
+
+export type Message = BaseMessage | ToolMessage;
 
 export type Conversation = {
   id: string;

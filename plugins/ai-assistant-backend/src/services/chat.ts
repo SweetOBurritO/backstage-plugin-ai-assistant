@@ -1,37 +1,33 @@
-import {
-  Model,
-  VectorStore,
-} from '@sweetoburrito/backstage-plugin-ai-assistant-node';
+import { Model } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
 import {
   LoggerService,
   RootConfigService,
   DatabaseService,
 } from '@backstage/backend-plugin-api';
-import { PromptBuilder } from './prompt';
-import { v4 as uuid } from 'uuid';
 import { ChatStore } from '../database/chat-store';
 import {
   Conversation,
   Message,
 } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { SignalsService } from '@backstage/plugin-signals-node';
-import { DEFAULT_SUMMARY_PROMPT } from '../constants/prompts';
+import {
+  DEFAULT_SYSTEM_PROMPT,
+  DEFAULT_TOOL_GUIDELINE,
+} from '../constants/prompts';
+import { Tool } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
+import { DynamicStructuredTool } from '@langchain/core/tools';
+import { createReactAgent } from '@langchain/langgraph/prebuilt';
+import { SystemMessagePromptTemplate } from '@langchain/core/prompts';
+import { createSummarizerService } from './summarizer';
+import { v4 as uuid } from 'uuid';
 
 export type ChatServiceOptions = {
   models: Model[];
+  tools: Tool[];
   logger: LoggerService;
-  vectorStore: VectorStore;
   config: RootConfigService;
-  promptBuilder: PromptBuilder;
   database: DatabaseService;
   signals: SignalsService;
-};
-
-type StreamOptions = {
-  modelId: string;
-  messages: Message[];
-  messageId: string;
-  userEntityRef: string;
 };
 
 type PromptOptions = {
@@ -60,78 +56,85 @@ export type ChatService = {
   getConversations: (
     options: GetConversationsOptions,
   ) => Promise<Conversation[]>;
+  addMessages: (
+    messages: Message[],
+    userRef: string,
+    conversationId: string,
+    recentConversationMessages?: Message[],
+  ) => Promise<void>;
 };
 
 export const createChatService = async ({
   models,
+  tools,
   logger,
-  vectorStore,
-  promptBuilder,
   database,
   signals,
   config,
 }: ChatServiceOptions): Promise<ChatService> => {
   logger.info(`Available models: ${models.map(m => m.id).join(', ')}`);
 
+  const system =
+    config.getOptionalString('aiAssistant.prompt.system') ||
+    DEFAULT_SYSTEM_PROMPT;
+
+  const toolGuideline =
+    config.getOptionalString('aiAssistant.prompt.toolGuideline') ||
+    DEFAULT_TOOL_GUIDELINE;
+
   const chatStore = await ChatStore.fromConfig({ database });
+  const summarizer = await createSummarizerService({ config, models });
 
-  const getChatModelById = (id: string) => {
-    return models.find(model => model.id === id)?.chatModel;
-  };
+  const agentTools = tools.map(tool => new DynamicStructuredTool(tool));
 
-  const streamMessage = async ({
-    modelId,
-    messages,
-    messageId,
-    userEntityRef,
-  }: StreamOptions) => {
-    const model = getChatModelById(modelId);
+  const systemPromptTemplate = SystemMessagePromptTemplate.fromTemplate(`
+    PURPOSE:
+    {basePrompt}
 
-    if (!model) {
-      throw new Error(`Model with id ${modelId} not found`);
-    }
+    TOOL USAGE GUIDELINES:
+    {toolGuideline}
 
-    const promptStream = await model.stream(messages);
+    Available tools:
+    {toolList}
 
-    const aiMessage: Required<Message> = {
-      id: messageId,
-      role: 'assistant',
-      content: '',
-    };
+    Context:
+    {context}`);
 
-    for await (const chunk of promptStream) {
-      aiMessage.content += chunk.content ?? '';
-
-      chatStore.updateMessage(aiMessage);
-
-      signals.publish({
-        channel: `ai-assistant.chat.message-stream:${messageId}`,
-        message: aiMessage,
-        recipients: {
-          type: 'user',
-          entityRef: userEntityRef,
-        },
-      });
-    }
-  };
-
-  const addChatMessage: (typeof chatStore)['addChatMessage'] = async (
+  const addMessages: ChatService['addMessages'] = async (
     messages,
     userRef,
     conversationId,
+    recentConversationMessages,
   ) => {
-    const conversationSize = await chatStore.getConversationSize(
-      conversationId,
-    );
+    // If we have recentConversationMessages, use them; otherwise, fetch the last 5 messages
+    const recentMessages =
+      recentConversationMessages ||
+      (await chatStore.getChatMessages(conversationId, userRef, 5, ['tool']));
 
-    if (conversationSize < 1) {
-      await chatStore.createConversation({
+    const conversationSize = (recentMessages?.length ?? 0) + messages.length;
+
+    if (recentMessages.length === 0) {
+      const conversation: Conversation = {
         id: conversationId,
-        userRef,
         title: 'New Conversation',
-      });
+        userRef,
+      };
+      chatStore.createConversation(conversation);
+      chatStore.addChatMessage(messages, userRef, conversationId);
 
-      await chatStore.addChatMessage(messages, userRef, conversationId);
+      signals.publish({
+        channel: `ai-assistant.chat.conversation-details-update`,
+        message: { conversation },
+        recipients: {
+          type: 'user',
+          entityRef: userRef,
+        },
+      });
+      return;
+    }
+
+    if (conversationSize < 5) {
+      chatStore.addChatMessage(messages, userRef, conversationId);
       return;
     }
 
@@ -140,47 +143,26 @@ export const createChatService = async ({
       userRef,
     );
 
-    if (conversationSize + messages.length < 5) {
-      await chatStore.addChatMessage(messages, userRef, conversationId);
-      return;
-    }
-
     if (conversation.title !== 'New Conversation') {
-      await chatStore.addChatMessage(messages, userRef, conversationId);
+      chatStore.addChatMessage(messages, userRef, conversationId);
       return;
     }
 
-    const summaryModelId =
-      config.getOptionalString('aiAssistant.conversation.summaryModel') ??
-      models[0].id;
-    const summaryModel = getChatModelById(summaryModelId);
+    const summary = await summarizer.summarize(recentMessages, '25 characters');
 
-    if (!summaryModel) {
-      throw new Error(`Model with id ${summaryModelId} not found`);
-    }
+    conversation.title = summary;
 
-    const conversationMessages = await chatStore.getChatMessages(
-      conversationId,
-      userRef,
-      5,
-    );
+    chatStore.updateConversation(conversation);
+    chatStore.addChatMessage(messages, userRef, conversationId);
 
-    const summaryPrompt =
-      config.getOptionalString('aiAssistant.conversation.summaryPrompt') ??
-      DEFAULT_SUMMARY_PROMPT;
-
-    const { text } = await summaryModel.invoke([
-      ...conversationMessages,
-      {
-        role: 'system',
-        content: summaryPrompt,
+    signals.publish({
+      channel: `ai-assistant.chat.conversation-details-update`,
+      message: { conversation },
+      recipients: {
+        type: 'user',
+        entityRef: userRef,
       },
-    ]);
-
-    conversation.title = text.trim();
-
-    await chatStore.updateConversation(conversation);
-    await chatStore.addChatMessage(messages, userRef, conversationId);
+    });
   };
 
   const prompt: ChatService['prompt'] = async ({
@@ -190,59 +172,107 @@ export const createChatService = async ({
     stream = true,
     userEntityRef,
   }: PromptOptions) => {
-    const model = getChatModelById(modelId);
+    const model = models.find(m => m.id === modelId)?.chatModel;
 
     if (!model) {
       throw new Error(`Model with id ${modelId} not found`);
     }
 
-    await addChatMessage(messages, userEntityRef, conversationId);
-
-    const context = await vectorStore.similaritySearch(
-      messages
-        .filter(m => m.role === 'user')
-        .map(m => m.content)
-        .join('\n'),
-    );
-
-    const recentConversationMessages = await chatStore.getChatMessages(
-      conversationId,
-      userEntityRef,
-      10,
-    );
-
-    const promptMessages = promptBuilder.buildPrompt(
-      [...recentConversationMessages, ...messages],
-      context,
-    );
-
-    const messageId: string = uuid();
-
     const aiMessage: Required<Message> = {
-      id: messageId,
-      role: 'assistant',
+      id: uuid(),
+      role: 'ai',
       content: '',
     };
 
-    await addChatMessage([aiMessage], userEntityRef, conversationId);
-
-    if (stream) {
-      streamMessage({
-        modelId,
-        messages: promptMessages,
-        messageId,
+    const streamFn = async () => {
+      const recentConversationMessages = await chatStore.getChatMessages(
+        conversationId,
         userEntityRef,
+        10,
+        ['tool'],
+      );
+
+      const systemPrompt = await systemPromptTemplate.formatMessages({
+        basePrompt: system,
+        toolGuideline,
+        toolList: agentTools
+          .map(tool => `- ${tool.name}: ${tool.description}`)
+          .join('\n'),
+        context: `none`,
       });
 
-      return [aiMessage];
-    }
-    const { text } = await model.invoke(promptMessages);
+      const agent = createReactAgent({
+        llm: model,
+        tools: agentTools,
+        prompt: systemPrompt[0].text,
+      });
 
-    aiMessage.content = text;
+      const promptStream = await agent.stream(
+        {
+          messages: [...recentConversationMessages, ...messages],
+        },
+        { streamMode: 'messages' },
+      );
 
-    await chatStore.updateMessage(aiMessage);
+      const responseMessages: Required<Message>[] = [];
+      let firstMessageId: string | undefined;
 
-    return [aiMessage];
+      for await (const [
+        message,
+        { __pregel_task_id: messageId },
+      ] of promptStream) {
+        if (!firstMessageId) {
+          firstMessageId = messageId;
+        }
+
+        const id = messageId === firstMessageId ? aiMessage.id : messageId;
+
+        const index = responseMessages.findIndex(m => m.id === id);
+        const role = message.getType();
+
+        if (index === -1) {
+          const content =
+            typeof message.content === 'string'
+              ? message.content
+              : JSON.stringify(message.content);
+
+          responseMessages.push({
+            role,
+            content,
+            id,
+          });
+        }
+
+        if (index !== -1) {
+          responseMessages[index] = {
+            ...responseMessages[index],
+            content: (responseMessages[index].content += message.content),
+          };
+        }
+
+        signals.publish({
+          channel: `ai-assistant.chat.conversation-stream:${conversationId}`,
+          message: { messages: responseMessages.filter(m => m.content) },
+          recipients: {
+            type: 'user',
+            entityRef: userEntityRef,
+          },
+        });
+      }
+
+      addMessages(
+        [...messages, ...responseMessages],
+        userEntityRef,
+        conversationId,
+        recentConversationMessages,
+      );
+
+      return responseMessages;
+    };
+
+    const result = streamFn();
+
+    return stream ? [aiMessage] : result;
   };
 
   const getAvailableModels: ChatService['getAvailableModels'] = async () => {
@@ -274,5 +304,6 @@ export const createChatService = async ({
     getAvailableModels,
     getConversation,
     getConversations,
+    addMessages,
   };
 };

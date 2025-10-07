@@ -37,6 +37,7 @@ export class ChatStore {
     conversationId: string,
     userRef: string,
     limit?: number,
+    excludeRoles?: Message['role'][],
   ): Promise<Required<Message>[]> {
     let query = this.messageTable()
       .where({ conversation_id: conversationId, userRef })
@@ -45,6 +46,10 @@ export class ChatStore {
 
     if (typeof limit === 'number') {
       query = query.limit(limit).orderBy('created_at', 'desc');
+    }
+
+    if (excludeRoles && excludeRoles.length > 0) {
+      query = query.whereNotIn('role', excludeRoles);
     }
 
     const rows = await query;
@@ -80,15 +85,6 @@ export class ChatStore {
       role: message.role,
       content: message.content,
     });
-  }
-
-  async getConversationSize(conversationId: string) {
-    const count = await this.messageTable()
-      .where({ conversation_id: conversationId })
-      .count('* as count')
-      .first();
-
-    return count?.count ? Number(count.count) : 0;
   }
 
   async getConversation(
