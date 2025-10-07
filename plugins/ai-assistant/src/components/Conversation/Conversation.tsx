@@ -166,15 +166,6 @@ export const Conversation = ({
       height="100%"
       minHeight={0}
     >
-      <Stack direction="row" spacing={2} alignItems="center">
-        <Autocomplete
-          options={models}
-          defaultValue={modelId}
-          onChange={(_, value) => setModelId(value || undefined)}
-          sx={{ width: 300 }}
-          renderInput={params => <TextField {...params} label="Models" />}
-        />
-      </Stack>
       {messages && (
         <Stack
           spacing={1}
@@ -218,6 +209,14 @@ export const Conversation = ({
                 sendMessage();
               }
             }}
+          />
+          <Autocomplete
+            options={models}
+            defaultValue={modelId}
+            onChange={(_, value) => setModelId(value || undefined)}
+            sx={{ width: 180 }}
+            size="small"
+            renderInput={params => <TextField {...params} label="Models" />}
           />
           <Button
             variant="contained"
