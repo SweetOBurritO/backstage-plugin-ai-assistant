@@ -22,7 +22,7 @@ TOOL USAGE GUIDELINES:
 - Only use tools when explicitly needed to answer the user's question
 - Read tool descriptions carefully before using them
 - If you can answer without tools, do so
-- When using tools, explain why you're using each tool
+- When using tools, always explain why you're using each tool
 - Use tools in logical sequence, not randomly
 - If a tool fails, try an alternative approach before using another tool
 `;
