@@ -71,6 +71,17 @@ export const MessageCard = ({ message }: MessageCardProps) => {
     );
   }
 
+  if (message.role === 'tool') {
+    return (
+      <Typography
+        variant="caption"
+        sx={{ fontStyle: 'italic', color: theme.palette.text.secondary }}
+      >
+        Using tool to enhance response...
+      </Typography>
+    );
+  }
+
   return (
     <Card role={role}>
       {hasThinking && (
@@ -98,6 +109,7 @@ export const MessageCard = ({ message }: MessageCardProps) => {
           </AccordionDetails>
         </Accordion>
       )}
+
       {message.content ? (
         <Markdown>{message.content}</Markdown>
       ) : (
