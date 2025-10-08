@@ -1,5 +1,17 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend
 
+## 0.7.0
+
+### Minor Changes
+
+- c15e38e: Added support for agent based tool execution
+
+### Patch Changes
+
+- Updated dependencies [c15e38e]
+  - @sweetoburrito/backstage-plugin-ai-assistant-common@0.5.0
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.5.0
+
 ## 0.6.1
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-azure-devops
 
+## 0.4.1
+
+### Patch Changes
+
+- Updated dependencies [c15e38e]
+  - @sweetoburrito/backstage-plugin-ai-assistant-common@0.5.0
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.5.0
+
 ## 0.4.0
 
 ### Minor Changes
