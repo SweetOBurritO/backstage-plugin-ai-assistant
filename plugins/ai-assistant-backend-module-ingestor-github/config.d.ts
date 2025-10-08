@@ -15,7 +15,7 @@ export interface Config {
          * @visibility backend
          */
         appId: string | number;
-        /**  
+        /**
          * GitHub App private key
          * @visibility secret
          */

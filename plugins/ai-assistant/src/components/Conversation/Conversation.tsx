@@ -1,11 +1,8 @@
 import { useApi, errorApiRef } from '@backstage/core-plugin-api';
 import { chatApiRef } from '../../api/chat';
-import { useAsync, useAsyncFn, useList, useLocalStorage } from 'react-use';
-import { useEffect, useRef, useState } from 'react';
-import {
-  signalApiRef,
-  SignalSubscriber,
-} from '@backstage/plugin-signals-react';
+import { useAsync, useAsyncFn, useLocalStorage } from 'react-use';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { signalApiRef } from '@backstage/plugin-signals-react';
 
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
@@ -38,33 +35,69 @@ export const Conversation = ({
     undefined,
   );
 
-  const [messageSubscriber, setMessageSubscriber] = useState<
-    SignalSubscriber | undefined
-  >();
-
   const { value: models, loading: loadingModels } = useAsync(
     () => chatApi.getModels(),
     [chatApi],
   );
+
   const { value: history, loading: loadingHistory } = useAsync(
     () => chatApi.getConversation(conversationId),
     [chatApi, conversationId],
   );
 
-  const [messages, { push, set, updateAt }] = useList<Message>([]);
-  const messagesRef = useRef(messages);
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  const handleMessageUpdate = useCallback(
+    (newMessages: Required<Message>[]) => {
+      setMessages(prev => {
+        const updated = [...prev];
+
+        newMessages.forEach(message => {
+          const index = updated.findIndex(m => m.id === message.id);
+
+          if (index === -1) {
+            updated.push(message);
+          } else {
+            updated[index] = message;
+          }
+        });
+
+        return updated;
+      });
+    },
+    [setMessages],
+  );
 
   useEffect(() => {
-    messagesRef.current = messages;
-  }, [messages]);
+    if (!conversationId) {
+      return undefined;
+    }
+
+    const subscriber = signalApi.subscribe(
+      `ai-assistant.chat.conversation-stream:${conversationId}`,
+      (event: { messages: Required<Message>[] }) => {
+        handleMessageUpdate(event.messages);
+      },
+    );
+
+    return () => {
+      subscriber.unsubscribe();
+    };
+  }, [conversationId, signalApi, handleMessageUpdate]);
 
   useEffect(() => {
-    if (!history) {
+    if (!history || !history.length) {
       return;
     }
 
-    set(history);
-  }, [history, set]);
+    setMessages(history);
+  }, [history, setMessages]);
+
+  useEffect(() => {
+    if (!conversationId) {
+      setMessages([]);
+    }
+  }, [conversationId]);
 
   useEffect(() => {
     if (models && models.length && !modelId) {
@@ -72,80 +105,45 @@ export const Conversation = ({
     }
   }, [models, modelId, setModelId]);
 
-  const [{ loading: sending, value: messageResponse }, sendMessage] =
-    useAsyncFn(async () => {
-      const newMessages: Message[] = [{ role: 'user', content: input }];
+  const [{ loading: sending }, sendMessage] = useAsyncFn(async () => {
+    const newMessages: Message[] = [
+      { role: 'human', content: input, metadata: {} },
+    ];
 
-      if (!modelId) {
-        errorApi.post({
-          name: 'NoModelError',
-          message:
-            'No model has been selected for this conversation. Please select a model before sending a message',
-        });
-        return undefined;
-      }
-
-      setInput('');
-      inputRef.current?.focus();
-
-      newMessages.forEach(message => push(message));
-
-      const response = await chatApi.sendMessage({
-        conversationId,
-        modelId,
-        messages: newMessages,
+    if (!modelId) {
+      errorApi.post({
+        name: 'NoModelError',
+        message:
+          'No model has been selected for this conversation. Please select a model before sending a message',
       });
-
-      setConversationId(response.conversationId);
-
-      response.messages.forEach(message => push(message));
-
-      // Get last item in response.messages
-      const mostRecentMessage = response.messages.at(-1);
-
-      if (mostRecentMessage) {
-        messageSubscriber?.unsubscribe();
-
-        const { id: messageId } = mostRecentMessage;
-
-        setMessageSubscriber(
-          signalApi.subscribe(
-            `ai-assistant.chat.message-stream:${messageId}`,
-            (message: Required<Message>) => {
-              const index = messagesRef.current.findIndex(
-                m => m.id === message.id,
-              );
-              if (index !== -1) {
-                updateAt(index, message);
-              }
-            },
-          ),
-        );
-      }
-
-      return response;
-    }, [
-      input,
-      inputRef,
-      chatApi,
-      setConversationId,
-      conversationId,
-      modelId,
-      errorApi,
-      setInput,
-    ]);
-
-  useEffect(() => {
-    if (
-      !messageResponse ||
-      !conversationId ||
-      conversationId === messageResponse.conversationId
-    ) {
-      return;
+      return undefined;
     }
 
-    setConversationId(messageResponse.conversationId);
-  }, [messageResponse, setConversationId, conversationId]);
+    setInput('');
+    inputRef.current?.focus();
+
+    setMessages(prev => [...prev, ...newMessages]);
+
+    const response = await chatApi.sendMessage({
+      conversationId,
+      modelId,
+      messages: newMessages,
+    });
+
+    setConversationId(response.conversationId);
+    setMessages(prev => [...prev, ...response.messages]);
+
+    return response;
+  }, [
+    input,
+    inputRef,
+    chatApi,
+    setConversationId,
+    conversationId,
+    modelId,
+    errorApi,
+    setInput,
+  ]);
 
   const messageEndRef = useRef<HTMLDivElement>(null);
 
@@ -170,15 +168,6 @@ export const Conversation = ({
       height="100%"
       minHeight={0}
     >
-      <Stack direction="row" spacing={2} alignItems="center">
-        <Autocomplete
-          options={models}
-          defaultValue={modelId}
-          onChange={(_, value) => setModelId(value || undefined)}
-          sx={{ width: 300 }}
-          renderInput={params => <TextField {...params} label="Models" />}
-        />
-      </Stack>
       {messages && (
         <Stack
           spacing={1}
@@ -222,6 +211,14 @@ export const Conversation = ({
                 sendMessage();
               }
             }}
+          />
+          <Autocomplete
+            options={models}
+            defaultValue={modelId}
+            onChange={(_, value) => setModelId(value || undefined)}
+            sx={{ width: 180 }}
+            size="small"
+            renderInput={params => <TextField {...params} label="Models" />}
           />
           <Button
             variant="contained"

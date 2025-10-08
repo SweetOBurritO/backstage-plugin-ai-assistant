@@ -37,6 +37,7 @@ export class ChatStore {
     conversationId: string,
     userRef: string,
     limit?: number,
+    excludeRoles?: Message['role'][],
   ): Promise<Required<Message>[]> {
     let query = this.messageTable()
       .where({ conversation_id: conversationId, userRef })
@@ -47,12 +48,17 @@ export class ChatStore {
       query = query.limit(limit).orderBy('created_at', 'desc');
     }
 
+    if (excludeRoles && excludeRoles.length > 0) {
+      query = query.whereNotIn('role', excludeRoles);
+    }
+
     const rows = await query;
 
     const chatMessages: Required<Message>[] = rows.map(row => ({
       role: row.role,
       content: row.content,
       id: row.id,
+      metadata: row.metadata,
     }));
 
     return chatMessages;
@@ -68,6 +74,7 @@ export class ChatStore {
       conversation_id: conversationId,
       role: msg.role,
       content: msg.content,
+      metadata: msg.metadata,
       userRef,
       created_at: this.client.fn.now(),
     }));
@@ -79,16 +86,8 @@ export class ChatStore {
     await this.messageTable().where({ id: message.id }).update({
       role: message.role,
       content: message.content,
+      metadata: message.metadata,
     });
-  }
-
-  async getConversationSize(conversationId: string) {
-    const count = await this.messageTable()
-      .where({ conversation_id: conversationId })
-      .count('* as count')
-      .first();
-
-    return count?.count ? Number(count.count) : 0;
   }
 
   async getConversation(

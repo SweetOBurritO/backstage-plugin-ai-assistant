@@ -2,6 +2,8 @@ import { createExtensionPoint } from '@backstage/backend-plugin-api';
 import { Ingestor } from './types/ingestor';
 import { Embeddings } from '@langchain/core/embeddings';
 import { BaseChatModel } from '@langchain/core/language_models/chat_models';
+import { Tool } from './types';
+import { ZodType } from 'zod';
 
 export type DataIngestorExtensionPoint = {
   registerIngestor: (ingestor: Ingestor) => void;
@@ -38,3 +40,11 @@ export const modelProviderExtensionPoint =
   createExtensionPoint<ModelProviderExtensionPoint>({
     id: 'ai-assistant.model-provider',
   });
+
+export type ToolExtensionPoint = {
+  register: (tool: Tool<ZodType>) => void;
+};
+
+export const toolExtensionPoint = createExtensionPoint<ToolExtensionPoint>({
+  id: 'ai-assistant.tool',
+});

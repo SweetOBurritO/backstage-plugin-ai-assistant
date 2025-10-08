@@ -227,7 +227,7 @@ export class PgVectorStore implements VectorStore {
    */
   async similaritySearch(
     query: string,
-    filter: EmbeddingDocumentMetadata,
+    filter?: EmbeddingDocumentMetadata,
     amount: number = this.amount,
   ): Promise<EmbeddingDocument[]> {
     if (!this.embeddings) {

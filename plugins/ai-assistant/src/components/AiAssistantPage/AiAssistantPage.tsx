@@ -18,9 +18,12 @@ import Typography from '@mui/material/Typography';
 import MenuIcon from '@mui/icons-material/Menu';
 import AddIcon from '@mui/icons-material/Add';
 import { useApi } from '@backstage/core-plugin-api';
+import { signalApiRef } from '@backstage/plugin-signals-react';
 
 export const AiAssistantPage = () => {
   const chatApi = useApi(chatApiRef);
+  const signalApi = useApi(signalApiRef);
+
   const theme = useTheme();
 
   const [conversationId, setConversationId] = useState<string>();
@@ -30,7 +33,7 @@ export const AiAssistantPage = () => {
     [chatApi],
   );
 
-  const [conversations, { set }] = useList<ConversationType>([]);
+  const [conversations, { set, updateAt }] = useList<ConversationType>([]);
 
   useEffect(() => {
     if (!conversationHistory) {
@@ -39,6 +42,27 @@ export const AiAssistantPage = () => {
 
     set(conversationHistory);
   }, [conversationHistory, set]);
+
+  useEffect(() => {
+    const subscription = signalApi.subscribe<{
+      conversation: ConversationType;
+    }>(`ai-assistant.chat.conversation-details-update`, ({ conversation }) => {
+      set(currentConversations => {
+        const index = currentConversations.findIndex(
+          c => c.id === conversation.id,
+        );
+
+        if (index !== -1) {
+          const newConversations = [...currentConversations];
+          newConversations[index] = conversation;
+          return newConversations;
+        }
+        return [conversation, ...currentConversations];
+      });
+    });
+
+    return () => subscription.unsubscribe();
+  }, [signalApi, set, updateAt]);
 
   const [open, setOpen] = useState(false);
 

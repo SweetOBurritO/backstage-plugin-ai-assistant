@@ -36,6 +36,7 @@
   ],
   "dependencies": {
     "@backstage/backend-plugin-api": "backstage:^",
-    "@langchain/core": "^0.3.72"
+    "@langchain/core": "^0.3.72",
+    "zod": "^4.1.11"
   }
 }

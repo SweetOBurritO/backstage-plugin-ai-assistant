@@ -12,12 +12,12 @@ export const Card = ({ children, role }: CardProps) => {
   return (
     <Paper
       sx={{
-        alignSelf: role === 'user' ? 'end' : 'start',
+        alignSelf: role === 'human' ? 'end' : 'start',
         maxWidth: '70%',
         width: '70%',
         borderRadius: 2,
         border: 'double transparent',
-        borderWidth: role !== 'user' ? '2px' : 0,
+        borderWidth: role !== 'human' ? '2px' : 0,
         backgroundImage: `linear-gradient(${theme.palette.background.paper}, ${theme.palette.background.paper}), linear-gradient(to right, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
         backgroundOrigin: 'border-box',
         backgroundClip: 'content-box, border-box',
