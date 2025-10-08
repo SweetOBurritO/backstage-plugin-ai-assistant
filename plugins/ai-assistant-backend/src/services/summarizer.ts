@@ -63,8 +63,6 @@ export const createSummarizerService = async ({
 
     const { text } = await llm.invoke(prompt);
 
-    console.log(text);
-
     return text.trim();
   };
 
