@@ -51,10 +51,6 @@ export const createDataIngestionPipeline = ({
     for await (const ingestor of ingestors) {
       logger.info(`Running ingestor: ${ingestor.id}`);
 
-      // TODO: This will cause these vectors to not be available while processing new documents
-      // We should rather look at deleting a specific document from the store as it is added if the ids match
-      await vectorStore.deleteDocuments({ filter: { source: ingestor.id } });
-
       const saveDocumentsBatch = async (documents: EmbeddingDocument[]) => {
         logger.info(
           `Ingested documents for ${ingestor.id}: ${documents.length}`,
@@ -67,6 +63,14 @@ export const createDataIngestionPipeline = ({
 
         const docs = await Promise.all(
           documents.map(async document => {
+            // Delete existing documents for this document id and ingestor source
+            logger.info(
+              `Deleting existing documents for ${document.metadata.id}`,
+            );
+            await vectorStore.deleteDocuments({
+              filter: { source: ingestor.id, id: document.metadata.id },
+            });
+
             const chunks = await splitter.splitText(document.content);
 
             const chunkDocs: EmbeddingDocument[] = chunks.flatMap(

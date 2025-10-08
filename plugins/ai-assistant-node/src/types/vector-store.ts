@@ -1,12 +1,22 @@
 import { Embeddings } from '@langchain/core/embeddings';
+import { RequireKeys } from './utils';
 
 export type EmbeddingsSource = string;
 
-export type EmbeddingDocumentMetadata = Partial<{
-  source: EmbeddingsSource;
-  id: string;
-  [key: string]: string;
-}>;
+/**
+ * Metadata that is required for each document to be embedded.
+ * - `source`: The source of the document, e.g. 'github', 'azure-devops', etc.
+ * - `id`: A unique identifier for the document within the source. Does not necessarily need to be globally unique or a UUID.
+ * Additional metadata can be added as needed.
+ */
+export type EmbeddingDocumentMetadata = RequireKeys<
+  {
+    source: EmbeddingsSource;
+    id: string;
+    [key: string]: any;
+  },
+  'id' | 'source'
+>;
 
 export type Embedding = {
   metadata: EmbeddingDocumentMetadata;
@@ -22,7 +32,7 @@ export type EmbeddingDocument = {
 
 type DeletionParams = {
   ids?: string[];
-  filter?: EmbeddingDocumentMetadata;
+  filter?: Partial<EmbeddingDocumentMetadata>;
 };
 
 export interface VectorStore {
