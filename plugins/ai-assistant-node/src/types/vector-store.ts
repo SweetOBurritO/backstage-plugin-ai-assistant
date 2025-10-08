@@ -13,7 +13,7 @@ export type EmbeddingDocumentMetadata = RequireKeys<
   {
     source: EmbeddingsSource;
     id: string;
-    [key: string]: any;
+    [key: string]: string;
   },
   'id' | 'source'
 >;
