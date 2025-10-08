@@ -103,7 +103,7 @@ export const createWikiIngestor = async ({
           metadata: {
             source: MODULE_ID,
             id: `${wiki.id}:${page.path}`,
-            url: page.url ?? '',
+            url: page.url!,
             organization: azureDevOpsService.organization,
             project: azureDevOpsService.project,
             wiki: wiki.name!,

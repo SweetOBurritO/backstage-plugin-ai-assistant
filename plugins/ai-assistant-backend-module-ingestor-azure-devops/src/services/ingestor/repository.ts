@@ -110,7 +110,7 @@ export const createRepositoryIngestor = async ({
           metadata: {
             source: MODULE_ID,
             id: `${repository.id}:${item.path}`,
-            url: item.url ?? '',
+            url: item.url!,
             organization: azureDevOpsService.organization,
             project: azureDevOpsService.project,
             repository: repository.name!,

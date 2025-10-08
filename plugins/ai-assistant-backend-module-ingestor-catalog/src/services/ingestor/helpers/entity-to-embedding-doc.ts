@@ -54,7 +54,7 @@ export function mapEntityToEmbeddingDoc(entity: Entity): EmbeddingDocument {
       kind: entity.kind,
       namespace: ns,
       name: entity.metadata.name,
-      uid: entity.metadata.uid,
+      uid: entity.metadata.uid!,
     },
     content: parts.join('\n'),
   };
