@@ -29,15 +29,13 @@ export const createGitHubIngestor = async ({
   >('aiAssistant.ingestors.github.repositories');
 
   const fileTypes =
-    config.getOptionalStringArray(
-      'aiAssistant.ingestors.github.fileTypes',
-    ) ?? defaultFileTypes;
+    config.getOptionalStringArray('aiAssistant.ingestors.github.fileTypes') ??
+    defaultFileTypes;
 
   // Get batch size for processing files (default to 50 files per batch)
   const filesBatchSize =
-    config.getOptionalNumber(
-      'aiAssistant.ingestors.github.filesBatchSize',
-    ) ?? DEFAULT_FILE_BATCH_SIZE;
+    config.getOptionalNumber('aiAssistant.ingestors.github.filesBatchSize') ??
+    DEFAULT_FILE_BATCH_SIZE;
 
   // Create GitHub service
   const githubService = await createGitHubService({ config, logger });
@@ -95,20 +93,29 @@ export const createGitHubIngestor = async ({
             file.path!,
           );
 
-          const completionStats = getProgressStats(globalIndex + 1, files.length);
+          const completionStats = getProgressStats(
+            globalIndex + 1,
+            files.length,
+          );
 
           logger.info(
             `Retrieved content for GitHub file: "${file.path}" in repository: "${repo.name}" [Progress: ${completionStats.completed}/${completionStats.total} (${completionStats.percentage}%) completed of repository]`,
           );
 
           // Generate proper GitHub URL for the file
-          const githubUrl = `https://github.com/${githubService.owner}/${repo.name}/blob/${repo.default_branch || 'main'}/${file.path}`;
-          
+          const githubUrl = `https://github.com/${githubService.owner}/${
+            repo.name
+          }/blob/${repo.default_branch || 'main'}/${file.path}`;
+
           // Create enhanced content with URL reference and metadata
           const enhancedContent = `Repository: ${repo.name}
           File Path: ${file.path}
           GitHub URL: ${githubUrl}
-          ${repo.description ? `Repository Description: ${repo.description}` : ''}
+          ${
+            repo.description
+              ? `Repository Description: ${repo.description}`
+              : ''
+          }
           
           Content:
           ${content}`;

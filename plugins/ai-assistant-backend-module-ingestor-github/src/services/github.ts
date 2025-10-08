@@ -15,14 +15,22 @@ export const createGitHubService = async ({
   // Get configuration values
   const owner = config.getString('aiAssistant.ingestors.github.owner');
   const appId = config.getString('aiAssistant.ingestors.github.appId');
-  const privateKey = config.getString('aiAssistant.ingestors.github.privateKey');
-  const installationId = config.getNumber('aiAssistant.ingestors.github.installationId');
-  const baseUrl = config.getOptionalString('aiAssistant.ingestors.github.baseUrl');
+  const privateKey = config.getString(
+    'aiAssistant.ingestors.github.privateKey',
+  );
+  const installationId = config.getNumber(
+    'aiAssistant.ingestors.github.installationId',
+  );
+  const baseUrl = config.getOptionalString(
+    'aiAssistant.ingestors.github.baseUrl',
+  );
 
   logger.info(`Connecting to GitHub App for owner: ${owner}`);
 
   if (!owner || !appId || !privateKey || !installationId) {
-    throw new Error('GitHub owner, appId, privateKey, and installationId are required');
+    throw new Error(
+      'GitHub owner, appId, privateKey, and installationId are required',
+    );
   }
 
   // Create GitHub App instance
@@ -42,13 +50,14 @@ export const createGitHubService = async ({
    * @returns List of repositories for the specified GitHub owner
    */
   const getRepos = async () => {
-    const { data: repositories } = await octokit.rest.apps.listReposAccessibleToInstallation({
-      per_page: 100,
-    });
+    const { data: repositories } =
+      await octokit.rest.apps.listReposAccessibleToInstallation({
+        per_page: 100,
+      });
 
     // Filter repositories by owner if needed
-    const repos = repositories.repositories.filter(repo => 
-      repo.owner?.login?.toLowerCase() === owner.toLowerCase()
+    const repos = repositories.repositories.filter(
+      repo => repo.owner?.login?.toLowerCase() === owner.toLowerCase(),
     );
 
     logger.info(`Found ${repos.length} repositories for owner ${owner}`);
@@ -77,7 +86,7 @@ export const createGitHubService = async ({
 
     if (fileTypes && fileTypes.length > 0) {
       const filteredFiles = files.filter((file: any) =>
-        fileTypes.some(type => file.path?.endsWith(type))
+        fileTypes.some(type => file.path?.endsWith(type)),
       );
       logger.info(
         `Filtered to ${filteredFiles.length} files with types: ${fileTypes.join(
@@ -108,11 +117,15 @@ export const createGitHubService = async ({
     }
 
     if (!('content' in fileContent) || fileContent.type !== 'file') {
-      throw new Error(`Expected file but got ${fileContent.type} for path: ${path}`);
+      throw new Error(
+        `Expected file but got ${fileContent.type} for path: ${path}`,
+      );
     }
 
     // Decode base64 content
-    const content = Buffer.from(fileContent.content, 'base64').toString('utf-8');
+    const content = Buffer.from(fileContent.content, 'base64').toString(
+      'utf-8',
+    );
 
     return content;
   };
