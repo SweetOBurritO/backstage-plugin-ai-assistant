@@ -63,9 +63,9 @@ export const createDataIngestionPipeline = ({
 
         const docs = await Promise.all(
           documents.map(async document => {
-            // Delete existing documents for this document id and ingestor source
+            // Delete existing documents with this document id and ingestor source
             logger.info(
-              `Deleting existing documents for ${document.metadata.id}`,
+              `Deleting existing documents with id: [${document.metadata.id}] and source: [${ingestor.id}]`,
             );
             await vectorStore.deleteDocuments({
               filter: { source: ingestor.id, id: document.metadata.id },
