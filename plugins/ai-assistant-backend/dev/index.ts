@@ -43,4 +43,16 @@ backend.add(
   ),
 );
 
+// backend.add(
+//   import(
+//     '@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-azure-devops'
+//   ),
+// );
+
+// backend.add(
+//   import(
+//     '@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-github'
+//   ),
+// );
+
 backend.start();

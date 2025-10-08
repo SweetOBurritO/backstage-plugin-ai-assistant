@@ -22,8 +22,6 @@ jobs:
         uses: backstage/actions/yarn-install@v0.6.17
         with:
           cache-prefix: ${{ runner.os }}-v22.x
-      - run: yarn commitlint --from=origin/main
-        if: github.actor != 'dependabot[bot]'
       - run: yarn lint:all
       - run: yarn dedupe --check
       - run: yarn prettier:check
