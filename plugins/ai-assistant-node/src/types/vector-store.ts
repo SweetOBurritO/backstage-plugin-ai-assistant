@@ -41,7 +41,7 @@ export interface VectorStore {
   deleteDocuments(deletionParams: DeletionParams): Promise<void>;
   similaritySearch(
     query: string,
-    filter?: EmbeddingDocumentMetadata,
+    filter?: Partial<EmbeddingDocumentMetadata>,
     amount?: number,
   ): Promise<EmbeddingDocument[]>;
 }
