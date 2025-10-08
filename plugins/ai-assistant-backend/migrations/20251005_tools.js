@@ -22,4 +22,11 @@ exports.up = async knex => {
 
   // update all messages that have the role assistant to role ai
   await knex('message').where('role', 'assistant').update({ role: 'ai' });
+
+  // add metadata jsonb column to message
+  await knex.schema.alterTable('message', table => {
+    table.jsonb('metadata').defaultTo({});
+  });
+
+  await knex('message').update({ metadata: {} });
 };

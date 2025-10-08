@@ -8,6 +8,7 @@ import { ChatStore } from '../database/chat-store';
 import {
   Conversation,
   Message,
+  JsonObject,
 } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { SignalsService } from '@backstage/plugin-signals-node';
 import {
@@ -20,6 +21,7 @@ import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { SystemMessagePromptTemplate } from '@langchain/core/prompts';
 import { createSummarizerService } from './summarizer';
 import { v4 as uuid } from 'uuid';
+import { ToolMessage } from '@langchain/core/messages';
 
 export type ChatServiceOptions = {
   models: Model[];
@@ -182,6 +184,7 @@ export const createChatService = async ({
       id: uuid(),
       role: 'ai',
       content: '',
+      metadata: {},
     };
 
     const streamFn = async () => {
@@ -236,10 +239,19 @@ export const createChatService = async ({
               ? message.content
               : JSON.stringify(message.content);
 
+          const toolName =
+            role === 'tool' ? (message as ToolMessage).name : undefined;
+          const metadata: JsonObject = {};
+
+          if (toolName) {
+            metadata.name = toolName;
+          }
+
           responseMessages.push({
             role,
             content,
             id,
+            metadata,
           });
         }
 

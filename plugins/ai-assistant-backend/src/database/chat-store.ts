@@ -58,6 +58,7 @@ export class ChatStore {
       role: row.role,
       content: row.content,
       id: row.id,
+      metadata: row.metadata,
     }));
 
     return chatMessages;
@@ -73,6 +74,7 @@ export class ChatStore {
       conversation_id: conversationId,
       role: msg.role,
       content: msg.content,
+      metadata: msg.metadata,
       userRef,
       created_at: this.client.fn.now(),
     }));
@@ -84,6 +86,7 @@ export class ChatStore {
     await this.messageTable().where({ id: message.id }).update({
       role: message.role,
       content: message.content,
+      metadata: message.metadata,
     });
   }
 

@@ -1,4 +1,6 @@
-type BaseMessage = {
+import { JsonObject } from './json';
+
+export type Message = {
   id?: string;
   role:
     | 'human'
@@ -10,14 +12,8 @@ type BaseMessage = {
     | 'tool'
     | 'remove';
   content: string;
+  metadata: JsonObject;
 };
-
-export type ToolMessage = BaseMessage & {
-  role: 'tool';
-  name: string;
-};
-
-export type Message = BaseMessage | ToolMessage;
 
 export type Conversation = {
   id: string;

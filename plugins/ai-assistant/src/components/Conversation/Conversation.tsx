@@ -106,7 +106,9 @@ export const Conversation = ({
   }, [models, modelId, setModelId]);
 
   const [{ loading: sending }, sendMessage] = useAsyncFn(async () => {
-    const newMessages: Message[] = [{ role: 'human', content: input }];
+    const newMessages: Message[] = [
+      { role: 'human', content: input, metadata: {} },
+    ];
 
     if (!modelId) {
       errorApi.post({

@@ -37,10 +37,6 @@ Do NOT use for general knowledge that doesn't require company-specific informati
           .describe('The number of results to return.'),
       }),
       func: async ({ query, filter, amount }) => {
-        console.log('query: ', query);
-        console.log('filter: ', filter);
-        console.log('amount: ', amount);
-
         const results = await vectorStore.similaritySearch(
           query,
           filter,

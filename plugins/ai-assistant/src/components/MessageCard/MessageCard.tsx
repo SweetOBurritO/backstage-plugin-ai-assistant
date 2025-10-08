@@ -77,7 +77,8 @@ export const MessageCard = ({ message }: MessageCardProps) => {
         variant="caption"
         sx={{ fontStyle: 'italic', color: theme.palette.text.secondary }}
       >
-        Used tool to enhance response...
+        Used tool{message.metadata.name ? ` ${message.metadata.name}` : ''} to
+        enhance response...
       </Typography>
     );
   }

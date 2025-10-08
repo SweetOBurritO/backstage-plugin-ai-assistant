@@ -1,12 +1,9 @@
 import express from 'express';
-import { AnyZodObject, ZodEffects } from 'zod';
+import { ZodObject } from 'zod';
 
 type ValidationKey = 'body' | 'query' | 'params' | 'headers';
 
-export const validation = (
-  schema: AnyZodObject | ZodEffects<AnyZodObject>,
-  key: ValidationKey,
-) => {
+export const validation = (schema: ZodObject, key: ValidationKey) => {
   return (
     req: express.Request,
     res: express.Response,
