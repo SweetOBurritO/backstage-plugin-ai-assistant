@@ -1,5 +1,4 @@
 import { Embeddings } from '@langchain/core/embeddings';
-import { RequireKeys } from './utils';
 
 export type EmbeddingsSource = string;
 
@@ -9,14 +8,11 @@ export type EmbeddingsSource = string;
  * - `id`: A unique identifier for the document within the source. Does not necessarily need to be globally unique or a UUID.
  * Additional metadata can be added as needed.
  */
-export type EmbeddingDocumentMetadata = RequireKeys<
-  {
-    source: EmbeddingsSource;
-    id: string;
-    [key: string]: string;
-  },
-  'id' | 'source'
->;
+export type EmbeddingDocumentMetadata = {
+  source: EmbeddingsSource;
+  id: string;
+  [key: string]: string;
+};
 
 export type Embedding = {
   metadata: EmbeddingDocumentMetadata;
