@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-node
 
+## 0.5.1
+
+### Patch Changes
+
+- 594fa77: optimised ingestor embedding to allow incremental deletes and updates
+
 ## 0.5.0
 
 ### Minor Changes
