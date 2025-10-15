@@ -19,6 +19,7 @@ import { applyDatabaseMigrations } from './database/migrations';
 import { PgVectorStore } from './database';
 import { signalsServiceRef } from '@backstage/plugin-signals-node';
 import { createSearchKnowledgeTool } from './services/tools/searchKnowledge';
+import { catalogServiceRef } from '@backstage/plugin-catalog-node';
 
 /**
  * aiAssistantPlugin backend plugin
@@ -83,6 +84,9 @@ export const aiAssistantPlugin = createBackendPlugin({
         httpAuth: coreServices.httpAuth,
         userInfo: coreServices.userInfo,
         signals: signalsServiceRef,
+        catalog: catalogServiceRef,
+        cache: coreServices.cache,
+        auth: coreServices.auth,
       },
 
       async init(options) {
