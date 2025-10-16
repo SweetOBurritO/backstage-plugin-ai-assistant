@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend
 
+## 0.8.0
+
+### Minor Changes
+
+- 3f477e3: Add user context to prompts.
+
 ## 0.7.1
 
 ### Patch Changes
