@@ -1,8 +1,11 @@
 import { Model } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
+import { CatalogService } from '@backstage/plugin-catalog-node';
+import { UserEntity } from '@backstage/catalog-model';
 import {
   LoggerService,
   RootConfigService,
   DatabaseService,
+  AuthService,
 } from '@backstage/backend-plugin-api';
 import { ChatStore } from '../database/chat-store';
 import {
@@ -22,6 +25,10 @@ import { SystemMessagePromptTemplate } from '@langchain/core/prompts';
 import { createSummarizerService } from './summarizer';
 import { v4 as uuid } from 'uuid';
 import { ToolMessage } from '@langchain/core/messages';
+import type {
+  BackstageCredentials,
+  CacheService,
+} from '@backstage/backend-plugin-api';
 
 export type ChatServiceOptions = {
   models: Model[];
@@ -30,6 +37,9 @@ export type ChatServiceOptions = {
   config: RootConfigService;
   database: DatabaseService;
   signals: SignalsService;
+  catalog: CatalogService;
+  cache: CacheService;
+  auth: AuthService;
 };
 
 type PromptOptions = {
@@ -73,6 +83,9 @@ export const createChatService = async ({
   database,
   signals,
   config,
+  catalog,
+  cache,
+  auth,
 }: ChatServiceOptions): Promise<ChatService> => {
   logger.info(`Available models: ${models.map(m => m.id).join(', ')}`);
 
@@ -98,6 +111,9 @@ export const createChatService = async ({
 
     Available tools:
     {toolList}
+
+    Calling User:
+    {user}
 
     Context:
     {context}`);
@@ -195,6 +211,9 @@ export const createChatService = async ({
         ['tool'],
       );
 
+      const credentials = await auth.getOwnServiceCredentials();
+      const user = await getUser(cache, userEntityRef, credentials, catalog);
+
       const systemPrompt = await systemPromptTemplate.formatMessages({
         basePrompt: system,
         toolGuideline,
@@ -202,6 +221,7 @@ export const createChatService = async ({
           .map(tool => `- ${tool.name}: ${tool.description}`)
           .join('\n'),
         context: `none`,
+        user,
       });
 
       const agent = createReactAgent({
@@ -319,3 +339,23 @@ export const createChatService = async ({
     addMessages,
   };
 };
+
+async function getUser(
+  cache: CacheService,
+  userEntityRef: string,
+  credentials: BackstageCredentials,
+  catalog: CatalogService,
+) {
+  const cached = await cache.get(userEntityRef);
+
+  if (cached) {
+    return JSON.parse(String(cached));
+  }
+
+  const user = (await catalog.getEntityByRef(userEntityRef, {
+    credentials,
+  })) as UserEntity | undefined;
+  await cache.set(userEntityRef, JSON.stringify(user));
+
+  return user;
+}
