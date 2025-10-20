@@ -47,6 +47,14 @@ export const Conversation = ({
 
   const [messages, setMessages] = useState<Message[]>([]);
 
+  useEffect(() => {
+    if (!history || !history.length) {
+      return;
+    }
+
+    setMessages(history);
+  }, [history, setMessages]);
+
   const handleMessageUpdate = useCallback(
     (newMessages: Required<Message>[]) => {
       setMessages(prev => {
@@ -86,14 +94,6 @@ export const Conversation = ({
   }, [conversationId, signalApi, handleMessageUpdate]);
 
   useEffect(() => {
-    if (!history || !history.length) {
-      return;
-    }
-
-    setMessages(history);
-  }, [history, setMessages]);
-
-  useEffect(() => {
     if (!conversationId) {
       setMessages([]);
     }
@@ -131,7 +131,6 @@ export const Conversation = ({
     });
 
     setConversationId(response.conversationId);
-    setMessages(prev => [...prev, ...response.messages]);
 
     return response;
   }, [
@@ -183,9 +182,19 @@ export const Conversation = ({
             },
           }}
         >
-          {messages.map(message => (
-            <MessageCard key={message.id} message={message} />
+          {messages.map((message, idx) => (
+            <MessageCard
+              key={message.id ?? idx}
+              message={message}
+              loading={false}
+            />
           ))}
+          {messages[messages.length - 1]?.role === 'human' && (
+            <MessageCard
+              message={{ content: '', role: 'ai', metadata: {} }}
+              loading
+            />
+          )}
           <div ref={messageEndRef} />
         </Stack>
       )}

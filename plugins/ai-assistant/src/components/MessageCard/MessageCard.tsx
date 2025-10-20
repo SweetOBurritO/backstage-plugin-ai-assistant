@@ -16,9 +16,10 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 export type MessageCardProps = {
   message: Message;
+  loading: boolean;
 };
 
-export const MessageCard = ({ message }: MessageCardProps) => {
+export const MessageCard = ({ message, loading }: MessageCardProps) => {
   const { content, role } = message;
 
   const theme = useTheme();
@@ -54,10 +55,6 @@ export const MessageCard = ({ message }: MessageCardProps) => {
     const [, contentResponse] = content.split('</think>');
     return contentResponse ?? '';
   }, [content, hasThinking]);
-
-  const loading = useMemo(() => {
-    return role === 'ai' && content === '';
-  }, [content, role]);
 
   if (loading) {
     return (

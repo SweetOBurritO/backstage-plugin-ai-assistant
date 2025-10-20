@@ -28,7 +28,7 @@ import type {
   BackstageCredentials,
   CacheService,
 } from '@backstage/backend-plugin-api';
-import { AIMessage } from '@langchain/core/messages';
+import { AIMessage, ToolMessage } from '@langchain/core/messages';
 
 export type ChatServiceOptions = {
   models: Model[];
@@ -196,13 +196,6 @@ export const createChatService = async ({
       throw new Error(`Model with id ${modelId} not found`);
     }
 
-    const aiMessage: Required<Message> = {
-      id: uuid(),
-      role: 'ai',
-      content: '',
-      metadata: {},
-    };
-
     const streamFn = async () => {
       const recentConversationMessages = await chatStore.getChatMessages(
         conversationId,
@@ -241,14 +234,26 @@ export const createChatService = async ({
         {
           messages: [...recentConversationMessages, ...messages],
         },
-        { streamMode: 'values' },
+        { streamMode: ['values', 'custom'] },
       );
 
       const responseMessages: Required<Message>[] = [];
 
-      for await (const { messages: promptMessages } of promptStream) {
+      for await (const [mode, chunk] of promptStream) {
+        if (mode === 'custom') {
+          console.log(chunk);
+
+          continue;
+        }
+
+        const { messages: promptMessages } = chunk;
+
         const newMessages: Required<Message>[] = promptMessages
           .filter(m => responseMessages.findIndex(rm => rm.id === m.id) === -1)
+          .filter(
+            m =>
+              recentConversationMessages.findIndex(rm => rm.id === m.id) === -1,
+          )
           .filter(m => m.getType() !== 'human')
           .map(m => {
             const id = m.id ?? '';
@@ -261,11 +266,17 @@ export const createChatService = async ({
             const metadata: JsonObject = {};
 
             if (role === 'ai') {
-              metadata.toolCalls = (m as AIMessage).tool_calls || [];
+              const aiMessage = m as AIMessage;
+              metadata.toolCalls = aiMessage.tool_calls || [];
               metadata.finishReason =
-                (m as AIMessage).response_metadata.finish_reason || undefined;
+                aiMessage.response_metadata.finish_reason || undefined;
               metadata.modelName =
-                (m as AIMessage).response_metadata.model_name || undefined;
+                aiMessage.response_metadata.model_name || undefined;
+            }
+
+            if (role === 'tool') {
+              const toolMessage = m as ToolMessage;
+              metadata.name = toolMessage.name || '';
             }
 
             return {
@@ -302,7 +313,7 @@ export const createChatService = async ({
 
     const result = streamFn();
 
-    return stream ? [aiMessage] : result;
+    return stream ? [] : result;
   };
 
   const getAvailableModels: ChatService['getAvailableModels'] = async () => {
