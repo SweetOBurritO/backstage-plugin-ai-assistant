@@ -1,5 +1,13 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend
 
+## 0.8.0
+
+### Minor Changes
+
+- 0fc9105: fix duplicate messaged and broken skeletons for messages on frontend
+- a398ebf: Swap to full message streaming instead of chunking to fix issue preventing tools from running
+- 3f477e3: Add user context to prompts.
+
 ## 0.7.1
 
 ### Patch Changes

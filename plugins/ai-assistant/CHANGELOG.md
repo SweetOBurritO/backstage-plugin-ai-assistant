@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant
 
+## 0.6.0
+
+### Minor Changes
+
+- 0fc9105: fix duplicate messaged and broken skeletons for messages on frontend
+
 ## 0.5.0
 
 ### Minor Changes
