@@ -251,8 +251,6 @@ export const createChatService = async ({
           .filter(m => responseMessages.findIndex(rm => rm.id === m.id) === -1)
           .filter(m => m.getType() !== 'human')
           .map(m => {
-            console.log(m);
-
             const id = m.id ?? '';
             const role = m.getType();
             const content =
