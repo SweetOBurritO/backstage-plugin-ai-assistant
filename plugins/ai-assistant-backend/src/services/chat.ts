@@ -234,18 +234,12 @@ export const createChatService = async ({
         {
           messages: [...recentConversationMessages, ...messages],
         },
-        { streamMode: ['values', 'custom'] },
+        { streamMode: ['values'] },
       );
 
       const responseMessages: Required<Message>[] = [];
 
-      for await (const [mode, chunk] of promptStream) {
-        if (mode === 'custom') {
-          console.log(chunk);
-
-          continue;
-        }
-
+      for await (const [, chunk] of promptStream) {
         const { messages: promptMessages } = chunk;
 
         const newMessages: Required<Message>[] = promptMessages
