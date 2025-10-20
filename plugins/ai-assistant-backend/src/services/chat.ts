@@ -281,16 +281,30 @@ export const createChatService = async ({
             };
           });
 
-        responseMessages.push(...newMessages);
+        // Simulate streaming until langchain messages error is better understood
+        for await (const m of newMessages) {
+          const parts = m.content.split(' ');
 
-        signals.publish({
-          channel: `ai-assistant.chat.conversation-stream:${conversationId}`,
-          message: { messages: responseMessages },
-          recipients: {
-            type: 'user',
-            entityRef: userEntityRef,
-          },
-        });
+          let messageBuilder = '';
+
+          for await (const part of parts) {
+            messageBuilder = messageBuilder.concat(part).concat(' ');
+            m.content = messageBuilder;
+
+            await new Promise(resolve => setTimeout(resolve, 50));
+
+            signals.publish({
+              channel: `ai-assistant.chat.conversation-stream:${conversationId}`,
+              message: { messages: [m] },
+              recipients: {
+                type: 'user',
+                entityRef: userEntityRef,
+              },
+            });
+          }
+        }
+
+        responseMessages.push(...newMessages);
       }
 
       responseMessages.forEach(m => {

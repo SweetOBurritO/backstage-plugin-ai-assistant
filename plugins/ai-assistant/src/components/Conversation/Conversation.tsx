@@ -189,7 +189,8 @@ export const Conversation = ({
               loading={false}
             />
           ))}
-          {messages[messages.length - 1]?.role === 'human' && (
+          {(messages[messages.length - 1]?.role === 'human' ||
+            messages[messages.length - 1]?.role === 'tool') && (
             <MessageCard
               message={{ content: '', role: 'ai', metadata: {} }}
               loading
