@@ -24,11 +24,11 @@ import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { SystemMessagePromptTemplate } from '@langchain/core/prompts';
 import { createSummarizerService } from './summarizer';
 import { v4 as uuid } from 'uuid';
-import { ToolMessage } from '@langchain/core/messages';
 import type {
   BackstageCredentials,
   CacheService,
 } from '@backstage/backend-plugin-api';
+import { AIMessage } from '@langchain/core/messages';
 
 export type ChatServiceOptions = {
   models: Model[];
@@ -214,6 +214,13 @@ export const createChatService = async ({
       const credentials = await auth.getOwnServiceCredentials();
       const user = await getUser(cache, userEntityRef, credentials, catalog);
 
+      addMessages(
+        messages,
+        userEntityRef,
+        conversationId,
+        recentConversationMessages,
+      );
+
       const systemPrompt = await systemPromptTemplate.formatMessages({
         basePrompt: system,
         toolGuideline,
@@ -234,57 +241,48 @@ export const createChatService = async ({
         {
           messages: [...recentConversationMessages, ...messages],
         },
-        { streamMode: 'messages' },
+        { streamMode: 'values' },
       );
 
       const responseMessages: Required<Message>[] = [];
-      let firstMessageId: string | undefined;
 
-      for await (const [
-        message,
-        { __pregel_task_id: messageId },
-      ] of promptStream) {
-        if (!firstMessageId) {
-          firstMessageId = messageId;
-        }
+      for await (const { messages: promptMessages } of promptStream) {
+        const newMessages: Required<Message>[] = promptMessages
+          .filter(m => responseMessages.findIndex(rm => rm.id === m.id) === -1)
+          .filter(m => m.getType() !== 'human')
+          .map(m => {
+            console.log(m);
 
-        const id = messageId === firstMessageId ? aiMessage.id : messageId;
+            const id = m.id ?? '';
+            const role = m.getType();
+            const content =
+              typeof m.content === 'string'
+                ? m.content
+                : JSON.stringify(m.content);
 
-        const index = responseMessages.findIndex(m => m.id === id);
-        const role = message.getType();
+            const metadata: JsonObject = {};
 
-        if (index === -1) {
-          const content =
-            typeof message.content === 'string'
-              ? message.content
-              : JSON.stringify(message.content);
+            if (role === 'ai') {
+              metadata.toolCalls = (m as AIMessage).tool_calls || [];
+              metadata.finishReason =
+                (m as AIMessage).response_metadata.finish_reason || undefined;
+              metadata.modelName =
+                (m as AIMessage).response_metadata.model_name || undefined;
+            }
 
-          const toolName =
-            role === 'tool' ? (message as ToolMessage).name : undefined;
-          const metadata: JsonObject = {};
-
-          if (toolName) {
-            metadata.name = toolName;
-          }
-
-          responseMessages.push({
-            role,
-            content,
-            id,
-            metadata,
+            return {
+              id,
+              role,
+              content,
+              metadata,
+            };
           });
-        }
 
-        if (index !== -1) {
-          responseMessages[index] = {
-            ...responseMessages[index],
-            content: (responseMessages[index].content += message.content),
-          };
-        }
+        responseMessages.push(...newMessages);
 
         signals.publish({
           channel: `ai-assistant.chat.conversation-stream:${conversationId}`,
-          message: { messages: responseMessages.filter(m => m.content) },
+          message: { messages: responseMessages },
           recipients: {
             type: 'user',
             entityRef: userEntityRef,
@@ -292,12 +290,14 @@ export const createChatService = async ({
         });
       }
 
-      addMessages(
-        [...messages, ...responseMessages],
-        userEntityRef,
-        conversationId,
-        recentConversationMessages,
-      );
+      responseMessages.forEach(m => {
+        m.id = uuid();
+      });
+
+      addMessages(responseMessages, userEntityRef, conversationId, [
+        ...recentConversationMessages,
+        ...messages,
+      ]);
 
       return responseMessages;
     };

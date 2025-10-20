@@ -15,6 +15,7 @@ Rules:
 8. **Actively use available tools** to enhance your responses:
 9. Adapt your approach based on the specific tools and capabilities available in the current session
 10. When you have a link to an image, include it in your response using markdown format ![description](image_url).
+11. When you have a link to a document, include it in your response using markdown format [description](document_url).
 `;
 
 export const DEFAULT_TOOL_GUIDELINE = `
@@ -22,7 +23,7 @@ TOOL USAGE GUIDELINES:
 - Only use tools when explicitly needed to answer the user's question
 - Read tool descriptions carefully before using them
 - If you can answer without tools, do so
-- When using tools, always explain why you're using each tool
+- IMPORTANT: When using tools, always explain why you're using each tool
 - Use tools in logical sequence, not randomly
 - If a tool fails, try an alternative approach before using another tool
 `;
