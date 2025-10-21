@@ -20,6 +20,10 @@ backend:
       user: postgres
       password: postgres
 
+  actions:
+    pluginSources:
+      - 'catalog'
+
 auth:
   providers:
     guest:
@@ -49,13 +53,6 @@ catalog:
       target: ../../catalog.local-dev.yaml
 
 aiAssistant:
-  prompt:
-    system: |
-      You are a helpful AI assistant called freddy that helps users with their software development tasks.s
-      When you are given a question, you should first try to answer it using your own knowledge. If you are unable to answer the question, you should use one of the tools at your disposal to find the answer. Once you have found the answer, you should provide it to the user in a clear and concise manner.
-  conversation:
-    summaryModel: <your-summary-model> # Must be in your list of models
-
   storage:
     pgVector:
       chunkSize: 800

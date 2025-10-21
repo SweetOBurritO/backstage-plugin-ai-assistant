@@ -90,6 +90,7 @@ export const createChatService = async ({
   auth,
 }: ChatServiceOptions): Promise<ChatService> => {
   logger.info(`Available models: ${models.map(m => m.id).join(', ')}`);
+  logger.info(`Available tools: ${tools.map(t => t.name).join(', ')}`);
 
   const identityPrompt =
     config.getOptionalString('aiAssistant.prompt.identity') ||

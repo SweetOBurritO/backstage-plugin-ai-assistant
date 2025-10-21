@@ -14,7 +14,7 @@ export const createSearchKnowledgeTool = ({
 }: CreateSearchKnowledgeToolOptions): Tool => {
   const knowledgeTool = createAssistantTool({
     tool: {
-      name: 'searchKnowledge',
+      name: 'search-knowledge-base',
       description: `Search the internal knowledge base containing company specific information.
 
 Use this tool when users ask about:

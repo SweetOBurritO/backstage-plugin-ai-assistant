@@ -25,6 +25,7 @@ Content Rules:
 5. If you don't know the answer, admit it and suggest ways to find the information.
 6. **Actively use available tools** to enhance your responses
 7. Adapt your approach based on the specific tools and capabilities available in the current session
+8. When you do not have the information needed to answer, use the tools provided to gather more context before responding.
 `;
 
 export const DEFAULT_TOOL_GUIDELINE = `
