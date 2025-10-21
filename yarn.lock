@@ -9232,7 +9232,7 @@ __metadata:
     "@backstage/cli": "npm:^0.34.3"
     "@backstage/types": "backstage:^"
     "@n8n/json-schema-to-zod": "npm:1.1.0"
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "workspace:^"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.5.1"
   languageName: unknown
   linkType: soft
 
@@ -9243,7 +9243,7 @@ __metadata:
     "@backstage/backend-plugin-api": "npm:^1.4.3"
     "@backstage/backend-test-utils": "npm:^1.9.0"
     "@backstage/cli": "npm:^0.34.3"
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "workspace:^"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.5.1"
     zod: "npm:^4.1.11"
   languageName: unknown
   linkType: soft
@@ -9299,7 +9299,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@sweetoburrito/backstage-plugin-ai-assistant-node@npm:^0.5.0, @sweetoburrito/backstage-plugin-ai-assistant-node@npm:^0.5.1, @sweetoburrito/backstage-plugin-ai-assistant-node@workspace:^, @sweetoburrito/backstage-plugin-ai-assistant-node@workspace:plugins/ai-assistant-node":
+"@sweetoburrito/backstage-plugin-ai-assistant-node@npm:^0.5.0, @sweetoburrito/backstage-plugin-ai-assistant-node@npm:^0.5.1, @sweetoburrito/backstage-plugin-ai-assistant-node@workspace:plugins/ai-assistant-node":
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-node@workspace:plugins/ai-assistant-node"
   dependencies:
