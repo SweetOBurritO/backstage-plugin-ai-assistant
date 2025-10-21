@@ -1,5 +1,16 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend
 
+## 0.9.0
+
+### Minor Changes
+
+- 8cce0db: added tool provider for backstage actions registry
+- f65da94: Add split identity and formatting prompts for improved quality and control of responses
+
+### Patch Changes
+
+- 2f5a179: fix issue where last message in an ai response is duplicated
+
 ## 0.8.0
 
 ### Minor Changes
