@@ -91,19 +91,19 @@ export const createChatService = async ({
 }: ChatServiceOptions): Promise<ChatService> => {
   logger.info(`Available models: ${models.map(m => m.id).join(', ')}`);
 
-  const identity =
+  const identityPrompt =
     config.getOptionalString('aiAssistant.prompt.identity') ||
     DEFAULT_IDENTITY_PROMPT;
 
-  const formatting =
+  const formattingPrompt =
     config.getOptionalString('aiAssistant.prompt.formatting') ||
     DEFAULT_FORMATTING_PROMPT;
 
-  const content =
+  const contentPrompt =
     config.getOptionalString('aiAssistant.prompt.content') ||
     DEFAULT_SYSTEM_PROMPT;
 
-  const system = `${identity}\n\n${formatting}\n\n${content}`;
+  const combinedBasePrompt = `${identityPrompt}\n\n${formattingPrompt}\n\n${contentPrompt}`;
 
   const toolGuideline =
     config.getOptionalString('aiAssistant.prompt.toolGuideline') ||
@@ -227,7 +227,7 @@ export const createChatService = async ({
       );
 
       const systemPrompt = await systemPromptTemplate.formatMessages({
-        basePrompt: system,
+        basePrompt: combinedBasePrompt,
         toolGuideline,
         toolList: agentTools
           .map(tool => `- ${tool.name}: ${tool.description}`)
