@@ -9236,6 +9236,18 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@sweetoburrito/backstage-plugin-ai-assistant-backend-module-tool-provider-search@workspace:plugins/ai-assistant-backend-module-tool-provider-search":
+  version: 0.0.0-use.local
+  resolution: "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-tool-provider-search@workspace:plugins/ai-assistant-backend-module-tool-provider-search"
+  dependencies:
+    "@backstage/backend-plugin-api": "npm:^1.4.3"
+    "@backstage/backend-test-utils": "npm:^1.9.0"
+    "@backstage/cli": "npm:^0.34.3"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "workspace:^"
+    zod: "npm:^4.1.11"
+  languageName: unknown
+  linkType: soft
+
 "@sweetoburrito/backstage-plugin-ai-assistant-backend@workspace:plugins/ai-assistant-backend":
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-backend@workspace:plugins/ai-assistant-backend"
