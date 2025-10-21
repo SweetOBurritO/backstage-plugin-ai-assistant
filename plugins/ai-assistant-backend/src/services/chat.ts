@@ -15,6 +15,8 @@ import {
 } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { SignalsService } from '@backstage/plugin-signals-node';
 import {
+  DEFAULT_FORMATTING_PROMPT,
+  DEFAULT_IDENTITY_PROMPT,
   DEFAULT_SYSTEM_PROMPT,
   DEFAULT_TOOL_GUIDELINE,
 } from '../constants/prompts';
@@ -89,9 +91,19 @@ export const createChatService = async ({
 }: ChatServiceOptions): Promise<ChatService> => {
   logger.info(`Available models: ${models.map(m => m.id).join(', ')}`);
 
-  const system =
-    config.getOptionalString('aiAssistant.prompt.system') ||
+  const identity =
+    config.getOptionalString('aiAssistant.prompt.identity') ||
+    DEFAULT_IDENTITY_PROMPT;
+
+  const formatting =
+    config.getOptionalString('aiAssistant.prompt.formatting') ||
+    DEFAULT_FORMATTING_PROMPT;
+
+  const content =
+    config.getOptionalString('aiAssistant.prompt.content') ||
     DEFAULT_SYSTEM_PROMPT;
+
+  const system = `${identity}\n\n${formatting}\n\n${content}`;
 
   const toolGuideline =
     config.getOptionalString('aiAssistant.prompt.toolGuideline') ||
