@@ -307,14 +307,12 @@ export const createChatService = async ({
         responseMessages.push(...newMessages);
       }
 
-      responseMessages.forEach(m => {
-        m.id = uuid();
-      });
-
-      addMessages(responseMessages, userEntityRef, conversationId, [
-        ...recentConversationMessages,
-        ...messages,
-      ]);
+      addMessages(
+        responseMessages.map(m => ({ ...m, id: uuid() })),
+        userEntityRef,
+        conversationId,
+        [...recentConversationMessages, ...messages],
+      );
 
       return responseMessages;
     };
