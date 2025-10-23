@@ -55,4 +55,10 @@ backend.add(
 //   ),
 // );
 
+backend.add(
+  import(
+    '@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-pokeapi'
+  ),
+);
+
 backend.start();
