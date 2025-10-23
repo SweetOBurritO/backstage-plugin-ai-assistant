@@ -196,37 +196,47 @@ See [Architecture](./architecture.md#extension-points) for details.
 
 ## 🏗️ Project Structure
 
-```
-plugins/
-├── ai-assistant/                                    # Frontend plugin
-│   └── src/
-│       ├── components/                              # React components
-│       └── api/                                     # Frontend API client
-│
-├── ai-assistant-backend/                            # Backend core plugin
-│   └── src/
-│       ├── services/                                # Core services
-│       │   ├── chat.ts                              # Chat orchestration
-│       │   ├── ingestor.ts                          # Ingestion pipeline
-│       │   └── tools/                               # Built-in tools
-│       └── database/                                # Database layer
-│
-├── ai-assistant-common/                             # Shared types
-│   └── src/types/                                   # TypeScript interfaces
-│
-├── ai-assistant-node/                               # Backend interfaces
-│   └── src/
-│       ├── extensions.ts                            # Extension points
-│       └── types/                                   # Backend types
-│
-└── ai-assistant-backend-module-*/                   # Backend modules
-    ├── embeddings-provider-azure-open-ai/           # Azure OpenAI embeddings
-    ├── embeddings-provider-ollama/                  # Ollama embeddings
-    ├── model-provider-azure-ai/                     # Azure AI models
-    ├── model-provider-ollama/                       # Ollama models
-    ├── ingestor-catalog/                            # Backstage catalog
-    ├── ingestor-github/                             # GitHub repositories
-    └── ingestor-azure-devops/                       # Azure DevOps
+```mermaid
+graph TB
+    subgraph Plugins["plugins/"]
+        subgraph Frontend["ai-assistant (Frontend)"]
+            FC[components/<br/>React UI]
+            FA[api/<br/>API Client]
+        end
+
+        subgraph Backend["ai-assistant-backend (Core)"]
+            BS[services/<br/>Chat, Ingestion]
+            BD[database/<br/>Database Layer]
+            BT[tools/<br/>Built-in Tools]
+        end
+
+        subgraph Common["ai-assistant-common"]
+            CT[types/<br/>Shared Interfaces]
+        end
+
+        subgraph Node["ai-assistant-node"]
+            NE[extensions.ts<br/>Extension Points]
+            NT[types/<br/>Backend Types]
+        end
+
+        subgraph Modules["Backend Modules"]
+            ME[embeddings-provider-*<br/>Azure OpenAI, Ollama]
+            MM[model-provider-*<br/>Azure AI, Ollama]
+            MI[ingestor-*<br/>Catalog, GitHub, Azure DevOps]
+        end
+    end
+
+    Frontend --> Backend
+    Frontend --> Common
+    Backend --> Node
+    Backend --> Common
+    Modules --> Node
+
+    style Frontend fill:#e3f2fd
+    style Backend fill:#fff3e0
+    style Common fill:#f3e5f5
+    style Node fill:#e8f5e9
+    style Modules fill:#fce4ec
 ```
 
 ## 🔗 External Resources

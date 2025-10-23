@@ -1,5 +1,10 @@
 # Backstage Plugin: AI Assistant
 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Node Version](https://img.shields.io/badge/node-20%20%7C%2022-brightgreen.svg)](https://nodejs.org)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![Backstage](https://img.shields.io/badge/Backstage-New%20Backend%20System-blueviolet)](https://backstage.io)
+
 A production-ready Backstage plugin that provides an intelligent AI assistant with Retrieval-Augmented Generation (RAG) capabilities. This plugin enables conversational AI interactions with context from your organization's documentation, code repositories, and catalog entities.
 
 ## ✨ Features
@@ -100,26 +105,41 @@ For detailed setup instructions, see [Deployment Guide](./docs/deployment.md).
 
 The plugin follows a modular architecture with clear separation of concerns:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     Frontend (React)                        │
-│              ai-assistant Plugin UI                         │
-└─────────────────────┬───────────────────────────────────────┘
-                      │ REST API
-┌─────────────────────▼───────────────────────────────────────┐
-│                  Backend Core Plugin                        │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
-│  │ Chat Service │  │  Ingestion   │  │Vector Store  │     │
-│  │              │  │   Pipeline   │  │  (pgvector)  │     │
-│  └──────────────┘  └──────────────┘  └──────────────┘     │
-└─────────────────────┬───────────────────────────────────────┘
-                      │ Extension Points
-        ┌─────────────┼─────────────┬──────────────┐
-        │             │              │              │
-┌───────▼─────┐ ┌────▼────┐  ┌─────▼─────┐  ┌────▼────┐
-│ Embeddings  │ │ Models  │  │ Ingestors │  │  Tools  │
-│  Providers  │ │Providers│  │           │  │         │
-└─────────────┘ └─────────┘  └───────────┘  └─────────┘
+```mermaid
+graph TB
+    subgraph Frontend["Frontend Layer"]
+        UI[AI Assistant UI<br/>React Components]
+    end
+
+    subgraph Backend["Backend Core Plugin"]
+        Router[Router<br/>HTTP API]
+        Chat[Chat Service]
+        Ingestion[Ingestion Pipeline]
+        Vector[Vector Store<br/>pgvector]
+
+        Router --> Chat
+        Router --> Ingestion
+        Chat --> Vector
+        Ingestion --> Vector
+    end
+
+    subgraph Extensions["Extension Points"]
+        Embeddings[Embeddings Providers<br/>Azure OpenAI, Ollama]
+        Models[Model Providers<br/>Azure AI, Ollama]
+        Ingestors[Ingestors<br/>Catalog, GitHub, Azure DevOps]
+        Tools[Tools<br/>Custom Functions]
+    end
+
+    UI -->|REST API + SSE| Router
+    Chat --> Embeddings
+    Chat --> Models
+    Chat --> Tools
+    Ingestion --> Ingestors
+    Ingestion --> Embeddings
+
+    style Frontend fill:#e1f5ff
+    style Backend fill:#fff4e6
+    style Extensions fill:#f3e5f5
 ```
 
 See the [Architecture Guide](./docs/architecture.md) for detailed information.
@@ -176,30 +196,120 @@ plugins/
 
 ## 🤝 Contributing
 
-We welcome contributions! To contribute:
+We welcome contributions from the community! Whether you're fixing bugs, adding features, improving documentation, or helping other users, your contributions are valued.
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Submit a pull request
+### Ways to Contribute
 
-Please follow the existing code style and ensure all tests pass.
+- 🐛 **Report bugs** - Help us identify and fix issues
+- ✨ **Suggest features** - Share ideas for new capabilities
+- 📖 **Improve docs** - Make our documentation clearer and more comprehensive
+- 💻 **Submit code** - Fix bugs, add features, or optimize performance
+- 🔍 **Review PRs** - Help review contributions from other developers
+- 💬 **Help others** - Answer questions and participate in discussions
+
+### Getting Started
+
+1. Read our [Contributing Guide](CONTRIBUTING.md) for detailed instructions
+2. Check out our [Code of Conduct](CODE_OF_CONDUCT.md)
+3. Review the [Architecture Documentation](./docs/architecture.md) to understand the system
+4. Look for issues labeled `good first issue` or `help wanted`
+5. Join discussions and ask questions
+
+### Development Workflow
+
+```bash
+# Fork and clone the repository
+git clone https://github.com/YOUR_USERNAME/backstage-plugin-ai-assistant.git
+
+# Install dependencies
+yarn install
+
+# Start development environment
+yarn start
+
+# Run tests
+yarn test
+
+# Lint and format code
+yarn lint:all
+yarn prettier:write
+```
+
+For more details, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+### Project Governance
+
+Learn about our governance model, project roles, and decision-making process in [GOVERNANCE.md](GOVERNANCE.md).
 
 ## 📋 Roadmap
 
-<!-- Add roadmap items here -->
+### Current Version (0.0.1)
+
+- ✅ Core RAG functionality with pgvector
+- ✅ Multi-model support (Azure OpenAI, Ollama)
+- ✅ Pluggable architecture with extension points
+- ✅ Real-time streaming responses
+- ✅ Catalog, GitHub, and Azure DevOps ingestors
+- ✅ Conversation management and history
+
+### Planned Features
+
+#### Short Term (Q1 2026)
+
+- 🔄 **Enhanced Tool Support** - More built-in tools for common operations
+- 🔄 **Improved UI/UX** - Enhanced chat interface with rich formatting
+- 🔄 **Performance Optimization** - Faster vector searches and reduced latency
+- 🔄 **Additional Ingestors** - Confluence, Notion, and file system support
+- 🔄 **Monitoring & Observability** - Built-in metrics and tracing
+
+#### Medium Term (Q2-Q3 2026)
+
+- 📋 **Multi-tenancy Support** - User and team-specific knowledge bases
+- 📋 **Advanced RAG Techniques** - Hybrid search, re-ranking, and query expansion
+- 📋 **Model Provider Expansion** - Support for Anthropic, Google Gemini, and more
+- 📋 **Conversation Export** - Export conversations for analysis and sharing
+- 📋 **Admin Dashboard** - Management UI for configuration and monitoring
+
+#### Long Term (Q4 2026 and beyond)
+
+- 💡 **Fine-tuning Support** - Custom model fine-tuning on organization data
+- 💡 **Multi-modal Support** - Image and document understanding
+- 💡 **Agent Workflows** - Complex multi-step task automation
+- 💡 **Feedback Loop** - User feedback to improve responses
+- 💡 **Enterprise Features** - SSO, audit logging, and compliance tools
+
+### Version Compatibility
+
+| Component    | Version      | Status                            |
+| ------------ | ------------ | --------------------------------- |
+| Node.js      | 20.x, 22.x   | ✅ Supported                      |
+| Backstage    | 1.31+        | ✅ Supported (New Backend System) |
+| PostgreSQL   | 12+          | ✅ Supported                      |
+| pgvector     | 0.5+         | ✅ Supported                      |
+| Azure OpenAI | API 2024-02+ | ✅ Supported                      |
+| Ollama       | 0.1.0+       | ✅ Supported                      |
+
+See [GitHub Projects](https://github.com/SweetOBurritO/backstage-plugin-ai-assistant/projects) for detailed tracking.
 
 ## 📄 License
 
-This project is licensed under the terms specified in the [LICENSE](./LICENSE) file.
+This project is licensed under the Apache License 2.0 - see the [LICENSE](./LICENSE) file for details.
+
+## 📝 Changelog
+
+For a detailed list of changes, improvements, and bug fixes in each release, see:
+
+- [Backend Plugin Changelog](./plugins/ai-assistant-backend/CHANGELOG.md)
+- [Frontend Plugin Changelog](./plugins/ai-assistant/CHANGELOG.md)
 
 ## 💬 Support
 
 For issues, questions, or contributions, please:
 
 - Check the [Troubleshooting Guide](./docs/troubleshooting.md)
-- Open an issue on GitHub
+- Search [existing issues](https://github.com/SweetOBurritO/backstage-plugin-ai-assistant/issues)
+- Open a [new issue](https://github.com/SweetOBurritO/backstage-plugin-ai-assistant/issues/new) on GitHub
+- Start a [discussion](https://github.com/SweetOBurritO/backstage-plugin-ai-assistant/discussions) for questions
 - Refer to the [documentation](./docs/)
 
 ---

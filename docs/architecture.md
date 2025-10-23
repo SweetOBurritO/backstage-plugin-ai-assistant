@@ -17,41 +17,51 @@ The AI Assistant plugin follows a modular, extensible architecture built on Back
 
 ### High-Level Architecture
 
-```
-┌──────────────────────────────────────────────────────────────────┐
-│                         Frontend Layer                           │
-│  ┌────────────────────────────────────────────────────────┐     │
-│  │  AI Assistant UI (React)                               │     │
-│  │  - Chat Interface                                      │     │
-│  │  - Conversation Management                             │     │
-│  │  - Model Selection                                     │     │
-│  │  - Real-time Streaming                                 │     │
-│  └────────────────────────────────────────────────────────┘     │
-└──────────────────────┬───────────────────────────────────────────┘
-                       │ HTTP/REST + SSE (Server-Sent Events)
-┌──────────────────────▼───────────────────────────────────────────┐
-│                        Backend Core Plugin                       │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
-│  │ Router       │  │ Chat Service │  │  Ingestion   │          │
-│  │ (HTTP API)   │  │              │  │  Pipeline    │          │
-│  └──────────────┘  └──────┬───────┘  └──────┬───────┘          │
-│                            │                  │                  │
-│  ┌──────────────┐  ┌──────▼───────┐  ┌──────▼───────┐          │
-│  │ Chat Store   │  │ Summarizer   │  │ Vector Store │          │
-│  │ (Postgres)   │  │ Service      │  │ (pgvector)   │          │
-│  └──────────────┘  └──────────────┘  └──────────────┘          │
-└──────────────────────┬───────────────────────────────────────────┘
-                       │ Extension Points (Backend Plugin API)
-         ┌─────────────┼─────────────┬──────────────┬─────────────┐
-         │             │              │              │             │
-┌────────▼──────┐ ┌───▼─────┐  ┌────▼─────┐  ┌─────▼──────┐    │
-│  Embeddings   │ │ Model   │  │Ingestors │  │   Tools    │    │
-│  Providers    │ │Providers│  │          │  │            │    │
-│               │ │         │  │          │  │            │    │
-│ - Azure OAI   │ │- Azure  │  │- Catalog │  │- Search KB │    │
-│ - Ollama      │ │- Ollama │  │- GitHub  │  │- Custom    │    │
-│               │ │         │  │- AzDevOps│  │            │    │
-└───────────────┘ └─────────┘  └──────────┘  └────────────┘    │
+```mermaid
+graph TB
+    subgraph Frontend["Frontend Layer"]
+        UI["AI Assistant UI (React)<br/>- Chat Interface<br/>- Conversation Management<br/>- Model Selection<br/>- Real-time Streaming"]
+    end
+
+    subgraph Backend["Backend Core Plugin"]
+        Router["Router<br/>(HTTP API)"]
+        Chat["Chat Service"]
+        Ingestion["Ingestion Pipeline"]
+        ChatStore["Chat Store<br/>(PostgreSQL)"]
+        Summarizer["Summarizer Service"]
+        VectorStore["Vector Store<br/>(pgvector)"]
+
+        Router --> Chat
+        Router --> Ingestion
+        Chat --> ChatStore
+        Chat --> Summarizer
+        Chat --> VectorStore
+        Ingestion --> VectorStore
+    end
+
+    subgraph Extensions["Extension Points"]
+        direction TB
+        Embed["Embeddings Providers<br/>- Azure OpenAI<br/>- Ollama"]
+        Models["Model Providers<br/>- Azure AI<br/>- Ollama"]
+        Ingestors["Ingestors<br/>- Catalog<br/>- GitHub<br/>- Azure DevOps"]
+        Tools["Tools<br/>- Search KB<br/>- Custom"]
+    end
+
+    UI -->|"HTTP/REST + SSE"| Router
+    Chat --> Embed
+    Chat --> Models
+    Chat --> Tools
+    Ingestion --> Ingestors
+    Ingestion --> Embed
+
+    style Frontend fill:#e3f2fd
+    style Backend fill:#fff3e0
+    style Extensions fill:#f3e5f5
+    style UI fill:#bbdefb
+    style Router fill:#ffe0b2
+    style Chat fill:#ffe0b2
+    style Ingestion fill:#ffe0b2
+    style VectorStore fill:#ffccbc
 ```
 
 ## Core Components
@@ -300,99 +310,123 @@ type Tool<T extends ZodType> = {
 
 ### Chat Flow
 
-```
-1. User sends message via frontend
-   │
-   ▼
-2. Frontend POST to /chat endpoint
-   │
-   ▼
-3. Backend Router receives request
-   │
-   ▼
-4. Chat Service processes message
-   ├─ Retrieve conversation history
-   ├─ Perform similarity search in vector store
-   ├─ Build context with retrieved documents
-   ├─ Construct system prompt
-   │
-   ▼
-5. LangChain ReAct Agent executes
-   ├─ Process user message
-   ├─ Call tools if needed
-   ├─ Generate response
-   │
-   ▼
-6. Response streaming
-   ├─ Stream tokens via Backstage Signals
-   ├─ Frontend receives real-time updates
-   │
-   ▼
-7. Save to database
-   ├─ Store messages in chat_store
-   ├─ Update conversation metadata
-   │
-   ▼
-8. Return final response to frontend
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant Router
+    participant ChatService
+    participant VectorStore
+    participant LLM
+    participant Database
+
+    User->>Frontend: Send message
+    Frontend->>Router: POST /chat
+    Router->>ChatService: Process message
+
+    ChatService->>Database: Retrieve conversation history
+    Database-->>ChatService: Previous messages
+
+    ChatService->>VectorStore: Similarity search
+    VectorStore-->>ChatService: Relevant documents
+
+    ChatService->>ChatService: Build context & prompt
+
+    ChatService->>LLM: Execute ReAct Agent
+
+    alt Tool call needed
+        LLM->>ChatService: Call tool
+        ChatService->>ChatService: Execute tool
+        ChatService->>LLM: Return tool result
+    end
+
+    LLM-->>ChatService: Generate response (streaming)
+
+    loop Stream tokens
+        ChatService->>Frontend: Stream via SSE
+        Frontend->>User: Display partial response
+    end
+
+    ChatService->>Database: Save messages
+    ChatService-->>Frontend: Final response
+    Frontend->>User: Display complete response
 ```
 
 ### Ingestion Flow
 
-```
-1. Scheduler triggers ingestion job
-   │
-   ▼
-2. Ingestion Pipeline starts
-   │
-   ▼
-3. For each registered Ingestor:
-   ├─ Ingestor fetches raw data
-   │  (e.g., GitHub files, Catalog entities)
-   │
-   ▼
-4. Process documents
-   ├─ Delete old documents for same source+id
-   ├─ Split text into chunks (500 chars)
-   ├─ Add chunk metadata
-   │
-   ▼
-5. Generate embeddings
-   ├─ Use registered embeddings provider
-   ├─ Create vector representations
-   │
-   ▼
-6. Store in pgvector
-   ├─ Save document content
-   ├─ Save metadata
-   ├─ Save vector embeddings
-   │
-   ▼
-7. Log completion and metrics
+```mermaid
+flowchart TD
+    Start([Scheduler Triggers]) --> Pipeline[Ingestion Pipeline Starts]
+
+    Pipeline --> Loop{For Each<br/>Ingestor}
+
+    Loop -->|Catalog| IC[Catalog Ingestor]
+    Loop -->|GitHub| IG[GitHub Ingestor]
+    Loop -->|Azure DevOps| IA[Azure DevOps Ingestor]
+    Loop -->|Custom| IX[Custom Ingestors]
+
+    IC --> Fetch[Fetch Raw Data]
+    IG --> Fetch
+    IA --> Fetch
+    IX --> Fetch
+
+    Fetch --> Process[Process Documents]
+
+    Process --> Delete[Delete Old Versions<br/>same source+id]
+    Delete --> Chunk[Split into Chunks<br/>500 chars default]
+    Chunk --> Meta[Add Metadata<br/>source, id, refs]
+
+    Meta --> Embed[Generate Embeddings]
+    Embed --> EmbedProvider[Embeddings Provider<br/>Azure OpenAI/Ollama]
+    EmbedProvider --> Vectors[Vector Representations]
+
+    Vectors --> Store[Store in pgvector]
+    Store --> SaveContent[Save Content]
+    SaveContent --> SaveMeta[Save Metadata]
+    SaveMeta --> SaveVector[Save Vectors]
+
+    SaveVector --> Log[Log Metrics]
+    Log --> Loop
+
+    Loop -->|All Done| Complete([Ingestion Complete])
+
+    style Start fill:#c8e6c9
+    style Complete fill:#c8e6c9
+    style Process fill:#fff9c4
+    style Embed fill:#ffccbc
+    style Store fill:#b3e5fc
 ```
 
 ### RAG Context Retrieval
 
-```
-User Query: "How do I configure Azure integration?"
-   │
-   ▼
-1. Generate query embedding
-   │
-   ▼
-2. Vector similarity search
-   ├─ Compare query vector with document vectors
-   ├─ Retrieve top K most similar documents (default: 10)
-   │
-   ▼
-3. Build context
-   ├─ Combine retrieved document chunks
-   ├─ Include metadata (source, entity refs, etc.)
-   │
-   ▼
-4. Inject into system prompt
-   │
-   ▼
-5. LLM generates response with context
+```mermaid
+graph LR
+    Query["User Query:<br/>How do I configure<br/>Azure integration?"] --> GenEmbed[Generate Query<br/>Embedding]
+
+    GenEmbed --> Search[Vector Similarity<br/>Search]
+
+    subgraph VectorDB["pgvector Database"]
+        Docs[(Document Vectors)]
+    end
+
+    Search --> Docs
+    Docs --> Compare[Compare Similarity<br/>Cosine Distance]
+    Compare --> TopK[Retrieve Top K<br/>default: 10]
+
+    TopK --> Context[Build Context]
+    Context --> Combine[Combine Document<br/>Chunks]
+    Context --> AddMeta[Add Metadata<br/>source, refs, etc.]
+
+    Combine --> Prompt[Send to LLM<br/>with System Prompt]
+    AddMeta --> Prompt
+
+    Prompt --> LLM[Language Model]
+    LLM --> Response[Contextual Response]
+
+    style Query fill:#e1f5fe
+    style VectorDB fill:#f3e5f5
+    style Context fill:#fff9c4
+    style Response fill:#c8e6c9
 ```
 
 ## Database Schema
