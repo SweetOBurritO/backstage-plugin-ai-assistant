@@ -22,7 +22,9 @@
     "new": "backstage-cli new --scope sweetoburrito --no-private",
     "prepare": "husky",
     "release": "changeset version && yarn install --mode=update-lockfile",
-    "publish": "changeset publish"
+    "publish": "changeset publish",
+    "podman:up": "podman compose up -d",
+    "podman:down": "podman compose down"
   },
   "workspaces": {
     "packages": [
