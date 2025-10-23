@@ -5,3 +5,4 @@ This document provides an overview of the Backstage AI Assistant plugin, includi
 ## Installation
 
 - [Setup a model provider](./models/index.md)
+- [Setup an embeddings provider](./embeddings/index.md)

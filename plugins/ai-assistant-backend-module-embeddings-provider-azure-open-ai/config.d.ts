@@ -5,6 +5,7 @@ export interface Config {
         endpoint: string;
         deploymentName: string;
         instanceName: string;
+        openAIApiVersion: string;
         /**
          * @visibility secret
          */

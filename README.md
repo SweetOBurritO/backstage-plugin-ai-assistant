@@ -1,8 +1,7 @@
 # Backstage Plugin AI Assistant
 
 <p align="center">
-<img src="docs/images/logo.png" alt="assistant-logo.png" style="max-width:300px; width:100%; height:auto;"/>
-</p>
+<img src="docs/images/logo.png" alt="assistant-logo.png" width="200"/>
 </p>
 
 This repository provides a modular AI Assistant plugin for [Backstage](https://backstage.io/), enabling conversational AI, RAG (Retrieval-Augmented Generation), and tool integrations for developer portals. It supports multiple backend modules for data ingestion, model providers, embeddings, and tool providers.
@@ -17,4 +16,4 @@ This repository provides a modular AI Assistant plugin for [Backstage](https://b
 
 ## Getting Started
 
-See our [installation instructions](docs)
+See our [installation instructions](docs/index.md)
