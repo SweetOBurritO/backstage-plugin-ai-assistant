@@ -321,12 +321,13 @@ export const createChatService = async ({
 
         // Simulate streaming until langchain messages error is better understood
         for await (const m of newMessages) {
-          const parts = m.content.split(' ');
-
+          const words = m.content.split(' ');
+          const chunkSize = 5; // Send 5 words at a time
           let messageBuilder = '';
 
-          for await (const part of parts) {
-            messageBuilder = messageBuilder.concat(part).concat(' ');
+          for (let i = 0; i < words.length; i += chunkSize) {
+            const wordChunk = words.slice(i, i + chunkSize).join(' ');
+            messageBuilder = messageBuilder.concat(wordChunk).concat(' ');
             m.content = messageBuilder;
 
             await new Promise(resolve => setTimeout(resolve, 50));
