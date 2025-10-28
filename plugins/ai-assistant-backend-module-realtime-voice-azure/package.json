@@ -1,0 +1,50 @@
+{
+  "name": "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-realtime-voice-azure",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "description": "The realtime-voice-azure backend module for the ai-assistant plugin providing WebRTC-based voice conversion via Azure OpenAI Realtime API.",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "publishConfig": {
+    "access": "public",
+    "main": "dist/index.cjs.js",
+    "types": "dist/index.d.ts"
+  },
+  "backstage": {
+    "role": "backend-plugin-module",
+    "pluginId": "ai-assistant",
+    "pluginPackage": "@sweetoburrito/backstage-plugin-ai-assistant-backend"
+  },
+  "scripts": {
+    "start": "backstage-cli package start",
+    "build": "backstage-cli package build",
+    "lint": "backstage-cli package lint",
+    "test": "backstage-cli package test",
+    "clean": "backstage-cli package clean",
+    "prepack": "backstage-cli package prepack",
+    "postpack": "backstage-cli package postpack"
+  },
+  "dependencies": {
+    "@alcyone-labs/zod-to-json-schema": "4.0.10",
+    "@backstage/backend-plugin-api": "backstage:^",
+    "@backstage/catalog-model": "^1.7.5",
+    "@backstage/errors": "backstage:^",
+    "@backstage/plugin-catalog-node": "^1.19.1",
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "^0.5.0",
+    "express": "^4.17.1",
+    "express-promise-router": "^4.1.0",
+    "node-fetch": "^2.6.7",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@backstage/backend-test-utils": "backstage:^",
+    "@backstage/cli": "backstage:^",
+    "@types/express": "^4.0.0",
+    "@types/node-fetch": "^2.6.2"
+  },
+  "files": [
+    "dist",
+    "config.d.ts"
+  ],
+  "configSchema": "config.d.ts"
+}

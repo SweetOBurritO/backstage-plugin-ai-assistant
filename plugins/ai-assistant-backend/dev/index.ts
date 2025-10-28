@@ -67,4 +67,10 @@ backend.add(
   ),
 );
 
+backend.add(
+  import(
+    '@sweetoburrito/backstage-plugin-ai-assistant-backend-module-realtime-voice-azure'
+  ),
+);
+
 backend.start();
