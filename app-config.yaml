@@ -92,6 +92,7 @@ aiAssistant:
         - endpoint: <your-azure-ai-foundry-endpoint>
           modelName: '<your-model>'
 
+  # See ./docs/langfuse.md for more information
   # langfuse:
   #   secretKey: <<your-langfuse-secretKey>>>
   #   publicKey: <<your-langfuse-publicKey>>>
