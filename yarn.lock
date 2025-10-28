@@ -9269,7 +9269,7 @@ __metadata:
     "@backstage/cli": "npm:^0.34.3"
     "@langchain/core": "npm:^1.0.1"
     "@langchain/google-vertexai": "npm:^1.0.0"
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "workspace:^"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.5.1"
   languageName: unknown
   linkType: soft
 
@@ -9362,7 +9362,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@sweetoburrito/backstage-plugin-ai-assistant-node@npm:^0.5.0, @sweetoburrito/backstage-plugin-ai-assistant-node@npm:^0.5.1, @sweetoburrito/backstage-plugin-ai-assistant-node@workspace:^, @sweetoburrito/backstage-plugin-ai-assistant-node@workspace:plugins/ai-assistant-node":
+"@sweetoburrito/backstage-plugin-ai-assistant-node@npm:^0.5.0, @sweetoburrito/backstage-plugin-ai-assistant-node@npm:^0.5.1, @sweetoburrito/backstage-plugin-ai-assistant-node@workspace:plugins/ai-assistant-node":
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-node@workspace:plugins/ai-assistant-node"
   dependencies:
