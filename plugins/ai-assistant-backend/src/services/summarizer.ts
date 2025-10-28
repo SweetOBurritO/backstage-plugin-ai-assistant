@@ -40,6 +40,7 @@ export const createSummarizerService = async ({
   // Initialize Langfuse CallbackHandler for tracing
   // Note: CallbackHandler will use LANGFUSE_* environment variables automatically
   const langfuseHandler = new CallbackHandler({
+    userId: 'summarizer',
     tags: ['backstage-ai-assistant', 'summarizer'],
   });
 
