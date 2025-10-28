@@ -27,6 +27,14 @@ backend:
     pluginSources:
       - 'catalog'
 
+  langfuse:
+    secretKey:
+      $env: LANGFUSE_SECRET_KEY
+    publicKey:
+      $env: LANGFUSE_PUBLIC_KEY
+    baseUrl:
+      $env: LANGFUSE_BASE_URL
+
 auth:
   providers:
     guest:

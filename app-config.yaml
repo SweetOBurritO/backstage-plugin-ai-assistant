@@ -27,7 +27,7 @@ backend:
   langfuse:
     secretKey: <<your-langfuse-secretKey>>>
     publicKey: <<your-langfuse-publicKey>>>
-    host: <<your-langfuse-host>>>
+    baseUrl: <<your-langfuse-baseUrl>>>
 
 auth:
   providers:
