@@ -254,25 +254,20 @@ export const createChatService = async ({
           })
         : undefined;
 
-      const streamOptions: any = {
-        streamMode: ['values'],
-        runName: 'ai-assistant-chat',
-        metadata: {
-          langfuseUserId: userEntityRef,
-          langfuseSessionId: conversationId,
-          langfuseTags: ['ai-assistant', 'chat', modelId],
-        },
-      };
-
-      if (langfuseHandler) {
-        streamOptions.callbacks = [langfuseHandler];
-      }
-
       const promptStream = await agent.stream(
         {
           messages: [...recentConversationMessages, ...messages],
         },
-        streamOptions,
+        {
+          streamMode: ['values'],
+          runName: 'ai-assistant-chat',
+          metadata: {
+            langfuseUserId: userEntityRef,
+            langfuseSessionId: conversationId,
+            langfuseTags: ['ai-assistant', 'chat', modelId],
+          },
+          callbacks: langfuseHandler ? [langfuseHandler] : [],
+        },
       );
 
       const responseMessages: Required<Message>[] = [];
