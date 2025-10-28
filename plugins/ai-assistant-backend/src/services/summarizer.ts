@@ -4,6 +4,7 @@ import { DEFAULT_SUMMARY_PROMPT } from '../constants/prompts';
 import { SystemMessagePromptTemplate } from '@langchain/core/prompts';
 import { Message } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { CallbackHandler } from '@langfuse/langchain';
+import { hasLangfuseCredentials } from '../utils/langfuse';
 
 type SummarizerService = {
   summarize: (
@@ -37,12 +38,13 @@ export const createSummarizerService = async ({
 
   const llm = model.chatModel;
 
-  // Initialize Langfuse CallbackHandler for tracing
-  // Note: CallbackHandler will use LANGFUSE_* environment variables automatically
-  const langfuseHandler = new CallbackHandler({
-    userId: 'summarizer',
-    tags: ['backstage-ai-assistant', 'summarizer'],
-  });
+  // Initialize Langfuse CallbackHandler for tracing if credentials are available
+  const langfuseHandler = hasLangfuseCredentials()
+    ? new CallbackHandler({
+        userId: 'summarizer',
+        tags: ['backstage-ai-assistant', 'summarizer'],
+      })
+    : undefined;
 
   const summaryPromptTemplate = SystemMessagePromptTemplate.fromTemplate(`
     PURPOSE:
@@ -69,11 +71,16 @@ export const createSummarizerService = async ({
         .join('\n'),
     });
 
-    const { text } = await llm.invoke(prompt, {
-      callbacks: [langfuseHandler],
+    const invokeOptions: any = {
       runName: 'conversation-summarizer',
       tags: ['summarizer'],
-    });
+    };
+
+    if (langfuseHandler) {
+      invokeOptions.callbacks = [langfuseHandler];
+    }
+
+    const { text } = await llm.invoke(prompt, invokeOptions);
 
     return text.trim();
   };

@@ -1,17 +1,21 @@
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { LangfuseSpanProcessor } from '@langfuse/otel';
+import { hasLangfuseCredentials } from './utils/langfuse';
 
-// Initialize the Langfuse span processor
-export const langfuseSpanProcessor = new LangfuseSpanProcessor({
-  // Explicitly pass configuration from environment variables
-  secretKey: process.env.LANGFUSE_SECRET_KEY,
-  publicKey: process.env.LANGFUSE_PUBLIC_KEY,
-  baseUrl: process.env.LANGFUSE_BASE_URL,
-});
+export let langfuseSpanProcessor: LangfuseSpanProcessor | undefined;
 
-// Initialize OpenTelemetry SDK with Langfuse processor
-const sdk = new NodeSDK({
-  spanProcessors: [langfuseSpanProcessor],
-});
+if (hasLangfuseCredentials()) {
+  // Initialize the Langfuse span processor
+  langfuseSpanProcessor = new LangfuseSpanProcessor({
+    secretKey: process.env.LANGFUSE_SECRET_KEY,
+    publicKey: process.env.LANGFUSE_PUBLIC_KEY,
+    baseUrl: process.env.LANGFUSE_BASE_URL,
+  });
 
-sdk.start();
+  // Initialize OpenTelemetry SDK with Langfuse processor
+  const sdk = new NodeSDK({
+    spanProcessors: [langfuseSpanProcessor],
+  });
+
+  sdk.start();
+}

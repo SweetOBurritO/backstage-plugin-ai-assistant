@@ -26,6 +26,7 @@ import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { SystemMessagePromptTemplate } from '@langchain/core/prompts';
 import { createSummarizerService } from './summarizer';
 import { CallbackHandler } from '@langfuse/langchain';
+import { hasLangfuseCredentials } from '../utils/langfuse';
 import { v4 as uuid } from 'uuid';
 import type {
   BackstageCredentials,
@@ -244,27 +245,34 @@ export const createChatService = async ({
         prompt: systemPrompt[0].text,
       });
 
-      // Initialize Langfuse CallbackHandler for tracing
-      const langfuseHandler = new CallbackHandler({
-        sessionId: conversationId,
-        userId: userEntityRef,
-        tags: ['backstage-ai-assistant', 'chat'],
-      });
+      // Initialize Langfuse CallbackHandler for tracing if credentials are available
+      const langfuseHandler = hasLangfuseCredentials()
+        ? new CallbackHandler({
+            sessionId: conversationId,
+            userId: userEntityRef,
+            tags: ['backstage-ai-assistant', 'chat'],
+          })
+        : undefined;
+
+      const streamOptions: any = {
+        streamMode: ['values'],
+        runName: 'ai-assistant-chat',
+        metadata: {
+          langfuseUserId: userEntityRef,
+          langfuseSessionId: conversationId,
+          langfuseTags: ['ai-assistant', 'chat', modelId],
+        },
+      };
+
+      if (langfuseHandler) {
+        streamOptions.callbacks = [langfuseHandler];
+      }
 
       const promptStream = await agent.stream(
         {
           messages: [...recentConversationMessages, ...messages],
         },
-        {
-          streamMode: ['values'],
-          callbacks: [langfuseHandler],
-          runName: 'ai-assistant-chat',
-          metadata: {
-            langfuseUserId: userEntityRef,
-            langfuseSessionId: conversationId,
-            langfuseTags: ['ai-assistant', 'chat', modelId],
-          },
-        },
+        streamOptions,
       );
 
       const responseMessages: Required<Message>[] = [];
@@ -338,11 +346,15 @@ export const createChatService = async ({
       }
 
       // Flush Langfuse traces to ensure they are sent
-      try {
-        const { langfuseSpanProcessor } = await import('../instrumentation');
-        await langfuseSpanProcessor.forceFlush();
-      } catch (flushError) {
-        logger.error('Failed to flush Langfuse traces', flushError as Error);
+      if (langfuseHandler) {
+        try {
+          const { langfuseSpanProcessor } = await import('../instrumentation');
+          if (langfuseSpanProcessor) {
+            await langfuseSpanProcessor.forceFlush();
+          }
+        } catch (flushError) {
+          logger.error('Failed to flush Langfuse traces', flushError as Error);
+        }
       }
 
       addMessages(
