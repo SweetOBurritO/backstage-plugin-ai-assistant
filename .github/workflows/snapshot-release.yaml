@@ -1,19 +1,21 @@
-name: Version or Publish Changeset
+name: Publish Snapshot Release
 
 on:
+  workflow_dispatch:
+
   push:
     branches:
       - main
+    paths:
+      - packages/**
 
 permissions:
-  contents: write
-  pull-requests: write
-
-concurrency: ${{ github.workflow }}-${{ github.ref }}
+  contents: read
+  id-token: write
 
 jobs:
-  version-or-publish:
-    name: Create Changeset PR
+  snapshot-release:
+    name: Publish Snapshot
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,13 +36,14 @@ jobs:
       - name: Build Packages
         run: yarn build:all
 
-      - name: Create Changeset PR or Publish
-        id: changesets
-        uses: changesets/action@v1
-        with:
-          version: yarn release
-          publish: yarn publish
-          title: "chore(release): release plugins"
+      - name: Configure npm authentication
+        run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create and Publish Snapshot
+        run: |
+          yarn changeset version --snapshot 'snapshot'
+          yarn changeset publish --tag 'snapshot'
+        env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
