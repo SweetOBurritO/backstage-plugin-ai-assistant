@@ -24,10 +24,10 @@ backend:
     pluginSources:
       - 'catalog'
 
-  langfuse:
-    secretKey: <<your-langfuse-secretKey>>>
-    publicKey: <<your-langfuse-publicKey>>>
-    baseUrl: <<your-langfuse-baseUrl>>>
+  # langfuse:
+  #   secretKey: <<your-langfuse-secretKey>>>
+  #   publicKey: <<your-langfuse-publicKey>>>
+  #   baseUrl: <<your-langfuse-baseUrl>>>
 
 auth:
   providers:
