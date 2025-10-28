@@ -54,3 +54,4 @@ e2e-test-report/
 
 # Cache
 .cache/
+.vscode/mcp.json

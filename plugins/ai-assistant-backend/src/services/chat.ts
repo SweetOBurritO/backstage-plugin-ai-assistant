@@ -25,6 +25,7 @@ import { DynamicStructuredTool } from '@langchain/core/tools';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { SystemMessagePromptTemplate } from '@langchain/core/prompts';
 import { createSummarizerService } from './summarizer';
+import { CallbackHandler } from '@langfuse/langchain';
 import { v4 as uuid } from 'uuid';
 import type {
   BackstageCredentials,
@@ -243,11 +244,27 @@ export const createChatService = async ({
         prompt: systemPrompt[0].text,
       });
 
+      // Initialize Langfuse CallbackHandler for tracing
+      const langfuseHandler = new CallbackHandler({
+        sessionId: conversationId,
+        userId: userEntityRef,
+        tags: ['backstage-ai-assistant', 'chat'],
+      });
+
       const promptStream = await agent.stream(
         {
           messages: [...recentConversationMessages, ...messages],
         },
-        { streamMode: ['values'] },
+        {
+          streamMode: ['values'],
+          callbacks: [langfuseHandler],
+          runName: 'ai-assistant-chat',
+          metadata: {
+            langfuseUserId: userEntityRef,
+            langfuseSessionId: conversationId,
+            langfuseTags: ['ai-assistant', 'chat', modelId],
+          },
+        },
       );
 
       const responseMessages: Required<Message>[] = [];
@@ -318,6 +335,14 @@ export const createChatService = async ({
         }
 
         responseMessages.push(...newMessages);
+      }
+
+      // Flush Langfuse traces to ensure they are sent
+      try {
+        const { langfuseSpanProcessor } = await import('../instrumentation');
+        await langfuseSpanProcessor.forceFlush();
+      } catch (flushError) {
+        logger.error('Failed to flush Langfuse traces', flushError as Error);
       }
 
       addMessages(

@@ -3,6 +3,7 @@ import { Model } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
 import { DEFAULT_SUMMARY_PROMPT } from '../constants/prompts';
 import { SystemMessagePromptTemplate } from '@langchain/core/prompts';
 import { Message } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
+import { CallbackHandler } from '@langfuse/langchain';
 
 type SummarizerService = {
   summarize: (
@@ -36,6 +37,12 @@ export const createSummarizerService = async ({
 
   const llm = model.chatModel;
 
+  // Initialize Langfuse CallbackHandler for tracing
+  // Note: CallbackHandler will use LANGFUSE_* environment variables automatically
+  const langfuseHandler = new CallbackHandler({
+    tags: ['backstage-ai-assistant', 'summarizer'],
+  });
+
   const summaryPromptTemplate = SystemMessagePromptTemplate.fromTemplate(`
     PURPOSE:
     {summaryPrompt}
@@ -61,7 +68,11 @@ export const createSummarizerService = async ({
         .join('\n'),
     });
 
-    const { text } = await llm.invoke(prompt);
+    const { text } = await llm.invoke(prompt, {
+      callbacks: [langfuseHandler],
+      runName: 'conversation-summarizer',
+      tags: ['summarizer'],
+    });
 
     return text.trim();
   };

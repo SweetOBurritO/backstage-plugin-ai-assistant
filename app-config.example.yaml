@@ -1,0 +1,126 @@
+app:
+  title: Scaffolded Backstage App
+  baseUrl: http://localhost:3000
+
+backend:
+  baseUrl: http://localhost:7007
+  listen:
+    port: 7007
+  csp:
+    connect-src: ["'self'", 'http:', 'https:']
+  cors:
+    origin: http://localhost:3000
+    methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
+    credentials: true
+  database:
+    client: pg
+    connection:
+      host: localhost
+      port: 5432
+      user: postgres
+      password: postgres
+
+  actions:
+    pluginSources:
+      - 'catalog'
+
+auth:
+  providers:
+    guest:
+      userEntityRef: user:default/bob
+      ownershipEntityRefs: [group:default/devops]
+      dangerouslyAllowOutsideDevelopment: false
+
+# see https://backstage.io/docs/permissions/getting-started for more on the permission framework
+permission:
+  # setting this to `false` will disable permissions
+  enabled: true
+
+catalog:
+  orphanStrategy: delete
+  processingInterval: { minutes: 1 }
+  rules:
+    - allow:
+        - User
+        - Group
+        - System
+        - Component
+        - Domain
+        - API
+        - Resource
+  locations:
+    - type: file
+      target: ../../catalog.local-dev.yaml
+
+aiAssistant:
+  storage:
+    pgVector:
+      chunkSize: 800
+      amount: 10
+  ingestion:
+    schedule:
+      frequency:
+        days: 1
+      timeout:
+        hours: 1
+  embeddings:
+    azureOpenAi:
+      deploymentName: 'text-embedding-3-large'
+      instanceName: eastus
+      apiKey:
+        $env: AZURE-AI-API-KEY
+      endpoint: https://eastus.api.cognitive.microsoft.com/openai/v1/
+      openAIApiVersion: 2024-12-01-preview
+
+  models:
+    azureAi:
+      apiKey:
+        $env: AZURE-AI-API-KEY
+      models:
+        - endpoint: https://eastus.api.cognitive.microsoft.com/openai/v1/
+          modelName: gpt-5-mini
+
+ingestors:
+  # See ./plugins/ai-assistant-backend-module-ingestor-github/config.d.ts for more config options
+  # github:
+  #   owner: <your-github-org-or-username>
+  #   appId: <your-github-app-id>
+  #   privateKey: <your-github-private-key>
+  #   installationId: <your-github-installation-id>
+
+  # optional config to filter what to ingest
+  # filesBatchSize: <number-of-files-to-process-in-batches> # default: 50
+  # baseUrl: <your-github-enterprise-instance-url> # only needed for GitHub Enterprise
+  # fileTypes:
+  #   - '.md'
+  # repositories:
+  #   - name: <repository-name>
+  #     fileTypes:
+  #       - '.json'
+
+  # See ./plugins/ai-assistant-backend-module-ingestor-azure-devops/config.d.ts for more config options
+  # azureDevOps:
+  #   organization: <your-azure-devops-org-name>
+  #   project: <your-project-name>
+  #   token: <your-azure-ado-token>
+  #   resourceTypes:
+  #     # specify one or both of the following resource types to ingest
+  #     - 'repository'
+  #     - 'wiki'
+
+  # optional config to filter what to ingest
+  # fileTypes:
+  #   - '.md'
+  #   - '.json'
+  #   - '.txt'
+  # repositories:
+  #   - name: <repository-name>
+  #     fileTypes:
+  #       - '.json'
+  #       - '.md'
+  #       - '.txt'
+  # filesBatchSize: <number-of-repository-files-to-process-in-batches> # default: 50
+
+  # wikis:
+  #   - name: <wiki-name>
+  # pagesBatchSize: <number-of-wiki-pages-to-process-in-batches> # default: 50
