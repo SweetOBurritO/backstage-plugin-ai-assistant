@@ -1,4 +1,3 @@
-
 # Embeddings Providers
 
 An "embeddings provider" is a backend module that provides an embeddings model for vector embeddings for text (or other data) so they can be stored and searched by the AI Assistant. The AI Assistant uses embeddings to build and query semantic search indexes, vector stores, and to provide retrieval-augmented generation (RAG) functionality.
@@ -58,10 +57,10 @@ These keys and names vary by provider. Consult the provider's README or the modu
 
 Below are the providers included in this repo (look in the `plugins/` and top-level package directories for backend modules):
 
-| Provider | Service | Local module path |
-|--|--|--|
+| Provider     | Service                              | Local module path                                               |
+| ------------ | ------------------------------------ | --------------------------------------------------------------- |
 | Azure OpenAI | Azure AI Foundry / OpenAI embeddings | `ai-assistant-backend-module-embeddings-provider-azure-open-ai` |
-| Ollama | Ollama / OpenWebUI self-hosted | `ai-assistant-backend-module-embeddings-provider-ollama` |
+| Ollama       | Ollama / OpenWebUI self-hosted       | `ai-assistant-backend-module-embeddings-provider-ollama`        |
 
 ## Next steps
 

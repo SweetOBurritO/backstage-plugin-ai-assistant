@@ -10,7 +10,7 @@ to wire it into your Backstage backend.
 
 - Convert text or documents to numeric vector embeddings using an Ollama model.
 - Exposes a provider implementation compatible with the AI Assistant backend so different
- embeddings services can be swapped without changing the rest of the app.
+  embeddings services can be swapped without changing the rest of the app.
 - Minimal configuration for local or remote Ollama endpoints and optional API key support.
 
 ## When to use
@@ -31,19 +31,19 @@ Minimum configuration keys (example):
 aiAssistant:
   embeddings:
     ollama:
-        baseUrl: 'http://localhost:11434'
-        model: 'text-embedding-3-small'
-        apiKey: ${OLLAMA_API_KEY}
+      baseUrl: 'http://localhost:11434'
+      model: 'text-embedding-3-small'
+      apiKey: ${OLLAMA_API_KEY}
 ```
 
 Field descriptions:
 
 - `baseUrl` - The base URL of your Ollama service. For a local Ollama server this is typically
- `http://localhost:11434`. For Ollama Cloud or a proxied endpoint, use the full base URL. For ollama with webui you must set the base url to the `/ollama` route. i.e `http://localhost:11434/ollama`
+  `http://localhost:11434`. For Ollama Cloud or a proxied endpoint, use the full base URL. For ollama with webui you must set the base url to the `/ollama` route. i.e `http://localhost:11434/ollama`
 - `model` - The name of the model to use for generating embeddings. The model must support
- embeddings (check your Ollama model documentation for supported capabilities).
+  embeddings (check your Ollama model documentation for supported capabilities).
 - `apiKey` - (Optional) An API key for Ollama Cloud or any endpoint that requires authentication.
- Mark this value as secret in Backstage configuration when applicable.
+  Mark this value as secret in Backstage configuration when applicable.
 
 The exact keys available and required depend on your Ollama setup. Check the provider's
 `config.d.ts` in the package for the canonical types used by the module.
