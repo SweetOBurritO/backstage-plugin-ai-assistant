@@ -1,3 +1,6 @@
+# example app.config.yaml for local development purposes
+# no ingestors configured by default, by only adding an azure API key to the .env file
+# this should work (assuming you have gpt5-mini and text-embedding-3-large deployed in your Azure OpenAI instance)
 app:
   title: Scaffolded Backstage App
   baseUrl: http://localhost:3000
