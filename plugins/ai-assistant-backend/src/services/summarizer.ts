@@ -4,7 +4,6 @@ import { DEFAULT_SUMMARY_PROMPT } from '../constants/prompts';
 import { SystemMessagePromptTemplate } from '@langchain/core/prompts';
 import { Message } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { CallbackHandler } from '@langfuse/langchain';
-import { hasLangfuseCredentials } from '../utils/langfuse';
 
 type SummarizerService = {
   summarize: (
@@ -16,11 +15,13 @@ type SummarizerService = {
 type SummarizerServiceOptions = {
   config: RootConfigService;
   models: Model[];
+  langfuseEnabled: boolean;
 };
 
 export const createSummarizerService = async ({
   config,
   models,
+  langfuseEnabled,
 }: SummarizerServiceOptions): Promise<SummarizerService> => {
   const summaryModelId =
     config.getOptionalString('aiAssistant.conversation.summaryModel') ??
@@ -39,7 +40,7 @@ export const createSummarizerService = async ({
   const llm = model.chatModel;
 
   // Initialize Langfuse CallbackHandler for tracing if credentials are available
-  const langfuseHandler = hasLangfuseCredentials()
+  const langfuseHandler = langfuseEnabled
     ? new CallbackHandler({
         userId: 'summarizer',
         tags: ['backstage-ai-assistant', 'summarizer'],
@@ -76,7 +77,7 @@ export const createSummarizerService = async ({
       tags: ['summarizer'],
     };
 
-    if (langfuseHandler) {
+    if (langfuseEnabled) {
       invokeOptions.callbacks = [langfuseHandler];
     }
 

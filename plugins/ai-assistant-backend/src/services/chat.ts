@@ -26,7 +26,6 @@ import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { SystemMessagePromptTemplate } from '@langchain/core/prompts';
 import { createSummarizerService } from './summarizer';
 import { CallbackHandler } from '@langfuse/langchain';
-import { hasLangfuseCredentials } from '../utils/langfuse';
 import { v4 as uuid } from 'uuid';
 import type {
   BackstageCredentials,
@@ -44,6 +43,7 @@ export type ChatServiceOptions = {
   catalog: CatalogService;
   cache: CacheService;
   auth: AuthService;
+  langfuseEnabled: boolean;
 };
 
 type PromptOptions = {
@@ -90,6 +90,7 @@ export const createChatService = async ({
   catalog,
   cache,
   auth,
+  langfuseEnabled,
 }: ChatServiceOptions): Promise<ChatService> => {
   logger.info(`Available models: ${models.map(m => m.id).join(', ')}`);
   logger.info(`Available tools: ${tools.map(t => t.name).join(', ')}`);
@@ -113,7 +114,11 @@ export const createChatService = async ({
     DEFAULT_TOOL_GUIDELINE;
 
   const chatStore = await ChatStore.fromConfig({ database });
-  const summarizer = await createSummarizerService({ config, models });
+  const summarizer = await createSummarizerService({
+    config,
+    models,
+    langfuseEnabled,
+  });
 
   const agentTools = tools.map(tool => new DynamicStructuredTool(tool));
 
@@ -246,7 +251,7 @@ export const createChatService = async ({
       });
 
       // Initialize Langfuse CallbackHandler for tracing if credentials are available
-      const langfuseHandler = hasLangfuseCredentials()
+      const langfuseHandler = langfuseEnabled
         ? new CallbackHandler({
             sessionId: conversationId,
             userId: userEntityRef,
@@ -339,18 +344,6 @@ export const createChatService = async ({
         }
 
         responseMessages.push(...newMessages);
-      }
-
-      // Flush Langfuse traces to ensure they are sent
-      if (langfuseHandler) {
-        try {
-          const { langfuseSpanProcessor } = await import('../instrumentation');
-          if (langfuseSpanProcessor) {
-            await langfuseSpanProcessor.forceFlush();
-          }
-        } catch (flushError) {
-          logger.error('Failed to flush Langfuse traces', flushError as Error);
-        }
       }
 
       addMessages(
