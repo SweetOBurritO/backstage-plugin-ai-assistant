@@ -3,6 +3,12 @@ name: Publish Snapshot Release
 on:
   workflow_dispatch:
 
+  push:
+    branches:
+      - main
+    paths:
+      - packages/**
+
 permissions:
   contents: read
   id-token: write
@@ -29,6 +35,11 @@ jobs:
 
       - name: Build Packages
         run: yarn build:all
+
+      - name: Configure npm authentication
+        run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create and Publish Snapshot
         run: |

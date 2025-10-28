@@ -28,11 +28,15 @@ Ensure the `NPM_TOKEN` secret is configured in your repository:
 3. Click **"Run workflow"**
 4. Click the **"Run workflow"** button
 
-The workflow will:
+Important: the snapshot workflow only publishes when there are unreleased changesets present in the repository. The Changesets action needs a changeset file to generate the snapshot versions. If you run the workflow on a branch that has no changesets, the snapshot step will exit with "No unreleased changesets found" and nothing will be published.
+
+The workflow will (when changesets are present):
 
 - Build all packages
 - Create snapshot versions with timestamps (format: `1.2.3-snapshot-timestamp`)
 - Publish to npm under the `snapshot` tag
+
+If you want to publish a snapshot from a branch that doesn't have a changeset (for example, a feature branch), add a changeset file first (via `yarn changeset`) or use the manual snapshot workflow in your fork (with your own `NPM_TOKEN`).
 
 ## Installing Snapshot Releases
 

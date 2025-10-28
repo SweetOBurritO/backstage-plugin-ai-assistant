@@ -44,11 +44,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Publish Snapshot (if PR was created/updated)
-        if: steps.changesets.outputs.pullRequestNumber != ''
-        run: |
-          yarn changeset version --snapshot 'snapshot'
-          yarn changeset publish --tag 'snapshot'
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
