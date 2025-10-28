@@ -86,6 +86,10 @@ aiAssistant:
       models:
         - endpoint: <your-azure-ai-foundry-endpoint>
           modelName: '<your-model>'
+    googleVertexAi:
+      apiKey: '<your-api-key>'
+      models:
+        - '<your-model>'
 
 ingestors:
   # See ./plugins/ai-assistant-backend-module-ingestor-github/config.d.ts for more config options
