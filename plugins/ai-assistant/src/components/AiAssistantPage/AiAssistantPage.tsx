@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Conversation } from '../Conversation';
+import { AiAssistantChatModal } from '../AiAssistantChatModal';
 import type { Conversation as ConversationType } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { useAsync, useList } from 'react-use';
 import { chatApiRef } from '../../api/chat';
@@ -147,6 +148,8 @@ export const AiAssistantPage = () => {
           </List>
         </Box>
       </Drawer>
+
+      <AiAssistantChatModal />
     </>
   );
 };
