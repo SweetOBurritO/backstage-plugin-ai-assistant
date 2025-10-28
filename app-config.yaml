@@ -24,6 +24,11 @@ backend:
     pluginSources:
       - 'catalog'
 
+  langfuse:
+    secretKey: <<your-langfuse-secretKey>>>
+    publicKey: <<your-langfuse-publicKey>>>
+    host: <<your-langfuse-host>>>
+
 auth:
   providers:
     guest:
