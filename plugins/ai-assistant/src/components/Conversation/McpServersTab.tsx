@@ -73,6 +73,14 @@ export const McpServersTab: React.FC<McpServersTabProps> = () => {
 
     try {
       const parsedConfig = JSON.parse(config.options);
+
+      if (
+        Object.keys(parsedConfig).length === 0 &&
+        parsedConfig.constructor === Object
+      ) {
+        setError('Server configuration cannot be empty');
+        return false;
+      }
     } catch (e) {
       setError('Invalid JSON configuration. Please check your syntax.');
       return false;
@@ -93,7 +101,7 @@ export const McpServersTab: React.FC<McpServersTabProps> = () => {
   };
 
   const [{ loading: saving }, handleAddConfig] = useAsyncFn(async () => {
-    // if (!validateConfig(currentConfig)) return;
+    if (!validateConfig(currentConfig)) return;
 
     try {
       const parsedOptions = JSON.parse(currentConfig.options);
@@ -311,7 +319,7 @@ export const McpServersTab: React.FC<McpServersTabProps> = () => {
         <Typography variant="subtitle1">Configured Servers</Typography>
         {configs.length === 0 ? (
           <Alert severity="info">
-            No MCP servers configured. Add one below to get started.
+            No MCP servers configured. Add one above to get started.
           </Alert>
         ) : (
           configs.map((config, index) => (
