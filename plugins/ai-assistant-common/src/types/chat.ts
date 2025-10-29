@@ -14,6 +14,7 @@ export type Message = {
   content: string;
   metadata: JsonObject;
   score: number;
+  traceId?: string;
 };
 
 export type Conversation = {

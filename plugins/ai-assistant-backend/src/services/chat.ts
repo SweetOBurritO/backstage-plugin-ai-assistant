@@ -26,6 +26,7 @@ import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { SystemMessagePromptTemplate } from '@langchain/core/prompts';
 import { createSummarizerService } from './summarizer';
 import { CallbackHandler } from '@langfuse/langchain';
+import { LangfuseClient } from '@langfuse/client';
 import { v4 as uuid } from 'uuid';
 import type {
   BackstageCredentials,
@@ -63,12 +64,16 @@ type GetConversationsOptions = {
   userEntityRef: string;
 };
 
+// Helper type for messages with required fields except traceId which remains optional
+type MessageWithRequiredFields = Required<Omit<Message, 'traceId'>> &
+  Pick<Message, 'traceId'>;
+
 export type ChatService = {
-  prompt: (options: PromptOptions) => Promise<Required<Message>[]>;
+  prompt: (options: PromptOptions) => Promise<MessageWithRequiredFields[]>;
   getAvailableModels: () => Promise<string[]>;
   getConversation: (
     options: GetConversationOptions,
-  ) => Promise<Required<Message>[]>;
+  ) => Promise<MessageWithRequiredFields[]>;
   getConversations: (
     options: GetConversationsOptions,
   ) => Promise<Conversation[]>;
@@ -276,12 +281,12 @@ export const createChatService = async ({
         },
       );
 
-      const responseMessages: Required<Message>[] = [];
+      const responseMessages: MessageWithRequiredFields[] = [];
 
       for await (const [, chunk] of promptStream) {
         const { messages: promptMessages } = chunk;
 
-        const newMessages: Required<Message>[] = promptMessages
+        const newMessages: MessageWithRequiredFields[] = promptMessages
           .filter(m => responseMessages.findIndex(rm => rm.id === m.id) === -1)
           .filter(
             m =>
@@ -318,6 +323,7 @@ export const createChatService = async ({
               content,
               metadata,
               score: 0,
+              traceId: undefined,
             };
           });
 
@@ -348,8 +354,11 @@ export const createChatService = async ({
         responseMessages.push(...newMessages);
       }
 
+      // Get the traceId from Langfuse if enabled
+      const traceId = langfuseHandler?.last_trace_id ?? undefined;
+
       addMessages(
-        responseMessages.map(m => ({ ...m, id: uuid() })),
+        responseMessages.map(m => ({ ...m, id: uuid(), traceId })),
         userEntityRef,
         conversationId,
         [...recentConversationMessages, ...messages],
@@ -394,24 +403,36 @@ export const createChatService = async ({
   ) => {
     const message = await chatStore.getMessageById(messageId);
 
-    console.log(
-      `📚📚📚📚📚 Scoring message ${JSON.stringify(
-        message,
-        null,
-        2,
-      )} 📚📚📚📚📚`,
-    );
     if (!message) {
       throw new Error(`Message with id ${messageId} not found`);
+    }
+
+    if (langfuseEnabled && message.traceId) {
+      const langfuse = new LangfuseClient({
+        secretKey: 'sk-lf-e5caf6b6-79e4-45fc-bafd-b6c3368b728b',
+        publicKey: 'pk-lf-62941efb-1eb6-4924-9134-870afd80fce8',
+        baseUrl: 'https://dev--wu3-poc-langfuse.nintextest.io',
+      });
+
+      langfuse.score.create({
+        traceId: message.traceId,
+        name: 'helpfulness',
+        value: score,
+      });
+      logger.info(
+        `Scored message ${messageId} on Langfuse with trace ID ${message.traceId}`,
+      );
+    } else if (langfuseEnabled && !message.traceId) {
+      logger.warn(
+        `Message ${messageId} does not have a traceId, cannot score on Langfuse`,
+      );
     }
 
     const updatedMessage: Required<Message> = {
       ...message,
       score,
     };
-    console.log(
-      `💚💚💚💚 Scoring message ${JSON.stringify(message, null, 2)} 💚💚💚💚`,
-    );
+
     await chatStore.updateMessage(updatedMessage);
   };
 

@@ -6088,6 +6088,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@langfuse/client@npm:^4.3.0":
+  version: 4.3.0
+  resolution: "@langfuse/client@npm:4.3.0"
+  dependencies:
+    "@langfuse/core": "npm:^4.3.0"
+    "@langfuse/tracing": "npm:^4.3.0"
+    mustache: "npm:^4.2.0"
+  peerDependencies:
+    "@opentelemetry/api": ^1.9.0
+  checksum: 10c0/37f24bcf3bc680ed93cd2377076b4a290bc602172d5d7dbbd55fc8b6626308f22d85384443bf3cf986b25885cab1b537d9b3e99be7e196fb7b71658850e804a7
+  languageName: node
+  linkType: hard
+
 "@langfuse/core@npm:^4.0.0, @langfuse/core@npm:^4.3.0":
   version: 4.3.0
   resolution: "@langfuse/core@npm:4.3.0"
@@ -9709,6 +9722,7 @@ __metadata:
     "@langchain/core": "npm:^0.3.72"
     "@langchain/langgraph": "npm:^0.4.9"
     "@langchain/textsplitters": "npm:^0.1.0"
+    "@langfuse/client": "npm:^4.3.0"
     "@langfuse/core": "npm:^4.0.0"
     "@langfuse/langchain": "npm:^4.0.0"
     "@langfuse/otel": "npm:^4.3.0"
