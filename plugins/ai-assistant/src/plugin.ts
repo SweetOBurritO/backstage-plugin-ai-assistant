@@ -8,6 +8,7 @@ import {
 
 import { rootRouteRef } from './routes';
 import { chatApiRef, createChatService } from './api/chat';
+import { mcpApiRef, createMcpService } from './api/mcp';
 
 export const aiAssistantPlugin = createPlugin({
   id: 'ai-assistant',
@@ -22,6 +23,14 @@ export const aiAssistantPlugin = createPlugin({
         fetchApi: fetchApiRef,
       },
       factory: options => createChatService(options),
+    }),
+    createApiFactory({
+      api: mcpApiRef,
+      deps: {
+        discoveryApi: discoveryApiRef,
+        fetchApi: fetchApiRef,
+      },
+      factory: options => createMcpService(options),
     }),
   ],
 });
