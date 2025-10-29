@@ -108,10 +108,6 @@ export async function createChatRouter(
       const { messageId } = req.params;
       const { score } = req.body;
 
-      console.log(
-        `💡💡💡💡💡💡💡💡 Scoring message ${messageId} with score ${score} 💡💡💡💡💡💡💡💡`,
-      );
-
       await chat.scoreMessage(messageId, score);
 
       res.status(204).end();
