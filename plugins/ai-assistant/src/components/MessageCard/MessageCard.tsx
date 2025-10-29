@@ -3,6 +3,7 @@ import Markdown from 'react-markdown';
 import { useTheme } from '@mui/material/styles';
 import { useMemo } from 'react';
 import { Card } from './Card';
+import { FeedbackButtons } from './FeedbackButtons';
 
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
@@ -117,7 +118,7 @@ export const MessageCard = ({ message, loading }: MessageCardProps) => {
           width={40}
         />
       )}
-      <br />
+      {role === 'ai' && <FeedbackButtons messageId={message.id} />}
     </Card>
   );
 };
