@@ -1,1 +1,1 @@
-export { AiAssistantChatModal } from './AiAssistantChatModal';
+export * from './AiAssistantChatModal';

@@ -11,7 +11,7 @@ import AddIcon from '@mui/icons-material/Add';
 import Fab from '@mui/material/Fab';
 import ChatIcon from '@mui/icons-material/Chat';
 
-interface AiAssistantChatModalProps {
+export interface AiAssistantChatModalProps {
   // Whether to show the floating action button
   showFloatingButton?: boolean;
   // Props for controlled modal state

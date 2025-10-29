@@ -34,3 +34,14 @@ export const AiAssistantPage = aiAssistantPlugin.provide(
     mountPoint: rootRouteRef,
   }),
 );
+
+export const AiAssistantChatModal = aiAssistantPlugin.provide(
+  createRoutableExtension({
+    name: 'AiAssistantChatModal',
+    component: () =>
+      import('./components/AiAssistantChatModal').then(
+        m => m.AiAssistantChatModal,
+      ),
+    mountPoint: rootRouteRef,
+  }),
+);
