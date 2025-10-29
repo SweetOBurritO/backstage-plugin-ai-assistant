@@ -16,6 +16,7 @@ import Button from '@mui/material/Button';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
+import Tooltip from '@mui/material/Tooltip';
 import { McpServerConfig } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { mcpApiRef } from '../../api/mcp';
 
@@ -349,7 +350,9 @@ export const McpServersTab: React.FC<McpServersTabProps> = () => {
               }
             }}
           >
-            {showForm ? <CloseIcon /> : <AddIcon />}
+            <Tooltip title={showForm ? 'Close' : 'Add'}>
+              {showForm ? <CloseIcon /> : <AddIcon />}
+            </Tooltip>
           </IconButton>
         </Stack>
         {configs.length === 0 ? (
