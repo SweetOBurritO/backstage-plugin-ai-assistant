@@ -55,7 +55,25 @@ export async function createMcpRouter(
         options: mcpOptions,
       });
 
-      res.status(201).send();
+      res.status(204).send();
+    },
+  );
+
+  const deleteConfigSchema = z.object({
+    name: z.string(),
+    options: z.record(z.string(), z.any()),
+  });
+
+  router.delete(
+    '/config',
+    validation(deleteConfigSchema, 'body'),
+    async (req, res) => {
+      const credentials = await httpAuth.credentials(req);
+      const { name } = req.body;
+
+      await mcp.deleteUserMcpServerConfig(credentials, name);
+
+      res.status(204).send();
     },
   );
 

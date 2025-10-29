@@ -58,4 +58,8 @@ export class McpStore {
   ): Promise<void> {
     await this.mcpTable().where({ userRef, name }).update({ encryptedOptions });
   }
+
+  async deleteUserMcpConfig(userRef: string, name: string): Promise<void> {
+    await this.mcpTable().where({ userRef, name }).delete();
+  }
 }

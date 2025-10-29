@@ -38,6 +38,10 @@ export type McpService = {
   getUserMcpServerConfigNames: (
     credentials: BackstageCredentials,
   ) => Promise<string[]>;
+  deleteUserMcpServerConfig: (
+    credentials: BackstageCredentials,
+    name: string,
+  ) => Promise<void>;
 };
 
 export const createMcpService = async ({
@@ -150,10 +154,17 @@ export const createMcpService = async ({
       await mcpStore.updateUserMcpConfig(userEntityRef, name, encryptedOptions);
     };
 
+  const deleteUserMcpServerConfig: McpService['deleteUserMcpServerConfig'] =
+    async (credentials, name) => {
+      const { userEntityRef } = await userInfo.getUserInfo(credentials);
+      await mcpStore.deleteUserMcpConfig(userEntityRef, name);
+    };
+
   return {
     getTools,
     createUserMcpServerConfig,
     updateUserMcpServerConfig,
     getUserMcpServerConfigNames,
+    deleteUserMcpServerConfig,
   };
 };
