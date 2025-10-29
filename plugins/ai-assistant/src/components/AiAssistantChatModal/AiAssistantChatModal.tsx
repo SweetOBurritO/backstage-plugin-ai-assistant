@@ -33,8 +33,12 @@ export const AiAssistantChatModal = ({
 
   // Use controlled props if provided, otherwise use internal state
   const isOpen = controlledOpen !== undefined ? controlledOpen : modalOpen;
-  const conversationId = controlledConversationId !== undefined ? controlledConversationId : modalConversationId;
-  const setConversationId = controlledSetConversationId || setModalConversationId;
+  const conversationId =
+    controlledConversationId !== undefined
+      ? controlledConversationId
+      : modalConversationId;
+  const setConversationId =
+    controlledSetConversationId || setModalConversationId;
 
   const handleModalOpen = () => {
     if (controlledOpen === undefined) {
@@ -71,15 +75,10 @@ export const AiAssistantChatModal = ({
         </Box>
       )}
 
-      <Modal
-        open={isOpen}
-        onClose={handleModalClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
+      <Modal open={isOpen} onClose={handleModalClose}>
         <Box
           sx={{
-            position: 'absolute' as 'absolute',
+            position: 'absolute',
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
@@ -99,7 +98,7 @@ export const AiAssistantChatModal = ({
               justifyContent="space-between"
               alignItems="center"
             >
-              <Typography id="modal-modal-title" variant="h6" component="h2">
+              <Typography variant="h6" component="h2">
                 AI Assistant
               </Typography>
               <Stack direction="row" spacing={1}>
