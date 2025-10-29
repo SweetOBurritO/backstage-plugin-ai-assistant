@@ -20,6 +20,7 @@ export type ChatApi = {
     conversationId: string;
   }>;
   getConversations: () => Promise<Conversation[]>;
+  scoreMessage: (messageId: string, score: number) => Promise<void>;
 };
 
 type ChatApiOptions = {
@@ -94,5 +95,26 @@ export const createChatService = ({
     return data.conversations as Conversation[];
   };
 
-  return { getModels, getConversation, sendMessage, getConversations };
+  const scoreMessage: ChatApi['scoreMessage'] = async (messageId, score) => {
+    const assistantBaseUrl = await discoveryApi.getBaseUrl('ai-assistant');
+
+    await fetchApi.fetch(
+      `${assistantBaseUrl}/chat/message/${messageId}/score`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ score }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+  };
+
+  return {
+    getModels,
+    getConversation,
+    sendMessage,
+    getConversations,
+    scoreMessage,
+  };
 };

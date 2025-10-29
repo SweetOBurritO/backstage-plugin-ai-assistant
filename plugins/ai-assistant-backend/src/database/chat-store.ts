@@ -59,6 +59,7 @@ export class ChatStore {
       content: row.content,
       id: row.id,
       metadata: row.metadata,
+      score: row.score,
     }));
 
     return chatMessages;
@@ -87,6 +88,7 @@ export class ChatStore {
       role: message.role,
       content: message.content,
       metadata: message.metadata,
+      score: message.score,
     });
   }
 
@@ -139,5 +141,23 @@ export class ChatStore {
     }));
 
     return conversations;
+  }
+
+  async getMessageById(messageId: string): Promise<Required<Message> | null> {
+    const row = await this.messageTable().where({ id: messageId }).first();
+
+    if (!row) {
+      return null;
+    }
+
+    const message: Required<Message> = {
+      id: row.id,
+      role: row.role,
+      content: row.content,
+      metadata: row.metadata,
+      score: row.score,
+    };
+
+    return message;
   }
 }

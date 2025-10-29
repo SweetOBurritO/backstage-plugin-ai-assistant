@@ -5,12 +5,15 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
+import { useApi } from '@backstage/core-plugin-api';
+import { chatApiRef } from '../../api/chat';
 
 export type FeedbackButtonsProps = {
   messageId?: string;
 };
 
 export const FeedbackButtons = ({ messageId }: FeedbackButtonsProps) => {
+  const chatApi = useApi(chatApiRef);
   const theme = useTheme();
   const [score, setScore] = useState<number>(0); // 0 = no feedback, 1 = helpful, -1 = not helpful
 
@@ -23,6 +26,8 @@ export const FeedbackButtons = ({ messageId }: FeedbackButtonsProps) => {
     console.log(
       `User feedback: ${feedback} for message ${messageId}, score: ${newScore}`,
     );
+
+    chatApi.scoreMessage(messageId!, newScore);
   };
 
   return (

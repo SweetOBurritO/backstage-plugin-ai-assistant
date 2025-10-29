@@ -78,6 +78,7 @@ export type ChatService = {
     conversationId: string,
     recentConversationMessages?: Message[],
   ) => Promise<void>;
+  scoreMessage: (messageId: string, score: number) => Promise<void>;
 };
 
 export const createChatService = async ({
@@ -316,6 +317,7 @@ export const createChatService = async ({
               role,
               content,
               metadata,
+              score: 0,
             };
           });
 
@@ -385,12 +387,41 @@ export const createChatService = async ({
 
     return conversations;
   };
+
+  const scoreMessage: ChatService['scoreMessage'] = async (
+    messageId: string,
+    score: number,
+  ) => {
+    const message = await chatStore.getMessageById(messageId);
+
+    console.log(
+      `📚📚📚📚📚 Scoring message ${JSON.stringify(
+        message,
+        null,
+        2,
+      )} 📚📚📚📚📚`,
+    );
+    if (!message) {
+      throw new Error(`Message with id ${messageId} not found`);
+    }
+
+    const updatedMessage: Required<Message> = {
+      ...message,
+      score,
+    };
+    console.log(
+      `💚💚💚💚 Scoring message ${JSON.stringify(message, null, 2)} 💚💚💚💚`,
+    );
+    await chatStore.updateMessage(updatedMessage);
+  };
+
   return {
     prompt,
     getAvailableModels,
     getConversation,
     getConversations,
     addMessages,
+    scoreMessage,
   };
 };
 

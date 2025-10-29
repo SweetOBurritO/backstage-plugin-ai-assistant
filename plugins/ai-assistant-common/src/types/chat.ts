@@ -13,6 +13,7 @@ export type Message = {
     | 'remove';
   content: string;
   metadata: JsonObject;
+  score: number;
 };
 
 export type Conversation = {

@@ -90,5 +90,33 @@ export async function createChatRouter(
     res.json({ conversation });
   });
 
+  router.post(
+    '/message/:messageId/score',
+    validation(
+      z.object({
+        messageId: z.string().uuid(),
+      }),
+      'params',
+    ),
+    validation(
+      z.object({
+        score: z.number(),
+      }),
+      'body',
+    ),
+    async (req, res) => {
+      const { messageId } = req.params;
+      const { score } = req.body;
+
+      console.log(
+        `💡💡💡💡💡💡💡💡 Scoring message ${messageId} with score ${score} 💡💡💡💡💡💡💡💡`,
+      );
+
+      await chat.scoreMessage(messageId, score);
+
+      res.status(204).end();
+    },
+  );
+
   return router;
 }
