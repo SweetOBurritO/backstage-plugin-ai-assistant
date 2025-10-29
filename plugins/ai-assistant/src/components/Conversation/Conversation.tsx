@@ -107,7 +107,7 @@ export const Conversation = ({
 
   const [{ loading: sending }, sendMessage] = useAsyncFn(async () => {
     const newMessages: Message[] = [
-      { role: 'human', content: input, metadata: {} },
+      { role: 'human', content: input, metadata: {}, score: 0 },
     ];
 
     if (!modelId) {
@@ -192,7 +192,7 @@ export const Conversation = ({
           {(messages[messages.length - 1]?.role === 'human' ||
             messages[messages.length - 1]?.role === 'tool') && (
             <MessageCard
-              message={{ content: '', role: 'ai', metadata: {} }}
+              message={{ content: '', role: 'ai', metadata: {}, score: 0 }}
               loading
             />
           )}

@@ -92,7 +92,10 @@ export const aiAssistantPlugin = createBackendPlugin({
       async init(options) {
         const { httpRouter, database, config, logger } = options;
 
-        const langfuseEnabled = initLangfuse(config, logger);
+        const { langfuseEnabled, langfuseClient } = initLangfuse(
+          config,
+          logger,
+        );
 
         const client = await database.getClient();
 
@@ -120,6 +123,7 @@ export const aiAssistantPlugin = createBackendPlugin({
           models,
           tools,
           langfuseEnabled,
+          langfuseClient,
         });
 
         httpRouter.use(await createRouter({ ...options, chat }));
