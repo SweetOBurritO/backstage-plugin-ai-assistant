@@ -3,6 +3,7 @@ import { Model } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
 import { DEFAULT_SUMMARY_PROMPT } from '../constants/prompts';
 import { SystemMessagePromptTemplate } from '@langchain/core/prompts';
 import { Message } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
+import { CallbackHandler } from '@langfuse/langchain';
 
 type SummarizerService = {
   summarize: (
@@ -14,11 +15,13 @@ type SummarizerService = {
 type SummarizerServiceOptions = {
   config: RootConfigService;
   models: Model[];
+  langfuseEnabled: boolean;
 };
 
 export const createSummarizerService = async ({
   config,
   models,
+  langfuseEnabled,
 }: SummarizerServiceOptions): Promise<SummarizerService> => {
   const summaryModelId =
     config.getOptionalString('aiAssistant.conversation.summaryModel') ??
@@ -35,6 +38,14 @@ export const createSummarizerService = async ({
   }
 
   const llm = model.chatModel;
+
+  // Initialize Langfuse CallbackHandler for tracing if credentials are available
+  const langfuseHandler = langfuseEnabled
+    ? new CallbackHandler({
+        userId: 'summarizer',
+        tags: ['backstage-ai-assistant', 'summarizer'],
+      })
+    : undefined;
 
   const summaryPromptTemplate = SystemMessagePromptTemplate.fromTemplate(`
     PURPOSE:
@@ -61,7 +72,16 @@ export const createSummarizerService = async ({
         .join('\n'),
     });
 
-    const { text } = await llm.invoke(prompt);
+    const invokeOptions: any = {
+      runName: 'conversation-summarizer',
+      tags: ['summarizer'],
+    };
+
+    if (langfuseEnabled) {
+      invokeOptions.callbacks = [langfuseHandler];
+    }
+
+    const { text } = await llm.invoke(prompt, invokeOptions);
 
     return text.trim();
   };

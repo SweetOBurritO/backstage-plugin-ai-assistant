@@ -63,7 +63,6 @@ export const createOpenAiChatModel: CreateChatModelFunction = options => {
     modelName: options.modelName,
   });
 };
-
 ```
 
 ### Registering models in the module
@@ -74,7 +73,7 @@ Lastly we can connect this all together. In the example below we will:
 - Loop through those models and create a model for each config entry
 - Use the extension point provided by the ai assistant to register each of these models
 
-```diff
+````diff
 // module.ts
 import {
   coreServices,
@@ -147,4 +146,4 @@ backend.add(import('@sweetoburrito/backstage-plugin-ai-assistant-backend'));
 ++  ),
 ++);
 
-```
+````
