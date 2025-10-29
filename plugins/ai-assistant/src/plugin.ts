@@ -1,6 +1,7 @@
 import {
   createPlugin,
   createRoutableExtension,
+  createComponentExtension,
   createApiFactory,
   discoveryApiRef,
   fetchApiRef,
@@ -36,12 +37,13 @@ export const AiAssistantPage = aiAssistantPlugin.provide(
 );
 
 export const AiAssistantChatModal = aiAssistantPlugin.provide(
-  createRoutableExtension({
+  createComponentExtension({
     name: 'AiAssistantChatModal',
-    component: () =>
-      import('./components/AiAssistantChatModal').then(
-        m => m.AiAssistantChatModal,
-      ),
-    mountPoint: rootRouteRef,
+    component: {
+      lazy: () =>
+        import('./components/AiAssistantChatModal').then(
+          m => m.AiAssistantChatModal,
+        ),
+    },
   }),
 );
