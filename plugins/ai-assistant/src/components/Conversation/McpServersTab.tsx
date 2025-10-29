@@ -14,6 +14,8 @@ import CardActions from '@mui/material/CardActions';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import DeleteIcon from '@mui/icons-material/Delete';
+import CloseIcon from '@mui/icons-material/Close';
+import AddIcon from '@mui/icons-material/Add';
 import { McpServerConfig } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { mcpApiRef } from '../../api/mcp';
 
@@ -52,6 +54,7 @@ export const McpServersTab: React.FC<McpServersTabProps> = () => {
   });
 
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [showForm, setShowForm] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const jsonConfigRef = useRef<HTMLTextAreaElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
@@ -62,6 +65,7 @@ export const McpServersTab: React.FC<McpServersTabProps> = () => {
       options: JSON.stringify({}, null, 2),
     });
     setEditingIndex(null);
+    setShowForm(false);
     setError('');
   }, []);
 
@@ -153,6 +157,7 @@ export const McpServersTab: React.FC<McpServersTabProps> = () => {
       options: JSON.stringify({}, null, 2),
     });
     setEditingIndex(index);
+    setShowForm(true);
 
     // Smooth scroll to form and focus the JSON config field after a short delay
     setTimeout(() => {
@@ -224,104 +229,129 @@ export const McpServersTab: React.FC<McpServersTabProps> = () => {
 
   return (
     <Stack spacing={3}>
-      <Typography variant="h6">Model Context Protocol (MCP) Servers</Typography>
-      <Typography variant="body2" color="text.secondary">
-        Configure MCP servers to extend the AI assistant with additional tools
-        and capabilities.
-      </Typography>
+      <Stack direction="row" justifyContent="space-between" alignItems="center">
+        <Box>
+          <Typography variant="h6">
+            Model Context Protocol (MCP) Servers
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Configure MCP servers to extend the AI assistant with additional
+            tools and capabilities.
+          </Typography>
+        </Box>
+      </Stack>
 
-      {/* Add/Edit Configuration Form */}
-      <Paper variant="outlined" sx={{ p: 3 }} ref={formRef}>
-        <Typography variant="subtitle1" gutterBottom>
-          {editingIndex !== null ? 'Edit Server' : 'Add New Server'}
-        </Typography>
+      {showForm && (
+        <Paper variant="outlined" sx={{ p: 3 }} ref={formRef}>
+          <Typography variant="subtitle1" gutterBottom>
+            {editingIndex !== null ? 'Edit Server' : 'Add New Server'}
+          </Typography>
 
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
 
-        <Stack spacing={3}>
-          <TextField
-            label="Server Name"
-            fullWidth
-            value={currentConfig.name}
-            disabled={editingIndex !== null}
-            onChange={e =>
-              setCurrentConfig({
-                ...currentConfig,
-                name: e.target.value,
-              })
-            }
-            placeholder="my-mcp-server"
-            required
-          />
-
-          <Box>
-            <Typography variant="subtitle2" gutterBottom>
-              Server Configuration
-            </Typography>
-
-            {editingIndex !== null && (
-              <Alert severity="info" sx={{ mb: 1 }}>
-                <Typography variant="caption">
-                  Please re-enter the full JSON configuration below to update
-                  it. Existing configurations cannot be edited directly for
-                  security reasons.
-                </Typography>
-              </Alert>
-            )}
-
-            <Typography variant="body2" color="text.secondary" gutterBottom>
-              Define your MCP server configuration as JSON. This is similar to
-              how VS Code MCP extensions are configured.
-            </Typography>
+          <Stack spacing={3}>
             <TextField
-              multiline
-              rows={12}
+              label="Server Name"
               fullWidth
-              value={currentConfig.options}
+              value={currentConfig.name}
+              disabled={editingIndex !== null}
               onChange={e =>
                 setCurrentConfig({
                   ...currentConfig,
-                  options: e.target.value,
+                  name: e.target.value,
                 })
               }
-              placeholder="Enter JSON configuration..."
-              inputRef={jsonConfigRef}
-              sx={{
-                '& .MuiInputBase-input': {
-                  fontFamily: 'Consolas, "Courier New", monospace',
-                  fontSize: '0.875rem',
-                },
-              }}
+              placeholder="my-mcp-server"
+              required
             />
-          </Box>
 
-          <Stack direction="row" spacing={2} justifyContent="flex-end">
-            <Button onClick={resetForm}>Cancel</Button>
-            <Button
-              variant="contained"
-              onClick={handleAddConfig}
-              disabled={!currentConfig.name.trim() || saving}
-            >
-              {(() => {
-                if (saving) {
-                  return editingIndex !== null ? 'Updating...' : 'Adding...';
+            <Box>
+              <Typography variant="subtitle2" gutterBottom>
+                Server Configuration
+              </Typography>
+
+              {editingIndex !== null && (
+                <Alert severity="info" sx={{ mb: 1 }}>
+                  <Typography variant="caption">
+                    Please re-enter the full JSON configuration below to update
+                    it. Existing configurations cannot be edited directly for
+                    security reasons.
+                  </Typography>
+                </Alert>
+              )}
+
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Define your MCP server configuration as JSON. This is similar to
+                how VS Code MCP extensions are configured.
+              </Typography>
+              <TextField
+                multiline
+                rows={12}
+                fullWidth
+                value={currentConfig.options}
+                onChange={e =>
+                  setCurrentConfig({
+                    ...currentConfig,
+                    options: e.target.value,
+                  })
                 }
-                return editingIndex !== null ? 'Update Server' : 'Add Server';
-              })()}
-            </Button>
+                placeholder="Enter JSON configuration..."
+                inputRef={jsonConfigRef}
+                sx={{
+                  '& .MuiInputBase-input': {
+                    fontFamily: 'Consolas, "Courier New", monospace',
+                    fontSize: '0.875rem',
+                  },
+                }}
+              />
+            </Box>
+
+            <Stack direction="row" spacing={2} justifyContent="flex-end">
+              <Button onClick={resetForm}>Cancel</Button>
+              <Button
+                variant="contained"
+                onClick={handleAddConfig}
+                disabled={!currentConfig.name.trim() || saving}
+              >
+                {(() => {
+                  if (saving) {
+                    return editingIndex !== null ? 'Updating...' : 'Adding...';
+                  }
+                  return editingIndex !== null ? 'Update Server' : 'Add Server';
+                })()}
+              </Button>
+            </Stack>
           </Stack>
-        </Stack>
-      </Paper>
+        </Paper>
+      )}
 
       <Divider />
 
       {/* Existing Configurations */}
       <Stack spacing={2}>
-        <Typography variant="subtitle1">Configured Servers</Typography>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <Typography variant="subtitle1">Configured Servers</Typography>
+          <IconButton
+            onClick={() => {
+              if (showForm) {
+                resetForm();
+              } else {
+                resetForm();
+                setShowForm(true);
+              }
+            }}
+          >
+            {showForm ? <CloseIcon /> : <AddIcon />}
+          </IconButton>
+        </Stack>
         {configs.length === 0 ? (
           <Alert severity="info">
             No MCP servers configured. Add one above to get started.
