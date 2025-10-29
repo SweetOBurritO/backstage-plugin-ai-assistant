@@ -1,1 +1,5 @@
-export { aiAssistantPlugin, AiAssistantPage } from './plugin';
+export {
+  aiAssistantPlugin,
+  AiAssistantPage,
+  AiAssistantChatModal,
+} from './plugin';
