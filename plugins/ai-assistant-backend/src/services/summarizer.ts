@@ -1,7 +1,11 @@
 import { RootConfigService } from '@backstage/backend-plugin-api';
 import { Model } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
 import { DEFAULT_SUMMARY_PROMPT } from '../constants/prompts';
-import { SystemMessagePromptTemplate } from '@langchain/core/prompts';
+import {
+  SystemMessagePromptTemplate,
+  HumanMessagePromptTemplate,
+  ChatPromptTemplate,
+} from '@langchain/core/prompts';
 import { Message } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { CallbackHandler } from '@langfuse/langchain';
 
@@ -47,14 +51,20 @@ export const createSummarizerService = async ({
       })
     : undefined;
 
-  const summaryPromptTemplate = SystemMessagePromptTemplate.fromTemplate(`
-    PURPOSE:
-    {summaryPrompt}
-    Summarize the conversation in {summaryLength}
-
-    Conversation:
-    {conversation}
-  `);
+  const chatPromptTemplate = ChatPromptTemplate.fromMessages([
+    SystemMessagePromptTemplate.fromTemplate(`
+      PURPOSE:
+      {summaryPrompt}
+      
+      Please summarize the following conversation in {summaryLength}.
+    `),
+    HumanMessagePromptTemplate.fromTemplate(`
+      Conversation:
+      {conversation}
+      
+      Please provide a summary of this conversation.
+    `),
+  ]);
 
   const summarize: SummarizerService['summarize'] = async (
     messages,
@@ -64,7 +74,7 @@ export const createSummarizerService = async ({
       msg => msg.role === 'ai' || msg.role === 'human',
     );
 
-    const prompt = await summaryPromptTemplate.formatMessages({
+    const prompt = await chatPromptTemplate.formatMessages({
       summaryPrompt,
       summaryLength,
       conversation: conversationMessages

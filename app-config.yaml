@@ -91,6 +91,10 @@ aiAssistant:
       models:
         - endpoint: <your-azure-ai-foundry-endpoint>
           modelName: '<your-model>'
+    googleVertexAi:
+      apiKey: '<your-api-key>'
+      models:
+        - '<your-model>'
 
   # See ./docs/langfuse.md for more information
   # langfuse:
