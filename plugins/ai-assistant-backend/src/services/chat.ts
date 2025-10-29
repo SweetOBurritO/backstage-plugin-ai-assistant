@@ -31,6 +31,7 @@ import type {
   CacheService,
 } from '@backstage/backend-plugin-api';
 import { AIMessage, ToolMessage } from '@langchain/core/messages';
+import { McpService } from './mcp';
 
 export type ChatServiceOptions = {
   models: Model[];
@@ -42,6 +43,7 @@ export type ChatServiceOptions = {
   catalog: CatalogService;
   cache: CacheService;
   auth: AuthService;
+  mcp: McpService;
 };
 
 type PromptOptions = {
@@ -88,6 +90,7 @@ export const createChatService = async ({
   catalog,
   cache,
   auth,
+  mcp,
 }: ChatServiceOptions): Promise<ChatService> => {
   logger.info(`Available models: ${models.map(m => m.id).join(', ')}`);
   logger.info(`Available tools: ${tools.map(t => t.name).join(', ')}`);
@@ -112,8 +115,6 @@ export const createChatService = async ({
 
   const chatStore = await ChatStore.fromConfig({ database });
   const summarizer = await createSummarizerService({ config, models });
-
-  const agentTools = tools.map(tool => new DynamicStructuredTool(tool));
 
   const systemPromptTemplate = SystemMessagePromptTemplate.fromTemplate(`
     PURPOSE:
@@ -219,6 +220,12 @@ export const createChatService = async ({
 
       const credentials = await auth.getOwnServiceCredentials();
       const user = await getUser(cache, userEntityRef, credentials, catalog);
+
+      const mcpTools = await mcp.getTools(credentials);
+
+      const agentTools = tools
+        .map(tool => new DynamicStructuredTool(tool))
+        .concat(mcpTools.map(tool => new DynamicStructuredTool(tool)));
 
       addMessages(
         messages,

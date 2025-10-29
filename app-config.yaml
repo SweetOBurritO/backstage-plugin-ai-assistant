@@ -53,6 +53,12 @@ catalog:
       target: ../../catalog.local-dev.yaml
 
 aiAssistant:
+  mcp:
+    encryptionKey: <your encryption key>
+    servers:
+      - name: 'foo'
+        options: {}
+
   storage:
     pgVector:
       chunkSize: 800

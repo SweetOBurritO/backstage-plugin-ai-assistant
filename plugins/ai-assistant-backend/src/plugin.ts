@@ -20,6 +20,7 @@ import { PgVectorStore } from './database';
 import { signalsServiceRef } from '@backstage/plugin-signals-node';
 import { createSearchKnowledgeTool } from './services/tools/searchKnowledge';
 import { catalogServiceRef } from '@backstage/plugin-catalog-node';
+import { createMcpService } from './services/mcp';
 
 /**
  * aiAssistantPlugin backend plugin
@@ -109,6 +110,8 @@ export const aiAssistantPlugin = createBackendPlugin({
           ingestors,
         });
 
+        const mcp = await createMcpService(options);
+
         const searchKnowledgeTool = createSearchKnowledgeTool({ vectorStore });
         tools.push(searchKnowledgeTool);
 
@@ -116,9 +119,10 @@ export const aiAssistantPlugin = createBackendPlugin({
           ...options,
           models,
           tools,
+          mcp,
         });
 
-        httpRouter.use(await createRouter({ ...options, chat }));
+        httpRouter.use(await createRouter({ ...options, chat, mcp }));
         dataIngestionPipeline.start();
       },
     });
