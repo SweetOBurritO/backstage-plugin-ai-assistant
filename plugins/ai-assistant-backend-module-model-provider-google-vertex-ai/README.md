@@ -2,7 +2,7 @@
 
 The model-provider-google-vertex-ai backend module for the Backstage AI Assistant plugin.
 
-This module lets the AI Assistant backend call local or remote Google-hosted (GCP) Vertex AI models through a configuration-driven provider so the rest of the plugin remains model-agnostic.
+This module lets the AI Assistant backend call Google-hosted (GCP) Vertex AI models through a configuration-driven provider so the rest of the plugin remains model-agnostic.
 
 ## Features
 
