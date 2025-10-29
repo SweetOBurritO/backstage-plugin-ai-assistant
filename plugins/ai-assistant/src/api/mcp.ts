@@ -25,37 +25,67 @@ export const createMcpService = ({ fetchApi, discoveryApi }: McpApiOptions) => {
   const createMcpConfig = async (config: McpServerConfig): Promise<void> => {
     const assistantBaseUrl = await discoveryApi.getBaseUrl('ai-assistant');
 
-    await fetchApi.fetch(`${assistantBaseUrl}/mcp/config`, {
+    const res = await fetchApi.fetch(`${assistantBaseUrl}/mcp/config`, {
       method: 'POST',
       body: JSON.stringify(config),
       headers: {
         'Content-Type': 'application/json',
       },
     });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+
+      const { error } = errorData;
+
+      throw new Error(
+        `Failed to create MCP config: ${error || res.statusText}`,
+      );
+    }
   };
 
   const updateMcpConfig = async (config: McpServerConfig): Promise<void> => {
     const assistantBaseUrl = await discoveryApi.getBaseUrl('ai-assistant');
 
-    await fetchApi.fetch(`${assistantBaseUrl}/mcp/config`, {
+    const res = await fetchApi.fetch(`${assistantBaseUrl}/mcp/config`, {
       method: 'PATCH',
       body: JSON.stringify(config),
       headers: {
         'Content-Type': 'application/json',
       },
     });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+
+      const { error } = errorData;
+
+      throw new Error(
+        `Failed to update MCP config: ${error || res.statusText}`,
+      );
+    }
   };
 
   const deleteMcpConfig = async (configName: string): Promise<void> => {
     const assistantBaseUrl = await discoveryApi.getBaseUrl('ai-assistant');
 
-    await fetchApi.fetch(`${assistantBaseUrl}/mcp/config`, {
+    const res = await fetchApi.fetch(`${assistantBaseUrl}/mcp/config`, {
       method: 'DELETE',
       body: JSON.stringify({ name: configName }),
       headers: {
         'Content-Type': 'application/json',
       },
     });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+
+      const { error } = errorData;
+
+      throw new Error(
+        `Failed to delete MCP config: ${error || res.statusText}`,
+      );
+    }
   };
 
   return {

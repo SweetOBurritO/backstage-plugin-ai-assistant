@@ -137,6 +137,11 @@ export const McpServersTab: React.FC<McpServersTabProps> = () => {
           editingIndex !== null ? 'update' : 'create'
         } MCP configuration. Please try again.`,
       );
+      alertApi.post({
+        message: (err as Error).message,
+        display: 'transient',
+        severity: 'error',
+      });
     }
   }, [currentConfig, editingIndex, configs, mcpApi, validateConfig, resetForm]);
 
