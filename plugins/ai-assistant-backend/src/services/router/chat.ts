@@ -43,15 +43,14 @@ export async function createChatRouter(
     async (req, res) => {
       const { messages, conversationId, modelId, stream } = req.body;
 
-      const credentials = await httpAuth.credentials(req);
-      const { userEntityRef } = await userInfo.getUserInfo(credentials);
+      const userCredentials = await httpAuth.credentials(req);
 
       const responseMessages = await chat.prompt({
         modelId,
         messages,
         conversationId,
         stream,
-        userEntityRef,
+        userCredentials,
       });
 
       res.json({

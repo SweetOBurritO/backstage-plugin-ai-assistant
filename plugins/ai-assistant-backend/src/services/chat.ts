@@ -31,8 +31,10 @@ import { v4 as uuid } from 'uuid';
 import type {
   BackstageCredentials,
   CacheService,
+  UserInfoService,
 } from '@backstage/backend-plugin-api';
 import { AIMessage, ToolMessage } from '@langchain/core/messages';
+import { McpService } from './mcp';
 
 export type ChatServiceOptions = {
   models: Model[];
@@ -44,6 +46,8 @@ export type ChatServiceOptions = {
   catalog: CatalogService;
   cache: CacheService;
   auth: AuthService;
+  mcp: McpService;
+  userInfo: UserInfoService;
   langfuseEnabled: boolean;
   langfuseClient?: LangfuseClient;
 };
@@ -53,7 +57,7 @@ type PromptOptions = {
   messages: Message[];
   conversationId: string;
   stream?: boolean;
-  userEntityRef: string;
+  userCredentials: BackstageCredentials;
 };
 
 type GetConversationOptions = {
@@ -97,6 +101,8 @@ export const createChatService = async ({
   catalog,
   cache,
   auth,
+  mcp,
+  userInfo,
   langfuseEnabled,
   langfuseClient,
 }: ChatServiceOptions): Promise<ChatService> => {
@@ -127,8 +133,6 @@ export const createChatService = async ({
     models,
     langfuseEnabled,
   });
-
-  const agentTools = tools.map(tool => new DynamicStructuredTool(tool));
 
   const systemPromptTemplate = SystemMessagePromptTemplate.fromTemplate(`
     PURPOSE:
@@ -216,13 +220,15 @@ export const createChatService = async ({
     messages,
     modelId,
     stream = true,
-    userEntityRef,
+    userCredentials,
   }: PromptOptions) => {
     const model = models.find(m => m.id === modelId)?.chatModel;
 
     if (!model) {
       throw new Error(`Model with id ${modelId} not found`);
     }
+
+    const { userEntityRef } = await userInfo.getUserInfo(userCredentials);
 
     const streamFn = async () => {
       const recentConversationMessages = await chatStore.getChatMessages(
@@ -234,6 +240,12 @@ export const createChatService = async ({
 
       const credentials = await auth.getOwnServiceCredentials();
       const user = await getUser(cache, userEntityRef, credentials, catalog);
+
+      const mcpTools = await mcp.getTools(userCredentials);
+
+      const agentTools = tools
+        .map(tool => new DynamicStructuredTool(tool))
+        .concat(mcpTools.map(tool => new DynamicStructuredTool(tool)));
 
       addMessages(
         messages,

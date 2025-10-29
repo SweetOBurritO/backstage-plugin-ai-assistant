@@ -10,9 +10,11 @@ import Stack from '@mui/material/Stack';
 import Autocomplete from '@mui/material/Autocomplete';
 import Paper from '@mui/material/Paper';
 import NorthIcon from '@mui/icons-material/North';
+import SettingsIcon from '@mui/icons-material/Settings';
 import Button from '@mui/material/Button';
 import { Message } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { MessageCard } from '../MessageCard';
+import { SettingsModal } from './SettingsModal';
 
 type ConversationOptions = {
   conversationId: string | undefined;
@@ -34,6 +36,8 @@ export const Conversation = ({
     'modelId',
     undefined,
   );
+
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
 
   const { value: models, loading: loadingModels } = useAsync(
     () => chatApi.getModels(),
@@ -231,6 +235,15 @@ export const Conversation = ({
             renderInput={params => <TextField {...params} label="Models" />}
           />
           <Button
+            disabled={sending}
+            variant="contained"
+            color="info"
+            title="Settings"
+            onClick={() => setSettingsModalOpen(true)}
+          >
+            <SettingsIcon />
+          </Button>
+          <Button
             variant="contained"
             disabled={sending || !input.trim()}
             onClick={sendMessage}
@@ -239,6 +252,11 @@ export const Conversation = ({
           </Button>
         </Stack>
       </Paper>
+
+      <SettingsModal
+        open={settingsModalOpen}
+        onClose={() => setSettingsModalOpen(false)}
+      />
     </Stack>
   );
 };
