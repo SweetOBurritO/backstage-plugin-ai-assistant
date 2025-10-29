@@ -6,7 +6,7 @@
     "node": "20 || 22"
   },
   "scripts": {
-    "start": "dotenv -e .env -- backstage-cli repo start",
+    "start": "backstage-cli repo start",
     "build:backend": "yarn workspace backend build",
     "build:all": "backstage-cli repo build --all",
     "tsc": "tsc",
@@ -38,7 +38,6 @@
     "@changesets/cli": "^2.29.6",
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
-    "dotenv-cli": "^7.4.2",
     "husky": "^9.1.7",
     "prettier": "^2.3.2",
     "react": "^18.0.0",
