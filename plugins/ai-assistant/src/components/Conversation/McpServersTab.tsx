@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
-import { useApi, errorApiRef } from '@backstage/core-plugin-api';
+import { useApi, alertApiRef } from '@backstage/core-plugin-api';
 import { useAsync, useAsyncFn } from 'react-use';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
@@ -12,7 +12,6 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import Alert from '@mui/material/Alert';
-import Chip from '@mui/material/Chip';
 import Button from '@mui/material/Button';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { McpServerConfig } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
@@ -20,28 +19,28 @@ import { mcpApiRef } from '../../api/mcp';
 
 interface McpConfigFormData {
   name: string;
-  jsonConfig: string;
+  options: string;
 }
 
 interface McpServersTabProps {}
 
 export const McpServersTab: React.FC<McpServersTabProps> = () => {
   const mcpApi = useApi(mcpApiRef);
-  const errorApi = useApi(errorApiRef);
+  const alertApi = useApi(alertApiRef);
 
-  const [configs, setConfigs] = useState<McpServerConfig[]>([]);
+  const [configs, setConfigs] = useState<string[]>([]);
 
   // Fetch configs using useAsync hook
   const { loading, error: fetchError } = useAsync(async () => {
     try {
-      await mcpApi.getUserDefinedMcpConfigs();
-      // The API returns string[], but we need McpServerConfig[]
-      // For now, we'll start with an empty array until the API is updated
-      setConfigs([]);
+      const mcpConfigs = await mcpApi.getUserDefinedMcpConfigs();
+
+      setConfigs(mcpConfigs.names);
     } catch (error) {
-      errorApi.post({
-        name: 'McpConfigFetchError',
+      alertApi.post({
         message: 'Failed to fetch MCP configurations',
+        display: 'transient',
+        severity: 'error',
       });
       throw error;
     }
@@ -49,17 +48,7 @@ export const McpServersTab: React.FC<McpServersTabProps> = () => {
 
   const [currentConfig, setCurrentConfig] = useState<McpConfigFormData>({
     name: '',
-    jsonConfig: JSON.stringify(
-      {
-        command: 'node',
-        args: ['path/to/server.js'],
-        env: {},
-        cwd: '',
-        timeout: 30000,
-      },
-      null,
-      2,
-    ),
+    options: JSON.stringify({}, null, 2),
   });
 
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -70,17 +59,7 @@ export const McpServersTab: React.FC<McpServersTabProps> = () => {
   const resetForm = useCallback(() => {
     setCurrentConfig({
       name: '',
-      jsonConfig: JSON.stringify(
-        {
-          command: 'node',
-          args: ['path/to/server.js'],
-          env: {},
-          cwd: '',
-          timeout: 30000,
-        },
-        null,
-        2,
-      ),
+      options: JSON.stringify({}, null, 2),
     });
     setEditingIndex(null);
     setError('');
@@ -93,11 +72,7 @@ export const McpServersTab: React.FC<McpServersTabProps> = () => {
     }
 
     try {
-      const parsedConfig = JSON.parse(config.jsonConfig);
-      if (!parsedConfig.command || typeof parsedConfig.command !== 'string') {
-        setError('Command is required in the configuration');
-        return false;
-      }
+      const parsedConfig = JSON.parse(config.options);
     } catch (e) {
       setError('Invalid JSON configuration. Please check your syntax.');
       return false;
@@ -105,7 +80,7 @@ export const McpServersTab: React.FC<McpServersTabProps> = () => {
 
     // Check for duplicate names (excluding current editing item)
     const isDuplicate = configs.some(
-      (c, index) => c.name === config.name.trim() && index !== editingIndex,
+      (c, index) => c === config.name.trim() && index !== editingIndex,
     );
 
     if (isDuplicate) {
@@ -118,47 +93,35 @@ export const McpServersTab: React.FC<McpServersTabProps> = () => {
   };
 
   const [{ loading: saving }, handleAddConfig] = useAsyncFn(async () => {
-    if (!validateConfig(currentConfig)) return;
+    // if (!validateConfig(currentConfig)) return;
 
     try {
-      const parsedOptions = JSON.parse(currentConfig.jsonConfig);
+      const parsedOptions = JSON.parse(currentConfig.options);
 
       const newConfig: McpServerConfig = {
         name: currentConfig.name.trim(),
-        options: {
-          command: parsedOptions.command.trim(),
-          args: Array.isArray(parsedOptions.args)
-            ? parsedOptions.args.filter((arg: string) => arg.trim())
-            : [],
-          env:
-            parsedOptions.env && Object.keys(parsedOptions.env).length > 0
-              ? parsedOptions.env
-              : undefined,
-          cwd: parsedOptions.cwd?.trim() || undefined,
-          stderr: parsedOptions.stderr,
-          timeout: parsedOptions.timeout || 30000,
-        },
+        options: parsedOptions,
       };
 
       if (editingIndex !== null) {
         // Update existing config
         await mcpApi.updateMcpConfig(newConfig);
         const updated = [...configs];
-        updated[editingIndex] = newConfig;
+        updated[editingIndex] = newConfig.name;
         setConfigs(updated);
       } else {
         // Create new config
         await mcpApi.createMcpConfig(newConfig);
-        setConfigs([...configs, newConfig]);
+        setConfigs([...configs, newConfig.name]);
       }
 
       resetForm();
 
-      errorApi.post({
-        name: 'McpConfigSuccess',
+      alertApi.post({
         message: `MCP server "${newConfig.name}" ${
           editingIndex !== null ? 'updated' : 'created'
         } successfully`,
+        display: 'transient',
       });
     } catch (err) {
       setError(
@@ -167,30 +130,14 @@ export const McpServersTab: React.FC<McpServersTabProps> = () => {
         } MCP configuration. Please try again.`,
       );
     }
-  }, [
-    currentConfig,
-    editingIndex,
-    configs,
-    mcpApi,
-    errorApi,
-    validateConfig,
-    resetForm,
-  ]);
+  }, [currentConfig, editingIndex, configs, mcpApi, validateConfig, resetForm]);
 
   const handleEditConfig = (index: number) => {
     const config = configs[index];
-    const configObject = {
-      command: config.options.command || '',
-      args: config.options.args || [],
-      env: config.options.env || {},
-      cwd: config.options.cwd || '',
-      stderr: config.options.stderr || false,
-      timeout: config.options.timeout || 30000,
-    };
 
     setCurrentConfig({
-      name: config.name,
-      jsonConfig: JSON.stringify(configObject, null, 2),
+      name: config,
+      options: JSON.stringify({}, null, 2),
     });
     setEditingIndex(index);
 
@@ -213,7 +160,7 @@ export const McpServersTab: React.FC<McpServersTabProps> = () => {
       const configToDelete = configs[index];
 
       try {
-        await mcpApi.deleteMcpConfig(configToDelete.name);
+        await mcpApi.deleteMcpConfig(configToDelete);
         const updated = configs.filter((_, i) => i !== index);
         setConfigs(updated);
 
@@ -221,18 +168,20 @@ export const McpServersTab: React.FC<McpServersTabProps> = () => {
           resetForm();
         }
 
-        errorApi.post({
-          name: 'McpConfigSuccess',
-          message: `MCP server "${configToDelete.name}" deleted successfully`,
+        alertApi.post({
+          message: `MCP server "${configToDelete}" deleted successfully`,
+          display: 'transient',
+          severity: 'info',
         });
       } catch (err) {
-        errorApi.post({
-          name: 'McpConfigError',
-          message: `Failed to delete MCP server "${configToDelete.name}". Please try again.`,
+        alertApi.post({
+          message: `Failed to delete MCP server "${configToDelete}". Please try again.`,
+          display: 'transient',
+          severity: 'error',
         });
       }
     },
-    [configs, editingIndex, mcpApi, errorApi, resetForm],
+    [configs, editingIndex, mcpApi, alertApi, resetForm],
   );
 
   if (loading) {
@@ -268,6 +217,95 @@ export const McpServersTab: React.FC<McpServersTabProps> = () => {
         and capabilities.
       </Typography>
 
+      {/* Add/Edit Configuration Form */}
+      <Paper variant="outlined" sx={{ p: 3 }} ref={formRef}>
+        <Typography variant="subtitle1" gutterBottom>
+          {editingIndex !== null ? 'Edit Server' : 'Add New Server'}
+        </Typography>
+
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+
+        <Stack spacing={3}>
+          <TextField
+            label="Server Name"
+            fullWidth
+            value={currentConfig.name}
+            disabled={editingIndex !== null}
+            onChange={e =>
+              setCurrentConfig({
+                ...currentConfig,
+                name: e.target.value,
+              })
+            }
+            placeholder="my-mcp-server"
+            required
+          />
+
+          <Box>
+            <Typography variant="subtitle2" gutterBottom>
+              Server Configuration
+            </Typography>
+
+            {editingIndex !== null && (
+              <Alert severity="info" sx={{ mb: 1 }}>
+                <Typography variant="caption">
+                  Please re-enter the full JSON configuration below to update
+                  it. Existing configurations cannot be edited directly for
+                  security reasons.
+                </Typography>
+              </Alert>
+            )}
+
+            <Typography variant="body2" color="text.secondary" gutterBottom>
+              Define your MCP server configuration as JSON. This is similar to
+              how VS Code MCP extensions are configured.
+            </Typography>
+            <TextField
+              multiline
+              rows={12}
+              fullWidth
+              value={currentConfig.options}
+              onChange={e =>
+                setCurrentConfig({
+                  ...currentConfig,
+                  options: e.target.value,
+                })
+              }
+              placeholder="Enter JSON configuration..."
+              inputRef={jsonConfigRef}
+              sx={{
+                '& .MuiInputBase-input': {
+                  fontFamily: 'Consolas, "Courier New", monospace',
+                  fontSize: '0.875rem',
+                },
+              }}
+            />
+          </Box>
+
+          <Stack direction="row" spacing={2} justifyContent="flex-end">
+            <Button onClick={resetForm}>Cancel</Button>
+            <Button
+              variant="contained"
+              onClick={handleAddConfig}
+              disabled={!currentConfig.name.trim() || saving}
+            >
+              {(() => {
+                if (saving) {
+                  return editingIndex !== null ? 'Updating...' : 'Adding...';
+                }
+                return editingIndex !== null ? 'Update Server' : 'Add Server';
+              })()}
+            </Button>
+          </Stack>
+        </Stack>
+      </Paper>
+
+      <Divider />
+
       {/* Existing Configurations */}
       <Stack spacing={2}>
         <Typography variant="subtitle1">Configured Servers</Typography>
@@ -282,26 +320,9 @@ export const McpServersTab: React.FC<McpServersTabProps> = () => {
                 <Stack
                   direction="row"
                   justifyContent="space-between"
-                  alignItems="flex-start"
+                  alignItems="center"
                 >
-                  <Stack spacing={1} sx={{ flex: 1 }}>
-                    <Typography variant="subtitle2">{config.name}</Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Command: {config.options.command}
-                    </Typography>
-                    {config.options.args && config.options.args.length > 0 && (
-                      <Stack direction="row" spacing={1} flexWrap="wrap">
-                        <Typography variant="caption" color="text.secondary">
-                          Args:
-                        </Typography>
-                        {config.options.args.map(
-                          (arg: string, argIndex: number) => (
-                            <Chip key={argIndex} label={arg} size="small" />
-                          ),
-                        )}
-                      </Stack>
-                    )}
-                  </Stack>
+                  <Typography variant="subtitle2">{config}</Typography>
                   <CardActions>
                     <Button
                       size="small"
@@ -324,84 +345,6 @@ export const McpServersTab: React.FC<McpServersTabProps> = () => {
           ))
         )}
       </Stack>
-
-      <Divider />
-
-      {/* Add/Edit Configuration Form */}
-      <Paper variant="outlined" sx={{ p: 3 }} ref={formRef}>
-        <Typography variant="subtitle1" gutterBottom>
-          {editingIndex !== null ? 'Edit Server' : 'Add New Server'}
-        </Typography>
-
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-
-        <Stack spacing={3}>
-          <TextField
-            label="Server Name"
-            fullWidth
-            value={currentConfig.name}
-            onChange={e =>
-              setCurrentConfig({
-                ...currentConfig,
-                name: e.target.value,
-              })
-            }
-            placeholder="my-mcp-server"
-            required
-          />
-
-          <Box>
-            <Typography variant="subtitle2" gutterBottom>
-              Server Configuration
-            </Typography>
-            <Typography variant="body2" color="text.secondary" gutterBottom>
-              Define your MCP server configuration as JSON. This is similar to
-              how VS Code MCP extensions are configured.
-            </Typography>
-            <TextField
-              multiline
-              rows={12}
-              fullWidth
-              value={currentConfig.jsonConfig}
-              onChange={e =>
-                setCurrentConfig({
-                  ...currentConfig,
-                  jsonConfig: e.target.value,
-                })
-              }
-              placeholder="Enter JSON configuration..."
-              inputRef={jsonConfigRef}
-              sx={{
-                '& .MuiInputBase-input': {
-                  fontFamily: 'Consolas, "Courier New", monospace',
-                  fontSize: '0.875rem',
-                },
-              }}
-              helperText="Example properties: command, args, env, cwd, timeout, stderr"
-            />
-          </Box>
-
-          <Stack direction="row" spacing={2} justifyContent="flex-end">
-            <Button onClick={resetForm}>Cancel</Button>
-            <Button
-              variant="contained"
-              onClick={handleAddConfig}
-              disabled={!currentConfig.name.trim() || saving}
-            >
-              {(() => {
-                if (saving) {
-                  return editingIndex !== null ? 'Updating...' : 'Adding...';
-                }
-                return editingIndex !== null ? 'Update Server' : 'Add Server';
-              })()}
-            </Button>
-          </Stack>
-        </Stack>
-      </Paper>
     </Stack>
   );
 };

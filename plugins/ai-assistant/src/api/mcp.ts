@@ -14,12 +14,12 @@ export const mcpApiRef = createApiRef<McpApi>({
 });
 
 export const createMcpService = ({ fetchApi, discoveryApi }: McpApiOptions) => {
-  const getUserDefinedMcpConfigs = async (): Promise<string[]> => {
+  const getUserDefinedMcpConfigs = async (): Promise<{ names: string[] }> => {
     const assistantBaseUrl = await discoveryApi.getBaseUrl('ai-assistant');
 
     const response = await fetchApi.fetch(`${assistantBaseUrl}/mcp/config`);
     const data = await response.json();
-    return data.models;
+    return data;
   };
 
   const createMcpConfig = async (config: McpServerConfig): Promise<void> => {
@@ -49,12 +49,13 @@ export const createMcpService = ({ fetchApi, discoveryApi }: McpApiOptions) => {
   const deleteMcpConfig = async (configName: string): Promise<void> => {
     const assistantBaseUrl = await discoveryApi.getBaseUrl('ai-assistant');
 
-    await fetchApi.fetch(
-      `${assistantBaseUrl}/mcp/config/${encodeURIComponent(configName)}`,
-      {
-        method: 'DELETE',
+    await fetchApi.fetch(`${assistantBaseUrl}/mcp/config`, {
+      method: 'DELETE',
+      body: JSON.stringify({ name: configName }),
+      headers: {
+        'Content-Type': 'application/json',
       },
-    );
+    });
   };
 
   return {
