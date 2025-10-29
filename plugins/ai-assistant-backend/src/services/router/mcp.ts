@@ -61,7 +61,6 @@ export async function createMcpRouter(
 
   const deleteConfigSchema = z.object({
     name: z.string(),
-    options: z.record(z.string(), z.any()),
   });
 
   router.delete(
