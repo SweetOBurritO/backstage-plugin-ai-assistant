@@ -29,6 +29,7 @@ import { v4 as uuid } from 'uuid';
 import type {
   BackstageCredentials,
   CacheService,
+  UserInfoService,
 } from '@backstage/backend-plugin-api';
 import { AIMessage, ToolMessage } from '@langchain/core/messages';
 import { McpService } from './mcp';
@@ -44,6 +45,7 @@ export type ChatServiceOptions = {
   cache: CacheService;
   auth: AuthService;
   mcp: McpService;
+  userInfo: UserInfoService;
 };
 
 type PromptOptions = {
@@ -51,7 +53,7 @@ type PromptOptions = {
   messages: Message[];
   conversationId: string;
   stream?: boolean;
-  userEntityRef: string;
+  userCredentials: BackstageCredentials;
 };
 
 type GetConversationOptions = {
@@ -91,6 +93,7 @@ export const createChatService = async ({
   cache,
   auth,
   mcp,
+  userInfo,
 }: ChatServiceOptions): Promise<ChatService> => {
   logger.info(`Available models: ${models.map(m => m.id).join(', ')}`);
   logger.info(`Available tools: ${tools.map(t => t.name).join(', ')}`);
@@ -202,13 +205,15 @@ export const createChatService = async ({
     messages,
     modelId,
     stream = true,
-    userEntityRef,
+    userCredentials,
   }: PromptOptions) => {
     const model = models.find(m => m.id === modelId)?.chatModel;
 
     if (!model) {
       throw new Error(`Model with id ${modelId} not found`);
     }
+
+    const { userEntityRef } = await userInfo.getUserInfo(userCredentials);
 
     const streamFn = async () => {
       const recentConversationMessages = await chatStore.getChatMessages(
@@ -221,7 +226,7 @@ export const createChatService = async ({
       const credentials = await auth.getOwnServiceCredentials();
       const user = await getUser(cache, userEntityRef, credentials, catalog);
 
-      const mcpTools = await mcp.getTools(credentials);
+      const mcpTools = await mcp.getTools(userCredentials);
 
       const agentTools = tools
         .map(tool => new DynamicStructuredTool(tool))
