@@ -10,12 +10,16 @@ import { chatApiRef } from '../../api/chat';
 
 export type FeedbackButtonsProps = {
   messageId?: string;
+  initialScore?: number;
 };
 
-export const FeedbackButtons = ({ messageId }: FeedbackButtonsProps) => {
+export const FeedbackButtons = ({
+  messageId,
+  initialScore = 0,
+}: FeedbackButtonsProps) => {
   const chatApi = useApi(chatApiRef);
   const theme = useTheme();
-  const [score, setScore] = useState<number>(0); // 0 = no feedback, 1 = helpful, -1 = not helpful
+  const [score, setScore] = useState<number>(initialScore); // 0 = no feedback, 1 = helpful, -1 = not helpful
 
   const handleFeedback = async (feedback: 'good' | 'bad') => {
     const targetScore = feedback === 'good' ? 1 : -1;

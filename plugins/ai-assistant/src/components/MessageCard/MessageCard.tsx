@@ -118,7 +118,9 @@ export const MessageCard = ({ message, loading }: MessageCardProps) => {
           width={40}
         />
       )}
-      {role === 'ai' && <FeedbackButtons messageId={message.id} />}
+      {role === 'ai' && (
+        <FeedbackButtons messageId={message.id} initialScore={message.score} />
+      )}
     </Card>
   );
 };
