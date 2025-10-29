@@ -60,9 +60,9 @@ catalog:
 aiAssistant:
   mcp:
     encryptionKey: <your encryption key>
-    servers:
-      - name: 'foo'
-        options: {}
+    # servers:
+    # - name: 'foo'
+    #   options: {}
 
   storage:
     pgVector:
