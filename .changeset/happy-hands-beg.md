@@ -6,4 +6,4 @@
 ---
 
 - add mcp server configuration frontend
-- add mcp server configuration error handling on frontend and backend
+- add mcp server configuration validation and error handling on frontend and backend
