@@ -34,7 +34,7 @@ export interface Config {
        * @visibility secret
        */
       encryptionKey: string;
-      servers: Array<McpServerConfig>;
+      servers?: Array<McpServerConfig>;
     };
   };
 }

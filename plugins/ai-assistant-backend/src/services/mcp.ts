@@ -63,13 +63,15 @@ export const createMcpService = async ({
 
         return acc;
       }, {} as Record<string, McpServerConfigOptions>)
-    : {};
+    : null;
 
-  const preConfiguredMcpClient = new MultiServerMCPClient({
-    prefixToolNameWithServerName: true,
-    useStandardContentBlocks: true,
-    mcpServers: preConfiguredMcpServers,
-  });
+  const preConfiguredMcpClient = preConfiguredMcpServers
+    ? new MultiServerMCPClient({
+        prefixToolNameWithServerName: true,
+        useStandardContentBlocks: true,
+        mcpServers: preConfiguredMcpServers,
+      })
+    : null;
 
   const mcpStore = await McpStore.fromConfig({ database });
 
@@ -112,7 +114,9 @@ export const createMcpService = async ({
     });
 
     const userMcpTools = await userConfigClient.getTools();
-    const preConfiguredMcpTools = await preConfiguredMcpClient.getTools();
+    const preConfiguredMcpTools = preConfiguredMcpClient
+      ? await preConfiguredMcpClient.getTools()
+      : [];
 
     const mcpTools = [...userMcpTools, ...preConfiguredMcpTools];
 
