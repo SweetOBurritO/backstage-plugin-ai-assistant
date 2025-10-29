@@ -9,9 +9,9 @@ it into your Backstage backend.
 ## Features
 
 - Convert text or documents to numeric vector embeddings using Azure OpenAI / Azure AI Foundry
- embedding deployments.
+  embedding deployments.
 - Exposes a provider implementation compatible with the AI Assistant backend so different
- embeddings services can be swapped without changing the rest of the app.
+  embeddings services can be swapped without changing the rest of the app.
 - Handles basic batching and optional configuration for deployment name / endpoint selection.
 
 ## When to use
@@ -36,16 +36,15 @@ aiAssistant:
       deploymentName: 'text-embedding-3-large'
       instanceName: 'eastus'
       apiKey: ${AZURE_OPENAI_API_KEY}
-
 ```
 
 Field descriptions:
 
 - `endpoint` - The full Azure endpoint URL for the embeddings deployment. This may include
- the deployment path and api-version query parameter depending on your Azure setup.
+  the deployment path and api-version query parameter depending on your Azure setup.
 - `deploymentName` - The name of the deployment that provides the embeddings model.
 - `instanceName` - The Azure instance / region name (used for telemetry or constructing alternate
- endpoint forms in some setups).
+  endpoint forms in some setups).
 - `apiKey` - Your Azure OpenAI or Azure AI API key. Marked as secret in configuration.
 - `openAIApiVersion` -
 

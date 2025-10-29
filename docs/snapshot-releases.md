@@ -76,14 +76,14 @@ If you need to test changes from a fork:
 
 ## Snapshot vs. Regular Release
 
-| Feature | Snapshot Release | Regular Release |
-|---------|-----------------|-----------------|
-| **Requires changeset PR** | ❌ No | ✅ Yes |
-| **Version format** | `1.2.3-snapshot-timestamp` | `1.2.3` |
-| **npm tag** | Custom (e.g., `snapshot`) | `latest` |
-| **Affects default installs** | ❌ No | ✅ Yes |
-| **Permanent** | ⚠️ Can be deprecated | ✅ Yes |
-| **Use case** | Testing/validation | Official releases |
+| Feature                      | Snapshot Release           | Regular Release   |
+| ---------------------------- | -------------------------- | ----------------- |
+| **Requires changeset PR**    | ❌ No                      | ✅ Yes            |
+| **Version format**           | `1.2.3-snapshot-timestamp` | `1.2.3`           |
+| **npm tag**                  | Custom (e.g., `snapshot`)  | `latest`          |
+| **Affects default installs** | ❌ No                      | ✅ Yes            |
+| **Permanent**                | ⚠️ Can be deprecated       | ✅ Yes            |
+| **Use case**                 | Testing/validation         | Official releases |
 
 ## Best Practices
 

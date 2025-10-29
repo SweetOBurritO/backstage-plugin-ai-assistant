@@ -25,6 +25,12 @@ backend.add(import('@sweetoburrito/backstage-plugin-ai-assistant-backend'));
 //   ),
 // );
 
+// backend.add(
+//   import(
+//     '@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-google-vertex-ai'
+//   ),
+// );
+
 backend.add(
   import(
     '@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-azure-open-ai'

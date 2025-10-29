@@ -22,6 +22,7 @@ import { createSearchKnowledgeTool } from './services/tools/searchKnowledge';
 import { catalogServiceRef } from '@backstage/plugin-catalog-node';
 import { createMcpService } from './services/mcp';
 
+import { initLangfuse } from './services/langfuse';
 /**
  * aiAssistantPlugin backend plugin
  *
@@ -91,7 +92,10 @@ export const aiAssistantPlugin = createBackendPlugin({
       },
 
       async init(options) {
-        const { httpRouter, database } = options;
+        const { httpRouter, database, config, logger } = options;
+
+        const langfuseEnabled = initLangfuse(config, logger);
+
         const client = await database.getClient();
 
         await applyDatabaseMigrations(client);
@@ -120,6 +124,7 @@ export const aiAssistantPlugin = createBackendPlugin({
           models,
           tools,
           mcp,
+          langfuseEnabled,
         });
 
         httpRouter.use(await createRouter({ ...options, chat, mcp }));
