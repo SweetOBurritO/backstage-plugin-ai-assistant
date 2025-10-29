@@ -138,8 +138,35 @@ export const createMcpService = async ({
     return tools;
   };
 
+  const validateMcpServerConfig = async (
+    mcpConfig: McpServerConfig[],
+  ): Promise<void> => {
+    try {
+      const userMcpServers = mcpConfig.reduce((acc, server) => {
+        const { name, options } = server;
+
+        acc[name] = options;
+
+        return acc;
+      }, {} as Record<string, McpServerConfigOptions>);
+
+      const userConfigClient = new MultiServerMCPClient({
+        prefixToolNameWithServerName: true,
+        useStandardContentBlocks: true,
+        mcpServers: userMcpServers,
+      });
+
+      await userConfigClient.getTools();
+    } catch (e) {
+      const error = new Error('Invalid MCP server configuration');
+      error.name = 'McpConfigurationError';
+      throw error;
+    }
+  };
+
   const createUserMcpServerConfig: McpService['createUserMcpServerConfig'] =
     async (credentials, mcpConfig) => {
+      await validateMcpServerConfig([mcpConfig]);
       const { userEntityRef } = await userInfo.getUserInfo(credentials);
       const { name, options } = mcpConfig;
 
@@ -150,6 +177,7 @@ export const createMcpService = async ({
 
   const updateUserMcpServerConfig: McpService['updateUserMcpServerConfig'] =
     async (credentials, mcpConfig) => {
+      await validateMcpServerConfig([mcpConfig]);
       const { userEntityRef } = await userInfo.getUserInfo(credentials);
       const { name, options } = mcpConfig;
 

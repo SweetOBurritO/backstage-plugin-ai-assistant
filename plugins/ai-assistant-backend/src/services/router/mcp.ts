@@ -34,13 +34,20 @@ export async function createMcpRouter(
   router.post('/config', validation(configSchema, 'body'), async (req, res) => {
     const credentials = await httpAuth.credentials(req);
     const { name, options: mcpOptions } = req.body;
+    try {
+      await mcp.createUserMcpServerConfig(credentials, {
+        name,
+        options: mcpOptions,
+      });
 
-    await mcp.createUserMcpServerConfig(credentials, {
-      name,
-      options: mcpOptions,
-    });
-
-    res.status(201).send();
+      res.status(201).send();
+    } catch (error) {
+      if (error instanceof Error && error.name === 'McpConfigurationError') {
+        res.status(400).json({ error: error.message });
+        return;
+      }
+      throw error;
+    }
   });
 
   router.patch(
@@ -50,12 +57,19 @@ export async function createMcpRouter(
       const credentials = await httpAuth.credentials(req);
       const { name, options: mcpOptions } = req.body;
 
-      await mcp.updateUserMcpServerConfig(credentials, {
-        name,
-        options: mcpOptions,
-      });
-
-      res.status(204).send();
+      try {
+        await mcp.updateUserMcpServerConfig(credentials, {
+          name,
+          options: mcpOptions,
+        });
+        res.status(204).send();
+      } catch (error) {
+        if (error instanceof Error && error.name === 'McpConfigurationError') {
+          res.status(400).json({ error: error.message });
+          return;
+        }
+        throw error;
+      }
     },
   );
 
