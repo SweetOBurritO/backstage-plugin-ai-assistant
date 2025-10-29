@@ -25,6 +25,7 @@ import { DynamicStructuredTool } from '@langchain/core/tools';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { SystemMessagePromptTemplate } from '@langchain/core/prompts';
 import { createSummarizerService } from './summarizer';
+import { CallbackHandler } from '@langfuse/langchain';
 import { v4 as uuid } from 'uuid';
 import type {
   BackstageCredentials,
@@ -42,6 +43,7 @@ export type ChatServiceOptions = {
   catalog: CatalogService;
   cache: CacheService;
   auth: AuthService;
+  langfuseEnabled: boolean;
 };
 
 type PromptOptions = {
@@ -88,6 +90,7 @@ export const createChatService = async ({
   catalog,
   cache,
   auth,
+  langfuseEnabled,
 }: ChatServiceOptions): Promise<ChatService> => {
   logger.info(`Available models: ${models.map(m => m.id).join(', ')}`);
   logger.info(`Available tools: ${tools.map(t => t.name).join(', ')}`);
@@ -111,7 +114,11 @@ export const createChatService = async ({
     DEFAULT_TOOL_GUIDELINE;
 
   const chatStore = await ChatStore.fromConfig({ database });
-  const summarizer = await createSummarizerService({ config, models });
+  const summarizer = await createSummarizerService({
+    config,
+    models,
+    langfuseEnabled,
+  });
 
   const agentTools = tools.map(tool => new DynamicStructuredTool(tool));
 
@@ -243,11 +250,29 @@ export const createChatService = async ({
         prompt: systemPrompt[0].text,
       });
 
+      // Initialize Langfuse CallbackHandler for tracing if credentials are available
+      const langfuseHandler = langfuseEnabled
+        ? new CallbackHandler({
+            sessionId: conversationId,
+            userId: userEntityRef,
+            tags: ['backstage-ai-assistant', 'chat'],
+          })
+        : undefined;
+
       const promptStream = await agent.stream(
         {
           messages: [...recentConversationMessages, ...messages],
         },
-        { streamMode: ['values'] },
+        {
+          streamMode: ['values'],
+          runName: 'ai-assistant-chat',
+          metadata: {
+            langfuseUserId: userEntityRef,
+            langfuseSessionId: conversationId,
+            langfuseTags: ['ai-assistant', 'chat', modelId],
+          },
+          callbacks: langfuseHandler ? [langfuseHandler] : [],
+        },
       );
 
       const responseMessages: Required<Message>[] = [];
@@ -296,12 +321,13 @@ export const createChatService = async ({
 
         // Simulate streaming until langchain messages error is better understood
         for await (const m of newMessages) {
-          const parts = m.content.split(' ');
-
+          const words = m.content.split(' ');
+          const chunkSize = 5; // Send 5 words at a time
           let messageBuilder = '';
 
-          for await (const part of parts) {
-            messageBuilder = messageBuilder.concat(part).concat(' ');
+          for (let i = 0; i < words.length; i += chunkSize) {
+            const wordChunk = words.slice(i, i + chunkSize).join(' ');
+            messageBuilder = messageBuilder.concat(wordChunk).concat(' ');
             m.content = messageBuilder;
 
             await new Promise(resolve => setTimeout(resolve, 50));

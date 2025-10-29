@@ -24,6 +24,11 @@ backend:
     pluginSources:
       - 'catalog'
 
+  # langfuse:
+  #   secretKey: <<your-langfuse-secretKey>>>
+  #   publicKey: <<your-langfuse-publicKey>>>
+  #   baseUrl: <<your-langfuse-baseUrl>>>
+
 auth:
   providers:
     guest:
@@ -87,47 +92,53 @@ aiAssistant:
         - endpoint: <your-azure-ai-foundry-endpoint>
           modelName: '<your-model>'
 
-ingestors:
-  # See ./plugins/ai-assistant-backend-module-ingestor-github/config.d.ts for more config options
-  github:
-    owner: <your-github-org-or-username>
-    appId: <your-github-app-id>
-    privateKey: <your-github-private-key>
-    installationId: <your-github-installation-id>
+  # See ./docs/langfuse.md for more information
+  # langfuse:
+  #   secretKey: <<your-langfuse-secretKey>>>
+  #   publicKey: <<your-langfuse-publicKey>>>
+  #   baseUrl: <<your-langfuse-baseUrl>>>
 
-    # optional config to filter what to ingest
-    # filesBatchSize: <number-of-files-to-process-in-batches> # default: 50
-    # baseUrl: <your-github-enterprise-instance-url> # only needed for GitHub Enterprise
-    # fileTypes:
-    #   - '.md'
-    # repositories:
-    #   - name: <repository-name>
-    #     fileTypes:
-    #       - '.json'
+  ingestors:
+    # See ./plugins/ai-assistant-backend-module-ingestor-github/config.d.ts for more config options
+    github:
+      owner: <your-github-org-or-username>
+      appId: <your-github-app-id>
+      privateKey: <your-github-private-key>
+      installationId: <your-github-installation-id>
 
-  # See ./plugins/ai-assistant-backend-module-ingestor-azure-devops/config.d.ts for more config options
-  azureDevOps:
-    organization: <your-azure-devops-org-name>
-    project: <your-project-name>
-    token: <your-azure-ado-token>
-    resourceTypes:
-      # specify one or both of the following resource types to ingest
-      - 'repository'
-      - 'wiki'
+      # optional config to filter what to ingest
+      # filesBatchSize: <number-of-files-to-process-in-batches> # default: 50
+      # baseUrl: <your-github-enterprise-instance-url> # only needed for GitHub Enterprise
+      # fileTypes:
+      #   - '.md'
+      # repositories:
+      #   - name: <repository-name>
+      #     fileTypes:
+      #       - '.json'
 
-    # optional config to filter what to ingest
-    # fileTypes:
-    #   - '.md'
-    #   - '.json'
-    #   - '.txt'
-    # repositories:
-    #   - name: <repository-name>
-    #     fileTypes:
-    #       - '.json'
-    #       - '.md'
-    #       - '.txt'
-    # filesBatchSize: <number-of-repository-files-to-process-in-batches> # default: 50
+    # See ./plugins/ai-assistant-backend-module-ingestor-azure-devops/config.d.ts for more config options
+    azureDevOps:
+      organization: <your-azure-devops-org-name>
+      project: <your-project-name>
+      token: <your-azure-ado-token>
+      resourceTypes:
+        # specify one or both of the following resource types to ingest
+        - 'repository'
+        - 'wiki'
 
-    # wikis:
-    #   - name: <wiki-name>
-    # pagesBatchSize: <number-of-wiki-pages-to-process-in-batches> # default: 50
+      # optional config to filter what to ingest
+      # fileTypes:
+      #   - '.md'
+      #   - '.json'
+      #   - '.txt'
+      # repositories:
+      #   - name: <repository-name>
+      #     fileTypes:
+      #       - '.json'
+      #       - '.md'
+      #       - '.txt'
+      # filesBatchSize: <number-of-repository-files-to-process-in-batches> # default: 50
+
+      # wikis:
+      #   - name: <wiki-name>
+      # pagesBatchSize: <number-of-wiki-pages-to-process-in-batches> # default: 50
