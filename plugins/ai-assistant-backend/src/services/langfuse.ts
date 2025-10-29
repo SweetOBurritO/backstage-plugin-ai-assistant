@@ -4,11 +4,12 @@ import {
 } from '@backstage/backend-plugin-api';
 import { LangfuseSpanProcessor } from '@langfuse/otel';
 import { NodeSDK } from '@opentelemetry/sdk-node';
+import { LangfuseClient } from '@langfuse/client';
 
 export function initLangfuse(
   config: RootConfigService,
   logger: RootLoggerService,
-): boolean {
+): { langfuseEnabled: boolean; langfuseClient: LangfuseClient | undefined } {
   const langfuseSecret = config.getOptionalString(
     'aiAssistant.langfuse.secretKey',
   );
@@ -31,14 +32,23 @@ export function initLangfuse(
       spanProcessors: [langfuseSpanProcessor],
     });
 
+    const langfuseClient = new LangfuseClient({
+      secretKey: langfuseSecret,
+      publicKey: langfusePublic,
+      baseUrl: langfuseBaseUrl,
+    });
+
     logger.info(
       'Langfuse: Starting OpenTelemetry SDK with LangfuseSpanProcessor',
     );
     sdk.start();
-    return true;
+    return { langfuseEnabled: true, langfuseClient };
   }
   logger.info(
     'Langfuse: Skipping Langfuse initialization, credentials not found.',
   );
-  return false;
+  return {
+    langfuseEnabled: false,
+    langfuseClient: undefined,
+  };
 }

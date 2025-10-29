@@ -45,6 +45,7 @@ export type ChatServiceOptions = {
   cache: CacheService;
   auth: AuthService;
   langfuseEnabled: boolean;
+  langfuseClient?: LangfuseClient;
 };
 
 type PromptOptions = {
@@ -97,6 +98,7 @@ export const createChatService = async ({
   cache,
   auth,
   langfuseEnabled,
+  langfuseClient,
 }: ChatServiceOptions): Promise<ChatService> => {
   logger.info(`Available models: ${models.map(m => m.id).join(', ')}`);
   logger.info(`Available tools: ${tools.map(t => t.name).join(', ')}`);
@@ -408,19 +410,13 @@ export const createChatService = async ({
     }
 
     if (langfuseEnabled && message.traceId) {
-      const langfuse = new LangfuseClient({
-        secretKey: 'sk-lf-e5caf6b6-79e4-45fc-bafd-b6c3368b728b',
-        publicKey: 'pk-lf-62941efb-1eb6-4924-9134-870afd80fce8',
-        baseUrl: 'https://dev--wu3-poc-langfuse.nintextest.io',
-      });
-
-      langfuse.score.create({
+      langfuseClient!.score.create({
         traceId: message.traceId,
         name: 'helpfulness',
         value: score,
       });
       logger.info(
-        `Scored message ${messageId} on Langfuse with trace ID ${message.traceId}`,
+        `Scored message ${messageId} on Langfuse with trace ID ${message.traceId} - ${score} for helpfulness`,
       );
     } else if (langfuseEnabled && !message.traceId) {
       logger.warn(
@@ -434,6 +430,7 @@ export const createChatService = async ({
     };
 
     await chatStore.updateMessage(updatedMessage);
+    logger.info(`Message ${messageId} scored ${score}`);
   };
 
   return {
