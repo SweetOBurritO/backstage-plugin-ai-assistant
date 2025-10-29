@@ -68,6 +68,7 @@
     "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-catalog": "workspace:^",
     "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-github": "workspace:^",
     "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai": "workspace:^",
+    "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-google-vertex-ai": "workspace:^",
     "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama": "workspace:^",
     "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-tool-provider-backstage": "workspace:^",
     "@types/express": "^4.0.0",

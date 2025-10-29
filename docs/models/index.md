@@ -43,7 +43,8 @@ aiAssistant:
 
 ## Available Providers
 
-| Name     | Service                                                                                          | Link to Provider                                                                                                                               |
-| -------- | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Ollama   | [Ollama/OpenWebUI](https://docs.openwebui.com/getting-started/quick-start/starting-with-ollama/) | [Github](https://github.com/SweetOBurritO/backstage-plugin-ai-assistant/tree/main/plugins/ai-assistant-backend-module-model-provider-ollama)   |
-| Azure AI | [Azure AI Foundry](https://ai.azure.com/)                                                        | [Github](https://github.com/SweetOBurritO/backstage-plugin-ai-assistant/tree/main/plugins/ai-assistant-backend-module-model-provider-azure-ai) |
+| Name             | Service                                                                                          | Link to Provider                                                                                                                                       |
+| ---------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Ollama           | [Ollama/OpenWebUI](https://docs.openwebui.com/getting-started/quick-start/starting-with-ollama/) | [Github](https://github.com/SweetOBurritO/backstage-plugin-ai-assistant/tree/main/plugins/ai-assistant-backend-module-model-provider-ollama)           |
+| Azure AI         | [Azure AI Foundry](https://ai.azure.com/)                                                        | [Github](https://github.com/SweetOBurritO/backstage-plugin-ai-assistant/tree/main/plugins/ai-assistant-backend-module-model-provider-azure-ai)         |
+| Google Vertex AI | [Vertex AI Studio](https://cloud.google.com/vertex-ai)                                           | [Github](https://github.com/SweetOBurritO/backstage-plugin-ai-assistant/tree/main/plugins/ai-assistant-backend-module-model-provider-google-vertex-ai) |
