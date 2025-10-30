@@ -122,7 +122,12 @@ export const aiAssistantPlugin = createBackendPlugin({
           langfuseEnabled,
         });
 
-        httpRouter.use(await createRouter({ ...options, chat }));
+        httpRouter.use(await createRouter({ 
+          ...options, 
+          chat,
+          models,
+          langfuseEnabled,
+        }));
         dataIngestionPipeline.start();
       },
     });
