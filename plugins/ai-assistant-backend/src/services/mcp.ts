@@ -99,21 +99,27 @@ export const createMcpService = async ({
   const getTools: McpService['getTools'] = async credentials => {
     const userMcpConfig = await getUserMcpServerConfig(credentials);
 
-    const userMcpServers = userMcpConfig.reduce((acc, server) => {
-      const { name, options } = server;
+    const userMcpServers = userMcpConfig.length
+      ? userMcpConfig.reduce((acc, server) => {
+          const { name, options } = server;
 
-      acc[name] = options;
+          acc[name] = options;
 
-      return acc;
-    }, {} as Record<string, McpServerConfigOptions>);
+          return acc;
+        }, {} as Record<string, McpServerConfigOptions>)
+      : null;
 
-    const userConfigClient = new MultiServerMCPClient({
-      prefixToolNameWithServerName: true,
-      useStandardContentBlocks: true,
-      mcpServers: userMcpServers,
-    });
+    const userConfigClient = userMcpServers
+      ? new MultiServerMCPClient({
+          prefixToolNameWithServerName: true,
+          useStandardContentBlocks: true,
+          mcpServers: userMcpServers,
+        })
+      : null;
 
-    const userMcpTools = await userConfigClient.getTools();
+    const userMcpTools = userConfigClient
+      ? await userConfigClient.getTools()
+      : [];
     const preConfiguredMcpTools = preConfiguredMcpClient
       ? await preConfiguredMcpClient.getTools()
       : [];
