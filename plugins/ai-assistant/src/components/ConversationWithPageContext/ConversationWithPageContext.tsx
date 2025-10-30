@@ -13,8 +13,11 @@ import Paper from '@mui/material/Paper';
 import NorthIcon from '@mui/icons-material/North';
 import SettingsIcon from '@mui/icons-material/Settings';
 import Button from '@mui/material/Button';
-import { Box, Chip, Tooltip } from '@mui/material';
-import { Info as InfoIcon, CheckCircle as CheckCircleIcon } from '@mui/icons-material';
+import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
+import Tooltip from '@mui/material/Tooltip';
+import InfoIcon from '@mui/icons-material/Info';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Message } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { MessageCard } from '../MessageCard';
 import { SettingsModal } from '../Conversation/SettingsModal';
@@ -136,13 +139,11 @@ export const ConversationWithPageContext = ({
       return;
     }
 
-    console.debug('[Modal Page Summary] Starting page summary fetch...');
     setIsLoadingPageSummary(true);
 
     try {
       // Check if current page should be skipped
       if (pageSummarizationApi.shouldSkipCurrentPage()) {
-        console.debug('[Modal Page Summary] Skipping current page - in excluded patterns');
         setPageContext(null);
         return;
       }
@@ -152,12 +153,9 @@ export const ConversationWithPageContext = ({
       
       // Check if content is meaningful
       if (!pageSummarizationApi.isContentMeaningful(content)) {
-        console.debug('[Modal Page Summary] Skipping - content not meaningful enough');
         setPageContext(null);
         return;
       }
-
-      console.debug('[Modal Page Summary] Fetching summary for:', title);
 
       // Get page summary
       const result = await pageSummarizationApi.summarizePage({
@@ -174,12 +172,13 @@ export const ConversationWithPageContext = ({
           summary: result.summary,
         };
         setPageContext(context);
-        console.debug('[Modal Page Summary] ✅ Page context set for AI assistant:', result.summary);
       } else {
+        // eslint-disable-next-line no-console
         console.error('[Modal Page Summary] ❌ Failed to get summary:', result.error);
         setPageContext(null);
       }
     } catch (error) {
+        // eslint-disable-next-line no-console
       console.error('[Modal Page Summary] Error fetching page summary:', error);
       setPageContext(null);
     } finally {
@@ -188,19 +187,17 @@ export const ConversationWithPageContext = ({
   }, [pageSummarizationApi, enablePageSummarization]);
 
   // Fetch page summary when component mounts and page summarization is enabled
-  useEffect(() => {
+useEffect(() => {
     if (enablePageSummarization) {
-      console.debug('[Modal Page Summary] Component mounted, starting fetch...');
-      // Add a small delay to ensure the modal is fully rendered
-      const timeout = setTimeout(() => {
-        fetchPageSummary();
-      }, 100);
-      
-      return () => clearTimeout(timeout);
-    } else {
-      setPageContext(null);
-      setIsLoadingPageSummary(false);
+        // Add a small delay to ensure the modal is fully rendered
+        const timeout = setTimeout(() => {
+            fetchPageSummary();
+        }, 100);
+
+        return () => clearTimeout(timeout);
     }
+    setPageContext(null);
+    setIsLoadingPageSummary(false);
     
     return undefined;
   }, [enablePageSummarization, fetchPageSummary]);
@@ -282,7 +279,7 @@ export const ConversationWithPageContext = ({
     >
       {enablePageSummarization && (
         <Box>
-          {isLoadingPageSummary ? (
+          {isLoadingPageSummary && (
             <Tooltip title="Loading page context for AI assistant...">
               <Chip
                 icon={<InfoIcon />}
@@ -292,7 +289,8 @@ export const ConversationWithPageContext = ({
                 variant="outlined"
               />
             </Tooltip>
-          ) : pageContext ? (
+          )}
+          {!isLoadingPageSummary && pageContext && (
             <Tooltip title={`Page context available: ${pageContext.summary}`}>
               <Chip
                 icon={<CheckCircleIcon />}
@@ -302,7 +300,8 @@ export const ConversationWithPageContext = ({
                 variant="outlined"
               />
             </Tooltip>
-          ) : (
+          )}
+          {!isLoadingPageSummary && !pageContext && (
             <Tooltip title="No page context available for this page">
               <Chip
                 label="No page context"
@@ -339,13 +338,19 @@ export const ConversationWithPageContext = ({
                 loading={false}
               />
             ))}
-          {(messages.filter(m => m.role !== 'system')[messages.filter(m => m.role !== 'system').length - 1]?.role === 'human' ||
-            messages.filter(m => m.role !== 'system')[messages.filter(m => m.role !== 'system').length - 1]?.role === 'tool') && (
-            <MessageCard
-              message={{ content: '', role: 'ai', metadata: {}, score: 0 }}
-              loading
-            />
-          )}
+          {(() => {
+            const filtered = messages.filter(m => m.role !== 'system');
+            const lastRole = filtered[filtered.length - 1]?.role;
+            if (lastRole === 'human' || lastRole === 'tool') {
+              return (
+                <MessageCard
+                  message={{ content: '', role: 'ai', metadata: {}, score: 0 }}
+                  loading
+                />
+              );
+            }
+            return null;
+          })()}
           <div ref={messageEndRef} />
         </Stack>
       )}

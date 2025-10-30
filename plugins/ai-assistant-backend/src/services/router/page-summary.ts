@@ -114,7 +114,7 @@ export async function createPageSummaryRouter(
         
         if (processedContent.length > maxContentLength) {
           logger.info(`Content too large (${processedContent.length} chars), truncating to ${maxContentLength} chars`);
-          processedContent = processedContent.substring(0, maxContentLength) + '\n\n[Content truncated due to length]';
+          processedContent = `${processedContent.substring(0, maxContentLength)}\n\n[Content truncated due to length]`;
         }
         
         logger.info(`Content preprocessing: ${pageContent.length} -> ${processedContent.length} chars`);

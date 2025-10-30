@@ -48,7 +48,7 @@ export function cleanPageContent(content: string): string {
   // Limit final content length to prevent excessive token usage
   const maxFinalLength = 30000; // 30k characters
   if (cleanedContent.length > maxFinalLength) {
-    cleanedContent = cleanedContent.substring(0, maxFinalLength) + '\n\n[Content truncated for processing efficiency]';
+    cleanedContent = `${cleanedContent.substring(0, maxFinalLength)}\n\n[Content truncated for processing efficiency]`;
   }
 
   return cleanedContent.trim();

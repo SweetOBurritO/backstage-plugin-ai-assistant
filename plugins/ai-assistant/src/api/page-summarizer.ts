@@ -73,6 +73,7 @@ export const createPageSummarizationService = ({
       const result: PageSummaryResponse = await response.json();
       return result;
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error calling page summarization API:', error);
       return {
         success: false,
@@ -162,16 +163,11 @@ export const createPageSummarizationService = ({
     
     // Check if content is meaningful enough to summarize
     if (!isContentMeaningful(content)) {
-      console.debug('[Page Summary] Skipping page - content not meaningful enough');
       return null;
     }
-
-    console.debug('[Page Summary] Extracting content for:', title);
-    console.debug('[Page Summary] Content length:', content.length, 'characters');
     
     // Rate limiting check
     if (!checkRateLimit(url)) {
-      console.debug('[Page Summary] Skipping page due to rate limiting');
       return null;
     }
 
@@ -183,12 +179,10 @@ export const createPageSummarizationService = ({
     });
 
     if (result.success && result.summary) {
-      console.debug('[Page Summary] ✅ Generated summary for:', title);
-      console.debug('[Page Summary] Summary:', result.summary);
-      
       // Store the timestamp for rate limiting
       updateRateLimit(url);
     } else {
+      // eslint-disable-next-line no-console
       console.error('[Page Summary] ❌ Failed to generate summary:', result.error);
     }
 

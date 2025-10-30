@@ -18,16 +18,13 @@ export function usePageSummarization() {
       clearTimeout(timeoutRef.current);
     }
 
-    console.log('[Page Summary] Navigation detected, path:', location.pathname);
-
     // Wait for the page to fully render before extracting content
     // timeoutRef.current = setTimeout(async () => {
     const summarize = async () => {
       try {
-        console.log('[Page Summary] Summarizing page content...');
         await pageSummarizationApi.summarizeCurrentPage();
-        console.log('[Page Summary] Summarization complete.');
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('[Page Summary] Error during summarization:', error);
       }
     };
@@ -35,18 +32,20 @@ export function usePageSummarization() {
     // }, 2000); // Wait 2 seconds for the page to render
 
     // Cleanup timeout on unmount or when location changes
+    const timeout = timeoutRef.current;
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
+      if (timeout) {
+      clearTimeout(timeout);
       }
     };
   }, [location.pathname, location.search, location.hash, pageSummarizationApi]);
 
   // Cleanup timeout on unmount
   useEffect(() => {
+    const timeout = timeoutRef.current;
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
+      if (timeout) {
+        clearTimeout(timeout);
       }
     };
   }, []);

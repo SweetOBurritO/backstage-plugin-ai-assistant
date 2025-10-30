@@ -116,7 +116,7 @@ export const AiAssistantChatModal = ({
               <ConversationWithPageContext
                 conversationId={conversationId}
                 setConversationId={setConversationId}
-                enablePageSummarization={true}
+                enablePageSummarization
               />
             </Box>
           </Stack>
