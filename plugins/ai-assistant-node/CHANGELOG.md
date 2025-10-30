@@ -1,5 +1,13 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-node
 
+## 0.6.0
+
+### Minor Changes
+
+- f26adee: - add mcp server configuration frontend
+  - add mcp server configuration validation and error handling on frontend and backend
+- f26adee: Added simple encryption and decryption utils
+
 ## 0.5.1
 
 ### Patch Changes

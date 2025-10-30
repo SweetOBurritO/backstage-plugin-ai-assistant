@@ -1,5 +1,25 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend
 
+## 0.10.0
+
+### Minor Changes
+
+- 5f8701c: Add Langfuse integration for analytics
+- f26adee: - add mcp server configuration frontend
+  - add mcp server configuration validation and error handling on frontend and backend
+- 95b7cec: Add message scoring system (with optional langfuse integration)
+- fdc5770: add google vertex ai model provider
+- f26adee: added support for MCP through globally configured MCP and a Bring your own model for users
+
+### Patch Changes
+
+- Updated dependencies [f26adee]
+- Updated dependencies [f26adee]
+- Updated dependencies [95b7cec]
+- Updated dependencies [f26adee]
+  - @sweetoburrito/backstage-plugin-ai-assistant-common@0.6.0
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.6.0
+
 ## 0.9.0
 
 ### Minor Changes

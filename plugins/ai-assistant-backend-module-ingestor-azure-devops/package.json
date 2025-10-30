@@ -1,6 +1,6 @@
 {
   "name": "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-azure-devops",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "license": "Apache-2.0",
   "description": "The ingestor-azure-devops backend module for the ai-assistant plugin.",
   "main": "src/index.ts",
@@ -26,8 +26,8 @@
   },
   "dependencies": {
     "@backstage/backend-plugin-api": "^1.4.1",
-    "@sweetoburrito/backstage-plugin-ai-assistant-common": "^0.5.0",
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "^0.5.1",
+    "@sweetoburrito/backstage-plugin-ai-assistant-common": "^0.6.0",
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "^0.6.0",
     "azure-devops-node-api": "^15.1.1"
   },
   "devDependencies": {

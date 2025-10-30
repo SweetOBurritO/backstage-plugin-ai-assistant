@@ -1,5 +1,13 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama
 
+## 0.3.5
+
+### Patch Changes
+
+- Updated dependencies [f26adee]
+- Updated dependencies [f26adee]
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.6.0
+
 ## 0.3.4
 
 ### Patch Changes
