@@ -132,6 +132,7 @@ export const createChatService = async ({
     config,
     models,
     langfuseEnabled,
+    logger
   });
 
   const systemPromptTemplate = SystemMessagePromptTemplate.fromTemplate(`
