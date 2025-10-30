@@ -14,6 +14,7 @@ import {
   pageSummarizationApiRef,
   createPageSummarizationService,
 } from './api/page-summarizer';
+import { realtimeVoiceApiRef, RealtimeVoiceClient } from './api/realtimeVoice';
 
 export const aiAssistantPlugin = createPlugin({
   id: 'ai-assistant',
@@ -36,6 +37,14 @@ export const aiAssistantPlugin = createPlugin({
         fetchApi: fetchApiRef,
       },
       factory: options => createMcpService(options),
+    }),
+    createApiFactory({
+      api: realtimeVoiceApiRef,
+      deps: {
+        discoveryApi: discoveryApiRef,
+        fetchApi: fetchApiRef,
+      },
+      factory: options => new RealtimeVoiceClient(options),
     }),
     createApiFactory({
       api: pageSummarizationApiRef,
