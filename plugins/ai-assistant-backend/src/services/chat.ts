@@ -372,7 +372,7 @@ export const createChatService = async ({
       const traceId = langfuseHandler?.last_trace_id ?? undefined;
 
       addMessages(
-        responseMessages.map(m => ({ ...m, id: uuid() })),
+        responseMessages.map(m => ({ ...m, id: uuid(), traceId })),
         userEntityRef,
         conversationId,
         [...recentConversationMessages, ...messages],
