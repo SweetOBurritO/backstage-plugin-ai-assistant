@@ -122,7 +122,7 @@ export const createPageSummarizationService = ({
     // Skip certain pages that don't need summarization
     const skipPatterns = [
       '/chat',           // AI assistant chat page
-    //   '/ai-assistant',   // AI assistant page itself
+      '/ai-assistant',   // AI assistant page itself
       '/settings',       // User settings
       '/search',         // Search results (dynamic)
       '/api-docs',       // API documentation (already structured)
