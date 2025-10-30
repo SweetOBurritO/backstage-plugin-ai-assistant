@@ -8,8 +8,7 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
-import Fab from '@mui/material/Fab';
-import ChatIcon from '@mui/icons-material/Chat';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 
 export interface AiAssistantChatModalProps {
   // Whether to show the floating action button
@@ -61,18 +60,20 @@ export const AiAssistantChatModal = ({
   return (
     <>
       {showFloatingButton && (
-        <Fab
-          color="primary"
-          aria-label="open chat"
-          onClick={handleModalOpen}
+        <Box
           sx={{
             position: 'absolute',
             bottom: 16,
             right: 16,
+            borderRadius: theme => theme.shape.borderRadius,
+            boxShadow: theme => theme.shadows[4],
+            bgcolor: theme => theme.palette.background.paper,
+            border: theme => `1px solid ${theme.palette.primary.main}`,
           }}
+          onClick={handleModalOpen}
         >
-          <ChatIcon />
-        </Fab>
+          <AutoAwesomeIcon />
+        </Box>
       )}
 
       <Modal open={isOpen} onClose={handleModalClose}>
