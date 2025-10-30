@@ -52,7 +52,7 @@ export const ConversationWithPageContext = ({
   );
 
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
-  
+
   // Page context state
   const [pageContext, setPageContext] = useState<{
     title: string;
@@ -150,7 +150,7 @@ export const ConversationWithPageContext = ({
 
       // Extract page content
       const { content, title, url } = pageSummarizationApi.extractPageContent();
-      
+
       // Check if content is meaningful
       if (!pageSummarizationApi.isContentMeaningful(content)) {
         setPageContext(null);
@@ -174,11 +174,14 @@ export const ConversationWithPageContext = ({
         setPageContext(context);
       } else {
         // eslint-disable-next-line no-console
-        console.error('[Modal Page Summary] ❌ Failed to get summary:', result.error);
+        console.error(
+          '[Modal Page Summary] ❌ Failed to get summary:',
+          result.error,
+        );
         setPageContext(null);
       }
     } catch (error) {
-        // eslint-disable-next-line no-console
+      // eslint-disable-next-line no-console
       console.error('[Modal Page Summary] Error fetching page summary:', error);
       setPageContext(null);
     } finally {
@@ -187,18 +190,18 @@ export const ConversationWithPageContext = ({
   }, [pageSummarizationApi, enablePageSummarization]);
 
   // Fetch page summary when component mounts and page summarization is enabled
-useEffect(() => {
+  useEffect(() => {
     if (enablePageSummarization) {
-        // Add a small delay to ensure the modal is fully rendered
-        const timeout = setTimeout(() => {
-            fetchPageSummary();
-        }, 100);
+      // Add a small delay to ensure the modal is fully rendered
+      const timeout = setTimeout(() => {
+        fetchPageSummary();
+      }, 100);
 
-        return () => clearTimeout(timeout);
+      return () => clearTimeout(timeout);
     }
     setPageContext(null);
     setIsLoadingPageSummary(false);
-    
+
     return undefined;
   }, [enablePageSummarization, fetchPageSummary]);
 
@@ -231,7 +234,10 @@ useEffect(() => {
     inputRef.current?.focus();
 
     // Only add the human message to display (not the system message)
-    setMessages(prev => [...prev, { role: 'human', content: input, metadata: {}, score: 0 }]);
+    setMessages(prev => [
+      ...prev,
+      { role: 'human', content: input, metadata: {}, score: 0 },
+    ]);
 
     const response = await chatApi.sendMessage({
       conversationId,
@@ -330,7 +336,7 @@ useEffect(() => {
           }}
         >
           {messages
-            .filter((message) => message.role !== 'system') // Hide system messages from UI
+            .filter(message => message.role !== 'system') // Hide system messages from UI
             .map((message, idx) => (
               <MessageCard
                 key={message.id ?? idx}

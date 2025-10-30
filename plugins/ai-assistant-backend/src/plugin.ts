@@ -131,12 +131,15 @@ export const aiAssistantPlugin = createBackendPlugin({
           langfuseClient,
         });
 
-        httpRouter.use(await createRouter({ 
-          ...options, 
-          chat,
-          models,
-          langfuseEnabled,
-          mcp }));
+        httpRouter.use(
+          await createRouter({
+            ...options,
+            chat,
+            models,
+            langfuseEnabled,
+            mcp,
+          }),
+        );
         dataIngestionPipeline.start();
       },
     });

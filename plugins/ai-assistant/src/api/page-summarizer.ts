@@ -46,12 +46,13 @@ export const createPageSummarizationService = ({
   fetchApi,
   discoveryApi,
 }: PageSummarizationApiOptions): PageSummarizationApi => {
-  
-  const summarizePage = async (request: PageSummaryRequest): Promise<PageSummaryResponse> => {
+  const summarizePage = async (
+    request: PageSummaryRequest,
+  ): Promise<PageSummaryResponse> => {
     try {
       const baseUrl = await discoveryApi.getBaseUrl('ai-assistant');
       const url = `${baseUrl}/page-summary/summarize`;
-      
+
       const response = await fetchApi.fetch(url, {
         method: 'POST',
         headers: {
@@ -77,7 +78,8 @@ export const createPageSummarizationService = ({
       console.error('Error calling page summarization API:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error occurred',
+        error:
+          error instanceof Error ? error.message : 'Unknown error occurred',
       };
     }
   };
@@ -85,9 +87,9 @@ export const createPageSummarizationService = ({
   const extractPageContent = (): PageContent => {
     const title = document.title || '';
     const url = window.location.href;
-    
+
     // Get the main content area, try different selectors
-    let contentElement = 
+    let contentElement =
       document.querySelector('main') ||
       document.querySelector('[role="main"]') ||
       document.querySelector('.content') ||
@@ -105,28 +107,31 @@ export const createPageSummarizationService = ({
     return {
       content,
       title,
-      url
+      url,
     };
   };
 
   const isContentMeaningful = (content: string): boolean => {
     // Remove HTML tags and whitespace to get rough text length
-    const textContent = content.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
-    
+    const textContent = content
+      .replace(/<[^>]*>/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
     // Require at least 200 characters of text content
     return textContent.length >= 200;
   };
 
   const shouldSkipCurrentPage = (): boolean => {
     const pathname = window.location.pathname;
-    
+
     // Skip certain pages that don't need summarization
     const skipPatterns = [
-      '/chat',           // AI assistant chat page
-      '/ai-assistant',   // AI assistant page itself
-      '/settings',       // User settings
-      '/search',         // Search results (dynamic)
-      '/api-docs',       // API documentation (already structured)
+      '/chat', // AI assistant chat page
+      '/ai-assistant', // AI assistant page itself
+      '/settings', // User settings
+      '/search', // Search results (dynamic)
+      '/api-docs', // API documentation (already structured)
     ];
 
     return skipPatterns.some(pattern => pathname.startsWith(pattern));
@@ -136,7 +141,7 @@ export const createPageSummarizationService = ({
     const now = Date.now();
     const lastSummaryKey = `page-summary-${url}`;
     const lastSummaryTime = localStorage.getItem(lastSummaryKey);
-    
+
     if (lastSummaryTime) {
       const timeDiff = now - parseInt(lastSummaryTime, 10);
       // Don't summarize the same page more than once per minute
@@ -144,7 +149,7 @@ export const createPageSummarizationService = ({
         return false;
       }
     }
-    
+
     return true;
   };
 
@@ -153,45 +158,49 @@ export const createPageSummarizationService = ({
     localStorage.setItem(lastSummaryKey, Date.now().toString());
   };
 
-  const summarizeCurrentPage = async (): Promise<PageSummaryResponse | null> => {
-    // Check if we should skip this page
-    if (shouldSkipCurrentPage()) {
-      return null;
-    }
+  const summarizeCurrentPage =
+    async (): Promise<PageSummaryResponse | null> => {
+      // Check if we should skip this page
+      if (shouldSkipCurrentPage()) {
+        return null;
+      }
 
-    const { content, title, url } = extractPageContent();
-    
-    // Check if content is meaningful enough to summarize
-    if (!isContentMeaningful(content)) {
-      return null;
-    }
-    
-    // Rate limiting check
-    if (!checkRateLimit(url)) {
-      return null;
-    }
+      const { content, title, url } = extractPageContent();
 
-    const result = await summarizePage({
-      pageContent: content,
-      pageUrl: url,
-      pageTitle: title,
-      summaryLength: 'in 2-3 sentences',
-    });
+      // Check if content is meaningful enough to summarize
+      if (!isContentMeaningful(content)) {
+        return null;
+      }
 
-    if (result.success && result.summary) {
-      // Store the timestamp for rate limiting
-      updateRateLimit(url);
-    } else {
-      // eslint-disable-next-line no-console
-      console.error('[Page Summary] ❌ Failed to generate summary:', result.error);
-    }
+      // Rate limiting check
+      if (!checkRateLimit(url)) {
+        return null;
+      }
 
-    return result;
-  };
+      const result = await summarizePage({
+        pageContent: content,
+        pageUrl: url,
+        pageTitle: title,
+        summaryLength: 'in 2-3 sentences',
+      });
 
-  return { 
-    summarizePage, 
-    summarizeCurrentPage, 
+      if (result.success && result.summary) {
+        // Store the timestamp for rate limiting
+        updateRateLimit(url);
+      } else {
+        // eslint-disable-next-line no-console
+        console.error(
+          '[Page Summary] ❌ Failed to generate summary:',
+          result.error,
+        );
+      }
+
+      return result;
+    };
+
+  return {
+    summarizePage,
+    summarizeCurrentPage,
     extractPageContent,
     isContentMeaningful,
     shouldSkipCurrentPage,

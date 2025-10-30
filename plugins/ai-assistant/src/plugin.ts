@@ -10,7 +10,10 @@ import {
 import { rootRouteRef } from './routes';
 import { chatApiRef, createChatService } from './api/chat';
 import { mcpApiRef, createMcpService } from './api/mcp';
-import { pageSummarizationApiRef, createPageSummarizationService } from './api/page-summarizer';
+import {
+  pageSummarizationApiRef,
+  createPageSummarizationService,
+} from './api/page-summarizer';
 
 export const aiAssistantPlugin = createPlugin({
   id: 'ai-assistant',

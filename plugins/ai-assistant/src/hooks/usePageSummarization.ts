@@ -35,7 +35,7 @@ export function usePageSummarization() {
     const timeout = timeoutRef.current;
     return () => {
       if (timeout) {
-      clearTimeout(timeout);
+        clearTimeout(timeout);
       }
     };
   }, [location.pathname, location.search, location.hash, pageSummarizationApi]);

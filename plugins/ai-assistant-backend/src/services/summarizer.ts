@@ -1,6 +1,12 @@
-import { RootConfigService, LoggerService } from '@backstage/backend-plugin-api';
+import {
+  RootConfigService,
+  LoggerService,
+} from '@backstage/backend-plugin-api';
 import { Model } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
-import { DEFAULT_SUMMARY_PROMPT, DEFAULT_PAGE_SUMMARY_PROMPT } from '../constants/prompts';
+import {
+  DEFAULT_SUMMARY_PROMPT,
+  DEFAULT_PAGE_SUMMARY_PROMPT,
+} from '../constants/prompts';
 import {
   SystemMessagePromptTemplate,
   HumanMessagePromptTemplate,
@@ -34,7 +40,7 @@ export const createSummarizerService = async ({
   config,
   models,
   langfuseEnabled,
-  logger
+  logger,
 }: SummarizerServiceOptions): Promise<SummarizerService> => {
   const summaryModelId =
     config.getOptionalString('aiAssistant.conversation.summaryModel') ??
@@ -133,11 +139,15 @@ export const createSummarizerService = async ({
     pageTitle = '',
     summaryLength = 'as few words as possible',
   ) => {
-    logger.info(`[Page Summary] Starting summarization for content: ${pageContent.length} characters`);
-    
+    logger.info(
+      `[Page Summary] Starting summarization for content: ${pageContent.length} characters`,
+    );
+
     // Clean the page content before summarization
     const cleanedContent = cleanPageContent(pageContent);
-    logger.info(`[Page Summary] Cleaned content: ${cleanedContent.length} characters`);
+    logger.info(
+      `[Page Summary] Cleaned content: ${cleanedContent.length} characters`,
+    );
 
     const prompt = await pagePromptTemplate.formatMessages({
       pageSummaryPrompt,
@@ -159,16 +169,23 @@ export const createSummarizerService = async ({
 
     logger.info(`[Page Summary] Invoking LLM for summarization...`);
     const startTime = Date.now();
-    
+
     try {
       const { text } = await llm.invoke(prompt, invokeOptions);
       const endTime = Date.now();
-      logger.info(`[Page Summary] ✅ Summarization completed in ${endTime - startTime}ms`);
-      
+      logger.info(
+        `[Page Summary] ✅ Summarization completed in ${endTime - startTime}ms`,
+      );
+
       return text.trim();
     } catch (error) {
       const endTime = Date.now();
-      console.error(`[Page Summary] ❌ Summarization failed after ${endTime - startTime}ms:`, error);
+      console.error(
+        `[Page Summary] ❌ Summarization failed after ${
+          endTime - startTime
+        }ms:`,
+        error,
+      );
       throw error;
     }
   };

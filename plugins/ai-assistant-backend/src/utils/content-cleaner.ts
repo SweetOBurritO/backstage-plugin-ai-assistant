@@ -17,26 +17,32 @@ export function cleanPageContent(content: string): string {
   // Remove JavaScript blocks and inline scripts (optimized for performance)
   cleanedContent = cleanedContent.replace(
     /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-    ''
+    '',
   );
   cleanedContent = cleanedContent.replace(
     /\s*on\w+\s*=\s*["'][^"']*["']/gi,
-    ''
+    '',
   );
   cleanedContent = cleanedContent.replace(/javascript:[^"'\s>]*/gi, '');
 
   // Remove CSS style blocks and inline styles
   cleanedContent = cleanedContent.replace(
     /<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi,
-    ''
+    '',
   );
-  cleanedContent = cleanedContent.replace(/\s*style\s*=\s*["'][^"']*["']/gi, '');
-  cleanedContent = cleanedContent.replace(/\s*class\s*=\s*["'][^"']*["']/gi, '');
+  cleanedContent = cleanedContent.replace(
+    /\s*style\s*=\s*["'][^"']*["']/gi,
+    '',
+  );
+  cleanedContent = cleanedContent.replace(
+    /\s*class\s*=\s*["'][^"']*["']/gi,
+    '',
+  );
 
   // Remove common noise elements early to reduce processing load
   cleanedContent = cleanedContent.replace(
     /<(nav|header|footer|aside|script|style|noscript)[^>]*>[\s\S]*?<\/\1>/gi,
-    ''
+    '',
   );
 
   // Convert HTML to structured text preserving important elements
@@ -48,7 +54,10 @@ export function cleanPageContent(content: string): string {
   // Limit final content length to prevent excessive token usage
   const maxFinalLength = 30000; // 30k characters
   if (cleanedContent.length > maxFinalLength) {
-    cleanedContent = `${cleanedContent.substring(0, maxFinalLength)}\n\n[Content truncated for processing efficiency]`;
+    cleanedContent = `${cleanedContent.substring(
+      0,
+      maxFinalLength,
+    )}\n\n[Content truncated for processing efficiency]`;
   }
 
   return cleanedContent.trim();
@@ -109,15 +118,17 @@ function stripHtmlTags(html: string): string {
  * Normalize whitespace, removing excess spaces and line breaks
  */
 function normalizeContentWhitespace(text: string): string {
-  return text
-    // Replace multiple spaces with single space
-    .replace(/[ \t]+/g, ' ')
-    // Replace multiple line breaks with double line break (paragraph separation)
-    .replace(/\n{3,}/g, '\n\n')
-    // Remove spaces at the beginning and end of lines
-    .replace(/^[ \t]+|[ \t]+$/gm, '')
-    // Remove empty lines that only contain whitespace
-    .replace(/^\s*$/gm, '');
+  return (
+    text
+      // Replace multiple spaces with single space
+      .replace(/[ \t]+/g, ' ')
+      // Replace multiple line breaks with double line break (paragraph separation)
+      .replace(/\n{3,}/g, '\n\n')
+      // Remove spaces at the beginning and end of lines
+      .replace(/^[ \t]+|[ \t]+$/gm, '')
+      // Remove empty lines that only contain whitespace
+      .replace(/^\s*$/gm, '')
+  );
 }
 
 /**
@@ -128,7 +139,7 @@ export function extractTextContent(html: string): string {
 
   // Remove comments
   text = text.replace(/<!--[\s\S]*?-->/g, '');
-  
+
   // Remove common non-content elements by tag name
   text = text.replace(/<(nav|header|footer|aside)[^>]*>[\s\S]*?<\/\1>/gi, '');
 

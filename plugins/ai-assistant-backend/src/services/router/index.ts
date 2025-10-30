@@ -16,8 +16,8 @@ export type RouterOptions = ChatRouterOptions &
     config: RootConfigService;
     logger: LoggerService;
     models: Model[];
-  langfuseEnabled: boolean;
-};
+    langfuseEnabled: boolean;
+  };
 
 export async function createRouter(
   options: RouterOptions,
