@@ -308,7 +308,7 @@ export const createChatService = async ({
           )
           .filter(m => m.getType() !== 'human')
           .map(m => {
-            const id = uuid(); // Generate UUID here instead of using LangChain's ID
+            const id = m.id ?? '';
             const role = m.getType();
             const content =
               typeof m.content === 'string'
@@ -372,7 +372,7 @@ export const createChatService = async ({
       const traceId = langfuseHandler?.last_trace_id ?? undefined;
 
       addMessages(
-        responseMessages.map(m => ({ ...m, traceId })),
+        responseMessages.map(m => ({ ...m, id: uuid() })),
         userEntityRef,
         conversationId,
         [...recentConversationMessages, ...messages],
