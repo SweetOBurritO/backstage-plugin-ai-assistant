@@ -1,5 +1,21 @@
 # @sweetoburrito/backstage-plugin-ai-assistant
 
+## 0.7.0
+
+### Minor Changes
+
+- f26adee: - add mcp server configuration frontend
+  - add mcp server configuration validation and error handling on frontend and backend
+- db4e544: Add modal to allow assistant to be accessible everywhere in backstage instance
+- 95b7cec: Add message scoring system (with optional langfuse integration)
+
+### Patch Changes
+
+- Updated dependencies [f26adee]
+- Updated dependencies [f26adee]
+- Updated dependencies [95b7cec]
+  - @sweetoburrito/backstage-plugin-ai-assistant-common@0.6.0
+
 ## 0.6.0
 
 ### Minor Changes

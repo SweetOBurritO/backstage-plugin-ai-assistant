@@ -1,6 +1,6 @@
 {
   "name": "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-google-vertex-ai",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "Apache-2.0",
   "description": "The model-provider-google-vertex-ai backend module for the ai-assistant plugin.",
   "main": "src/index.ts",
@@ -27,7 +27,7 @@
   "dependencies": {
     "@backstage/backend-plugin-api": "^1.4.3",
     "@langchain/google-vertexai": "^0.2.18",
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "^0.5.1"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "^0.6.0"
   },
   "devDependencies": {
     "@backstage/backend-test-utils": "^1.9.0",
