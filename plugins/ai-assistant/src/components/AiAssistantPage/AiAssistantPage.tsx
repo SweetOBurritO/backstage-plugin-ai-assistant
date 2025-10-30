@@ -3,6 +3,7 @@ import { Conversation } from '../Conversation';
 import type { Conversation as ConversationType } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { useAsync, useList } from 'react-use';
 import { chatApiRef } from '../../api/chat';
+import { usePageSummarization } from '../../hooks/usePageSummarization';
 import { useTheme } from '@mui/material/styles';
 
 import Stack from '@mui/material/Stack';
@@ -25,6 +26,9 @@ export const AiAssistantPage = () => {
   const signalApi = useApi(signalApiRef);
 
   const theme = useTheme();
+
+  // Enable page summarization for navigation within the AI Assistant
+  usePageSummarization();
 
   const [conversationId, setConversationId] = useState<string>();
 
