@@ -115,6 +115,13 @@ aiAssistant:
       appId: <your-github-app-id>
       privateKey: <your-github-private-key>
       installationId: <your-github-installation-id>
+  # Real-time voice conversion using Azure OpenAI Realtime API (WebRTC)
+  realtimeVoice:
+    azureOpenAi:
+      apiKey: '<your-api-key>'
+      endpoint: 'https://your-resource.openai.azure.com'
+      deploymentName: "gpt-realtime-mini" # Must be a realtime-capable deployment
+      apiVersion: '2025-04-01-preview' # Optional, defaults to this value
 
       # optional config to filter what to ingest
       # filesBatchSize: <number-of-files-to-process-in-batches> # default: 50

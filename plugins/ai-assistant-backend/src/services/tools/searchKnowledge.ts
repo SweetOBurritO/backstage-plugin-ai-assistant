@@ -12,7 +12,7 @@ type CreateSearchKnowledgeToolOptions = {
 export const createSearchKnowledgeTool = ({
   vectorStore,
 }: CreateSearchKnowledgeToolOptions): Tool => {
-  const knowledgeTool = createAssistantTool({
+  return createAssistantTool({
     tool: {
       name: 'search-knowledge-base',
       description: `Search the internal knowledge base containing company specific information.
@@ -49,6 +49,4 @@ Do NOT use for general knowledge that doesn't require company-specific informati
       },
     },
   });
-
-  return knowledgeTool;
 };

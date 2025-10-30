@@ -10,6 +10,7 @@ import {
 import { rootRouteRef } from './routes';
 import { chatApiRef, createChatService } from './api/chat';
 import { mcpApiRef, createMcpService } from './api/mcp';
+import { realtimeVoiceApiRef, RealtimeVoiceClient } from './api/realtimeVoice';
 
 export const aiAssistantPlugin = createPlugin({
   id: 'ai-assistant',
@@ -32,6 +33,14 @@ export const aiAssistantPlugin = createPlugin({
         fetchApi: fetchApiRef,
       },
       factory: options => createMcpService(options),
+    }),
+    createApiFactory({
+      api: realtimeVoiceApiRef,
+      deps: {
+        discoveryApi: discoveryApiRef,
+        fetchApi: fetchApiRef,
+      },
+      factory: options => new RealtimeVoiceClient(options),
     }),
   ],
 });
