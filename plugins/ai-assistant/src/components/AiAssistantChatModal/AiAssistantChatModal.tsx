@@ -63,12 +63,23 @@ export const AiAssistantChatModal = ({
         <Box
           sx={{
             position: 'absolute',
-            bottom: 16,
-            right: 16,
-            borderRadius: theme => theme.shape.borderRadius,
+            bottom: theme => theme.spacing(2),
+            right: theme => theme.spacing(2),
+            borderRadius: '50%',
             boxShadow: theme => theme.shadows[4],
             bgcolor: theme => theme.palette.background.paper,
             border: theme => `1px solid ${theme.palette.primary.main}`,
+            width: 50,
+            height: 50,
+            padding: theme => theme.spacing(1),
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            ':hover': {
+              cursor: 'pointer',
+              boxShadow: theme => theme.shadows[6],
+              bgcolor: theme => theme.palette.action.hover,
+            },
           }}
           onClick={handleModalOpen}
         >
