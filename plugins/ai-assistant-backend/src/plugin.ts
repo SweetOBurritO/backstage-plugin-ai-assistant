@@ -146,11 +146,6 @@ export const aiAssistantPlugin = createBackendPlugin({
         }
 
         httpRouter.use(await createRouter({ ...options, chat, mcp }));
-        // // http router . add auth
-        httpRouter.addAuthPolicy({
-          allow: 'unauthenticated',
-          path: '*',
-        });
         // httpRouter.addAuthPolicy({
         //   pluginId: 'ai-assistant',
         //   policy: async (request, context) => {
