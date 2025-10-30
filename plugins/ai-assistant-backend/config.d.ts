@@ -1,5 +1,6 @@
 import { HumanDuration } from '@backstage/types';
 import { SchedulerServiceTaskScheduleDefinitionConfig } from '@backstage/backend-plugin-api';
+import { McpServerConfig } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 
 export interface Config {
   aiAssistant: {
@@ -27,6 +28,13 @@ export interface Config {
     };
     ingestion?: {
       schedule?: SchedulerServiceTaskScheduleDefinitionConfig;
+    };
+    mcp: {
+      /**
+       * @visibility secret
+       */
+      encryptionKey: string;
+      servers?: Array<McpServerConfig>;
     };
   };
 }

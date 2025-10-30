@@ -1,6 +1,7 @@
 import {
   createPlugin,
   createRoutableExtension,
+  createComponentExtension,
   createApiFactory,
   discoveryApiRef,
   fetchApiRef,
@@ -8,6 +9,7 @@ import {
 
 import { rootRouteRef } from './routes';
 import { chatApiRef, createChatService } from './api/chat';
+import { mcpApiRef, createMcpService } from './api/mcp';
 import { pageSummarizationApiRef, createPageSummarizationService } from './api/page-summarizer';
 
 export const aiAssistantPlugin = createPlugin({
@@ -23,6 +25,14 @@ export const aiAssistantPlugin = createPlugin({
         fetchApi: fetchApiRef,
       },
       factory: options => createChatService(options),
+    }),
+    createApiFactory({
+      api: mcpApiRef,
+      deps: {
+        discoveryApi: discoveryApiRef,
+        fetchApi: fetchApiRef,
+      },
+      factory: options => createMcpService(options),
     }),
     createApiFactory({
       api: pageSummarizationApiRef,
@@ -41,5 +51,17 @@ export const AiAssistantPage = aiAssistantPlugin.provide(
     component: () =>
       import('./components/AiAssistantPage').then(m => m.AiAssistantPage),
     mountPoint: rootRouteRef,
+  }),
+);
+
+export const AiAssistantChatModal = aiAssistantPlugin.provide(
+  createComponentExtension({
+    name: 'AiAssistantChatModal',
+    component: {
+      lazy: () =>
+        import('./components/AiAssistantChatModal').then(
+          m => m.AiAssistantChatModal,
+        ),
+    },
   }),
 );

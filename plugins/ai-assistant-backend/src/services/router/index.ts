@@ -8,12 +8,14 @@ import {
   RootConfigService,
 } from '@backstage/backend-plugin-api';
 import { MiddlewareFactory } from '@backstage/backend-defaults/rootHttpRouter';
+import { createMcpRouter, McpRouterOptions } from './mcp';
 import { Model } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
 
-export type RouterOptions = ChatRouterOptions & {
-  config: RootConfigService;
-  logger: LoggerService;
-  models: Model[];
+export type RouterOptions = ChatRouterOptions &
+  McpRouterOptions & {
+    config: RootConfigService;
+    logger: LoggerService;
+    models: Model[];
   langfuseEnabled: boolean;
 };
 
@@ -25,6 +27,7 @@ export async function createRouter(
 
   router.use('/chat', await createChatRouter(options));
   router.use('/models', await createModelRouter(options));
+  router.use('/mcp', await createMcpRouter(options));
   router.use('/page-summary', await createPageSummaryRouter(options));
 
   const middleware = MiddlewareFactory.create(options);

@@ -35,5 +35,8 @@
   },
   "files": [
     "dist"
-  ]
+  ],
+  "dependencies": {
+    "@langchain/mcp-adapters": "^1.0.0"
+  }
 }
