@@ -12,6 +12,8 @@ import {
   modelProviderExtensionPoint,
   Tool,
   toolExtensionPoint,
+  realtimeVoiceExtensionPoint,
+  RealtimeVoiceService,
 } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
 import { createDataIngestionPipeline } from './services/ingestor';
 import { createChatService } from './services/chat';
@@ -35,6 +37,7 @@ export const aiAssistantPlugin = createBackendPlugin({
     const ingestors: Ingestor[] = [];
     const models: Model[] = [];
     const tools: Tool[] = [];
+    const realtimeVoiceServices: RealtimeVoiceService[] = [];
 
     let embeddingsProvider: EmbeddingsProvider;
 
@@ -73,6 +76,12 @@ export const aiAssistantPlugin = createBackendPlugin({
           throw new Error(`Tool with name ${tool.name} is already registered.`);
         }
         tools.push(tool);
+      },
+    });
+
+    env.registerExtensionPoint(realtimeVoiceExtensionPoint, {
+      register: service => {
+        realtimeVoiceServices.push(service);
       },
     });
 
@@ -131,7 +140,17 @@ export const aiAssistantPlugin = createBackendPlugin({
           langfuseClient,
         });
 
+        // Initialize realtime voice services with tools
+        for (const realtimeVoiceService of realtimeVoiceServices) {
+          realtimeVoiceService.initialize({ tools });
+        }
+
         httpRouter.use(await createRouter({ ...options, chat, mcp }));
+        // httpRouter.addAuthPolicy({
+        //   pluginId: 'ai-assistant',
+        //   policy: async (request, context) => {
+        //     // Example policy: only allow authenticated users
+        // })
         dataIngestionPipeline.start();
       },
     });

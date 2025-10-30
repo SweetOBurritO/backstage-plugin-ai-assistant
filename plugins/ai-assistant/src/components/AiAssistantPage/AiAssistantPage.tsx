@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Conversation } from '../Conversation';
+import { RealtimeVoiceChat } from '../RealtimeVoiceChat';
 import type { Conversation as ConversationType } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { useAsync, useList } from 'react-use';
 import { chatApiRef } from '../../api/chat';
@@ -14,9 +15,13 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItem from '@mui/material/ListItem';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 
 import MenuIcon from '@mui/icons-material/Menu';
 import AddIcon from '@mui/icons-material/Add';
+import ChatIcon from '@mui/icons-material/Chat';
+import MicIcon from '@mui/icons-material/Mic';
 import { useApi } from '@backstage/core-plugin-api';
 import { signalApiRef } from '@backstage/plugin-signals-react';
 
@@ -27,6 +32,7 @@ export const AiAssistantPage = () => {
   const theme = useTheme();
 
   const [conversationId, setConversationId] = useState<string>();
+  const [currentTab, setCurrentTab] = useState<'text' | 'voice'>('text');
 
   const { value: conversationHistory } = useAsync(
     () => chatApi.getConversations(),
@@ -84,25 +90,53 @@ export const AiAssistantPage = () => {
         maxHeight="100vh"
         boxSizing="border-box"
       >
-        <Stack direction="row" spacing={2} justifyContent="flex-end">
-          <Tooltip title="New Chat">
-            <IconButton onClick={openNewChat}>
-              <AddIcon />
-            </IconButton>
-          </Tooltip>
+        <Stack direction="row" spacing={2} alignItems="center">
+          <Tabs
+            value={currentTab}
+            onChange={(_, value) => setCurrentTab(value)}
+            sx={{ flex: 1 }}
+          >
+            <Tab
+              label="Text Chat"
+              value="text"
+              icon={<ChatIcon />}
+              iconPosition="start"
+            />
+            <Tab
+              label="Voice Chat"
+              value="voice"
+              icon={<MicIcon />}
+              iconPosition="start"
+            />
+          </Tabs>
 
-          {conversations.length > 0 && (
-            <Tooltip title="Chat History">
-              <IconButton onClick={toggleDrawer(true)}>
-                <MenuIcon />
-              </IconButton>
-            </Tooltip>
+          {currentTab === 'text' && (
+            <>
+              <Tooltip title="New Chat">
+                <IconButton onClick={openNewChat}>
+                  <AddIcon />
+                </IconButton>
+              </Tooltip>
+
+              {conversations.length > 0 && (
+                <Tooltip title="Chat History">
+                  <IconButton onClick={toggleDrawer(true)}>
+                    <MenuIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+            </>
           )}
         </Stack>
-        <Conversation
-          conversationId={conversationId}
-          setConversationId={setConversationId}
-        />
+
+        {currentTab === 'text' && (
+          <Conversation
+            conversationId={conversationId}
+            setConversationId={setConversationId}
+          />
+        )}
+
+        {currentTab === 'voice' && <RealtimeVoiceChat />}
       </Stack>
       <Drawer anchor="right" open={open} onClose={toggleDrawer(false)}>
         <Box

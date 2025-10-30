@@ -48,3 +48,17 @@ export type ToolExtensionPoint = {
 export const toolExtensionPoint = createExtensionPoint<ToolExtensionPoint>({
   id: 'ai-assistant.tool',
 });
+
+export type RealtimeVoiceService = {
+  initialize: (options: { tools: Tool<ZodType>[] }) => void;
+};
+
+export type RealtimeVoiceExtensionPoint = {
+  register: (service: RealtimeVoiceService) => void;
+};
+
+export const realtimeVoiceExtensionPoint =
+  createExtensionPoint<RealtimeVoiceExtensionPoint>({
+    id: 'ai-assistant.realtime-voice',
+  });
+
