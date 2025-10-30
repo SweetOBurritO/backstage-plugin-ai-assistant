@@ -75,10 +75,11 @@ export const AiAssistantChatModal = ({
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
+            zIndex: theme => theme.zIndex.modal - 1,
             ':hover': {
               cursor: 'pointer',
               boxShadow: theme => theme.shadows[6],
-              bgcolor: theme => theme.palette.action.hover,
+              bgcolor: theme => theme.palette.background.default,
             },
           }}
           onClick={handleModalOpen}
