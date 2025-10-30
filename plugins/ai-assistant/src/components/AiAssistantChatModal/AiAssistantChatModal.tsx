@@ -63,13 +63,23 @@ export const AiAssistantChatModal = ({
       {showFloatingButton && (
         <Box
           sx={{
-            position: 'fixed',
-            top: '80%',
-            left: '94.56%',
-            zIndex: 9999,
+            position: 'absolute',
+            backgroundColor: 'red',
+            bottom: 16,
+            right: 16,
+            zIndex: theme => theme.zIndex.modal + 1,
           }}
         >
-          <Fab color="primary" aria-label="open chat" onClick={handleModalOpen}>
+          <Fab
+            color="primary"
+            aria-label="open chat"
+            onClick={handleModalOpen}
+            sx={{
+              backgroundColor: theme => theme.palette.background.default,
+              border: theme => `1px solid ${theme.palette.primary.main}`,
+              borderRadius: theme => theme.shape.borderRadius,
+            }}
+          >
             <ChatIcon />
           </Fab>
         </Box>
