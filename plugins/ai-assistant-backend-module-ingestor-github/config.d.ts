@@ -38,6 +38,12 @@ export interface Config {
          */
         filesBatchSize?: number;
         /**
+         * Optional list of glob patterns to exclude files and directories from ingestion.
+         * Patterns support glob syntax (e.g., **, *). Defaults to common build artifacts and dependencies if not specified.
+         * Examples: ['node_modules/**', '.git/**', 'dist/**', 'build/**']
+         */
+        pathExclusions?: string[];
+        /**
          * Optional list of repositories to ingest. If not specified, all repositories for the owner will be ingested.
          */
         repositories?: {
@@ -49,6 +55,11 @@ export interface Config {
            * Optional list of file types to ingest for this repository. Overrides the global fileTypes setting for this repository only.
            */
           fileTypes?: string[];
+          /**
+           * Optional list of glob patterns to exclude files and directories from ingestion for this repository.
+           * Overrides the global pathExclusions setting for this repository only.
+           */
+          pathExclusions?: string[];
         }[];
       };
     };
