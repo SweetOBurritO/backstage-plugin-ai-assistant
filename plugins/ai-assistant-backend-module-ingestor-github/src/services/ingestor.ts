@@ -268,14 +268,14 @@ export const createGitHubIngestor = async ({
         const pathFilter = createPathFilter({
           exclusionPatterns: repositoryPathExclusions,
         });
-        
+
         const originalFileCount = files.length;
-        
+
         // Log excluded files for debugging
-        const excludedFiles = files.filter(file => 
-          file.path && pathFilter.shouldExcludePath(file.path)
+        const excludedFiles = files.filter(
+          file => file.path && pathFilter.shouldExcludePath(file.path),
         );
-        
+
         if (excludedFiles.length > 0) {
           logger.debug(
             `Files excluded from repository ${repo.name}: ${excludedFiles
@@ -283,10 +283,10 @@ export const createGitHubIngestor = async ({
               .join(', ')}`,
           );
         }
-        
+
         files = pathFilter.filterFiles(files);
         const filteredFileCount = originalFileCount - files.length;
-        
+
         if (filteredFileCount > 0) {
           logger.info(
             `Filtered out ${filteredFileCount} files from repository ${repo.name} based on path exclusion patterns`,

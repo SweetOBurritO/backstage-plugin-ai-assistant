@@ -247,14 +247,14 @@ export const createRepositoryIngestor = async ({
         const pathFilter = createPathFilter({
           exclusionPatterns: repositoryPathExclusions,
         });
-        
+
         const originalItemCount = items.length;
-        
+
         // Log excluded items for debugging
-        const excludedItems = items.filter(item => 
-          item.path && pathFilter.shouldExcludePath(item.path)
+        const excludedItems = items.filter(
+          item => item.path && pathFilter.shouldExcludePath(item.path),
         );
-        
+
         if (excludedItems.length > 0) {
           logger.debug(
             `Items excluded from repository ${repo.name}: ${excludedItems
@@ -262,10 +262,10 @@ export const createRepositoryIngestor = async ({
               .join(', ')}`,
           );
         }
-        
+
         items = pathFilter.filterFiles(items);
         const filteredItemCount = originalItemCount - items.length;
-        
+
         if (filteredItemCount > 0) {
           logger.info(
             `Filtered out ${filteredItemCount} items from repository ${repo.name} based on path exclusion patterns`,
