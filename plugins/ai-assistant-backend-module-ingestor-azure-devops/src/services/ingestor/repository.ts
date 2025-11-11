@@ -17,6 +17,7 @@ import {
   validateExclusionPatterns,
 } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { DEFAULT_REPO_FILE_BATCH_SIZE } from '../../constants/default-repo-file-batch-size';
+import { DEFAULT_PATH_EXCLUSIONS } from '../../constants/default-path-exclusions';
 import {
   GitItem,
   GitRepository,
@@ -50,29 +51,28 @@ export const createRepositoryIngestor = async ({
       'aiAssistant.ingestors.azureDevOps.filesBatchSize', // Reuse the same config for consistency
     ) ?? DEFAULT_REPO_FILE_BATCH_SIZE;
 
-  // Get global path exclusion patterns from configuration
-  const globalPathExclusions = config.getOptionalStringArray(
-    'aiAssistant.ingestors.azureDevOps.pathExclusions',
-  );
+  // Get global path exclusion patterns from configuration, defaulting to predefined patterns
+  const globalPathExclusions =
+    config.getOptionalStringArray(
+      'aiAssistant.ingestors.azureDevOps.pathExclusions',
+    ) ?? DEFAULT_PATH_EXCLUSIONS;
 
-  // Validate exclusion patterns if provided
-  if (globalPathExclusions) {
-    const validation = validateExclusionPatterns(globalPathExclusions);
-    if (!validation.isValid) {
-      logger.error(
-        `Invalid path exclusion patterns in Azure DevOps ingestor configuration: ${validation.errors.join(
-          ', ',
-        )}`,
-      );
-      throw new Error(
-        `Invalid path exclusion patterns: ${validation.errors.join(', ')}`,
-      );
-    }
-    if (validation.warnings.length > 0) {
-      logger.warn(
-        `Path exclusion pattern warnings: ${validation.warnings.join(', ')}`,
-      );
-    }
+  // Validate exclusion patterns
+  const validation = validateExclusionPatterns(globalPathExclusions);
+  if (!validation.isValid) {
+    logger.error(
+      `Invalid path exclusion patterns in Azure DevOps ingestor configuration: ${validation.errors.join(
+        ', ',
+      )}`,
+    );
+    throw new Error(
+      `Invalid path exclusion patterns: ${validation.errors.join(', ')}`,
+    );
+  }
+  if (validation.warnings.length > 0) {
+    logger.warn(
+      `Path exclusion pattern warnings: ${validation.warnings.join(', ')}`,
+    );
   }
 
   /**
@@ -228,13 +228,11 @@ export const createRepositoryIngestor = async ({
         }: [${repositoryFileTypesFilter.join(', ')}]`,
       );
 
-      if (repositoryPathExclusions) {
-        logger.info(
-          `Using path exclusions for repository ${
-            repo.name
-          }: [${repositoryPathExclusions.join(', ')}]`,
-        );
-      }
+      logger.info(
+        `Using path exclusions for repository ${
+          repo.name
+        }: [${repositoryPathExclusions.join(', ')}]`,
+      );
 
       // Get the items to be ingested from the repository based on the file types filter
       let items = await azureDevOpsService.getRepoItems(
@@ -242,35 +240,33 @@ export const createRepositoryIngestor = async ({
         repositoryFileTypesFilter,
       );
 
-      // Apply path exclusion filtering if configured
-      if (repositoryPathExclusions) {
-        const pathFilter = createPathFilter({
-          exclusionPatterns: repositoryPathExclusions,
-        });
+      // Apply path exclusion filtering
+      const pathFilter = createPathFilter({
+        exclusionPatterns: repositoryPathExclusions,
+      });
 
-        const originalItemCount = items.length;
+      const originalItemCount = items.length;
 
-        // Log excluded items for debugging
-        const excludedItems = items.filter(
-          item => item.path && pathFilter.shouldExcludePath(item.path),
+      // Log excluded items for debugging
+      const excludedItems = items.filter(
+        item => item.path && pathFilter.shouldExcludePath(item.path),
+      );
+
+      if (excludedItems.length > 0) {
+        logger.debug(
+          `Items excluded from repository ${repo.name}: ${excludedItems
+            .map(i => i.path)
+            .join(', ')}`,
         );
+      }
 
-        if (excludedItems.length > 0) {
-          logger.debug(
-            `Items excluded from repository ${repo.name}: ${excludedItems
-              .map(i => i.path)
-              .join(', ')}`,
-          );
-        }
+      items = pathFilter.filterFiles(items);
+      const filteredItemCount = originalItemCount - items.length;
 
-        items = pathFilter.filterFiles(items);
-        const filteredItemCount = originalItemCount - items.length;
-
-        if (filteredItemCount > 0) {
-          logger.info(
-            `Filtered out ${filteredItemCount} items from repository ${repo.name} based on path exclusion patterns`,
-          );
-        }
+      if (filteredItemCount > 0) {
+        logger.info(
+          `Filtered out ${filteredItemCount} items from repository ${repo.name} based on path exclusion patterns`,
+        );
       }
 
       if (items.length === 0) {

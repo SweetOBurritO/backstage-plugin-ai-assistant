@@ -16,6 +16,7 @@ import {
   validateExclusionPatterns,
 } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { DEFAULT_FILE_BATCH_SIZE } from '../constants/default-file-batch-size';
+import { DEFAULT_PATH_EXCLUSIONS } from '../constants/default-path-exclusions';
 
 export const createGitHubIngestor = async ({
   config,
@@ -41,29 +42,28 @@ export const createGitHubIngestor = async ({
     config.getOptionalNumber('aiAssistant.ingestors.github.filesBatchSize') ??
     DEFAULT_FILE_BATCH_SIZE;
 
-  // Get global path exclusion patterns from configuration
-  const globalPathExclusions = config.getOptionalStringArray(
-    'aiAssistant.ingestors.github.pathExclusions',
-  );
+  // Get global path exclusion patterns from configuration, defaulting to predefined patterns
+  const globalPathExclusions =
+    config.getOptionalStringArray(
+      'aiAssistant.ingestors.github.pathExclusions',
+    ) ?? DEFAULT_PATH_EXCLUSIONS;
 
-  // Validate exclusion patterns if provided
-  if (globalPathExclusions) {
-    const validation = validateExclusionPatterns(globalPathExclusions);
-    if (!validation.isValid) {
-      logger.error(
-        `Invalid path exclusion patterns in GitHub ingestor configuration: ${validation.errors.join(
-          ', ',
-        )}`,
-      );
-      throw new Error(
-        `Invalid path exclusion patterns: ${validation.errors.join(', ')}`,
-      );
-    }
-    if (validation.warnings.length > 0) {
-      logger.warn(
-        `Path exclusion pattern warnings: ${validation.warnings.join(', ')}`,
-      );
-    }
+  // Validate exclusion patterns
+  const validation = validateExclusionPatterns(globalPathExclusions);
+  if (!validation.isValid) {
+    logger.error(
+      `Invalid path exclusion patterns in GitHub ingestor configuration: ${validation.errors.join(
+        ', ',
+      )}`,
+    );
+    throw new Error(
+      `Invalid path exclusion patterns: ${validation.errors.join(', ')}`,
+    );
+  }
+  if (validation.warnings.length > 0) {
+    logger.warn(
+      `Path exclusion pattern warnings: ${validation.warnings.join(', ')}`,
+    );
   }
 
   // Create GitHub service
@@ -249,13 +249,11 @@ export const createGitHubIngestor = async ({
         }: [${repositoryFileTypesFilter.join(', ')}]`,
       );
 
-      if (repositoryPathExclusions) {
-        logger.info(
-          `Using path exclusions for repository ${
-            repo.name
-          }: [${repositoryPathExclusions.join(', ')}]`,
-        );
-      }
+      logger.info(
+        `Using path exclusions for repository ${
+          repo.name
+        }: [${repositoryPathExclusions.join(', ')}]`,
+      );
 
       // Get the files to be ingested from the repository based on the file types filter
       let files = await githubService.getRepoFiles(
@@ -263,35 +261,33 @@ export const createGitHubIngestor = async ({
         repositoryFileTypesFilter,
       );
 
-      // Apply path exclusion filtering if configured
-      if (repositoryPathExclusions) {
-        const pathFilter = createPathFilter({
-          exclusionPatterns: repositoryPathExclusions,
-        });
+      // Apply path exclusion filtering
+      const pathFilter = createPathFilter({
+        exclusionPatterns: repositoryPathExclusions,
+      });
 
-        const originalFileCount = files.length;
+      const originalFileCount = files.length;
 
-        // Log excluded files for debugging
-        const excludedFiles = files.filter(
-          file => file.path && pathFilter.shouldExcludePath(file.path),
+      // Log excluded files for debugging
+      const excludedFiles = files.filter(
+        file => file.path && pathFilter.shouldExcludePath(file.path),
+      );
+
+      if (excludedFiles.length > 0) {
+        logger.debug(
+          `Files excluded from repository ${repo.name}: ${excludedFiles
+            .map(f => f.path)
+            .join(', ')}`,
         );
+      }
 
-        if (excludedFiles.length > 0) {
-          logger.debug(
-            `Files excluded from repository ${repo.name}: ${excludedFiles
-              .map(f => f.path)
-              .join(', ')}`,
-          );
-        }
+      files = pathFilter.filterFiles(files);
+      const filteredFileCount = originalFileCount - files.length;
 
-        files = pathFilter.filterFiles(files);
-        const filteredFileCount = originalFileCount - files.length;
-
-        if (filteredFileCount > 0) {
-          logger.info(
-            `Filtered out ${filteredFileCount} files from repository ${repo.name} based on path exclusion patterns`,
-          );
-        }
+      if (filteredFileCount > 0) {
+        logger.info(
+          `Filtered out ${filteredFileCount} files from repository ${repo.name} based on path exclusion patterns`,
+        );
       }
 
       if (files.length === 0) {
