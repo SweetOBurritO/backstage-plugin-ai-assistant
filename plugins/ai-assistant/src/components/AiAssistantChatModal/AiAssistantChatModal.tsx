@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Conversation } from '../Conversation';
+import { ConversationWithPageContext } from '../ConversationWithPageContext';
 import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
@@ -126,9 +126,10 @@ export const AiAssistantChatModal = ({
               </Stack>
             </Stack>
             <Box flex={1} sx={{ minHeight: 0 }}>
-              <Conversation
+              <ConversationWithPageContext
                 conversationId={conversationId}
                 setConversationId={setConversationId}
+                enablePageSummarization
               />
             </Box>
           </Stack>
