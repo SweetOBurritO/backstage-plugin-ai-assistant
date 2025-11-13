@@ -75,7 +75,7 @@ export const createSummarizerService = async ({
     });
 
     const { callbacks, metadata } = await callback.getAgentCallbackData({
-      sessionId: 'summarizer',
+      conversationId: 'summarizer',
       userId: 'system',
       modelId: summaryModelId,
     });

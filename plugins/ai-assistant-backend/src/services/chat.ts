@@ -269,7 +269,7 @@ export const createChatService = async ({
 
       const { metadata: promptMetadata, callbacks } =
         await callback.getAgentCallbackData({
-          sessionId: conversationId,
+          conversationId,
           userId: userEntityRef,
           modelId,
         });

@@ -40,15 +40,15 @@ export const aiAssistantModuleCallbackProviderLangfuse = createBackendModule({
         sdk.start();
 
         callbackProvider.register(async options => {
-          const { conversationId, userEntityRef, modelId } = options;
+          const { conversationId, userId, modelId } = options;
           const callback = new CallbackHandler({
-            sessionId: options.sessionId,
-            userId: options.userId,
-            tags: ['backstage-ai-assistant', 'chat', options.modelId],
+            sessionId: conversationId,
+            userId,
+            tags: ['backstage-ai-assistant', 'chat', modelId],
           });
 
           const metadata = {
-            langfuseUserId: userEntityRef,
+            langfuseUserId: userId,
             langfuseSessionId: conversationId,
             langfuseTags: ['ai-assistant', 'chat', modelId],
           };

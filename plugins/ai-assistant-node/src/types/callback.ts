@@ -4,7 +4,7 @@ import { JsonValue } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 export type CallbackOptions = Record<string, JsonValue> & {
   modelId: string;
   userId: string;
-  sessionId: string;
+  conversationId: string;
 };
 
 export type Callback = {
