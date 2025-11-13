@@ -25,8 +25,6 @@ import { DynamicStructuredTool } from '@langchain/core/tools';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { SystemMessagePromptTemplate } from '@langchain/core/prompts';
 import { createSummarizerService } from './summarizer';
-import { CallbackHandler } from '@langfuse/langchain';
-import { LangfuseClient } from '@langfuse/client';
 import { v4 as uuid } from 'uuid';
 import type {
   BackstageCredentials,
@@ -35,6 +33,7 @@ import type {
 } from '@backstage/backend-plugin-api';
 import { AIMessage, ToolMessage } from '@langchain/core/messages';
 import { McpService } from './mcp';
+import { CallbackService } from './callbacks';
 
 export type ChatServiceOptions = {
   models: Model[];
@@ -48,8 +47,7 @@ export type ChatServiceOptions = {
   auth: AuthService;
   mcp: McpService;
   userInfo: UserInfoService;
-  langfuseEnabled: boolean;
-  langfuseClient?: LangfuseClient;
+  callback: CallbackService;
 };
 
 type PromptOptions = {
@@ -103,8 +101,7 @@ export const createChatService = async ({
   auth,
   mcp,
   userInfo,
-  langfuseEnabled,
-  langfuseClient,
+  callback,
 }: ChatServiceOptions): Promise<ChatService> => {
   logger.info(`Available models: ${models.map(m => m.id).join(', ')}`);
   logger.info(`Available tools: ${tools.map(t => t.name).join(', ')}`);
@@ -131,7 +128,7 @@ export const createChatService = async ({
   const summarizer = await createSummarizerService({
     config,
     models,
-    langfuseEnabled,
+    callback,
   });
 
   const systemPromptTemplate = SystemMessagePromptTemplate.fromTemplate(`
@@ -270,14 +267,12 @@ export const createChatService = async ({
         prompt: systemPrompt[0].text,
       });
 
-      // Initialize Langfuse CallbackHandler for tracing if credentials are available
-      const langfuseHandler = langfuseEnabled
-        ? new CallbackHandler({
-            sessionId: conversationId,
-            userId: userEntityRef,
-            tags: ['backstage-ai-assistant', 'chat'],
-          })
-        : undefined;
+      const { metadata: promptMetadata, callbacks } =
+        await callback.getAgentCallbackData({
+          sessionId: conversationId,
+          userId: userEntityRef,
+          modelId,
+        });
 
       const promptStream = await agent.stream(
         {
@@ -286,12 +281,8 @@ export const createChatService = async ({
         {
           streamMode: ['values'],
           runName: 'ai-assistant-chat',
-          metadata: {
-            langfuseUserId: userEntityRef,
-            langfuseSessionId: conversationId,
-            langfuseTags: ['ai-assistant', 'chat', modelId],
-          },
-          callbacks: langfuseHandler ? [langfuseHandler] : [],
+          metadata: promptMetadata,
+          callbacks,
         },
       );
 
@@ -368,11 +359,8 @@ export const createChatService = async ({
         responseMessages.push(...newMessages);
       }
 
-      // Get the traceId from Langfuse if enabled
-      const traceId = langfuseHandler?.last_trace_id ?? undefined;
-
       addMessages(
-        responseMessages.map(m => ({ ...m, id: uuid(), traceId })),
+        responseMessages.map(m => ({ ...m, id: uuid() })),
         userEntityRef,
         conversationId,
         [...recentConversationMessages, ...messages],
@@ -419,21 +407,6 @@ export const createChatService = async ({
 
     if (!message) {
       throw new Error(`Message with id ${messageId} not found`);
-    }
-
-    if (langfuseEnabled && message.traceId) {
-      langfuseClient!.score.create({
-        traceId: message.traceId,
-        name: 'helpfulness',
-        value: score,
-      });
-      logger.info(
-        `Scored message ${messageId} on Langfuse with trace ID ${message.traceId} - ${score} for helpfulness`,
-      );
-    } else if (langfuseEnabled && !message.traceId) {
-      logger.warn(
-        `Message ${messageId} does not have a traceId, cannot score on Langfuse`,
-      );
     }
 
     const updatedMessage: Required<Message> = {

@@ -37,6 +37,7 @@
   "dependencies": {
     "@backstage/backend-plugin-api": "backstage:^",
     "@langchain/core": "^0.3.72",
+    "@sweetoburrito/backstage-plugin-ai-assistant-common": "workspace:^",
     "zod": "^4.1.11"
   }
 }

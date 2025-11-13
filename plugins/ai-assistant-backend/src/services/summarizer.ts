@@ -7,7 +7,7 @@ import {
   ChatPromptTemplate,
 } from '@langchain/core/prompts';
 import { Message } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
-import { CallbackHandler } from '@langfuse/langchain';
+import { CallbackService } from './callbacks';
 
 type SummarizerService = {
   summarize: (
@@ -19,13 +19,13 @@ type SummarizerService = {
 type SummarizerServiceOptions = {
   config: RootConfigService;
   models: Model[];
-  langfuseEnabled: boolean;
+  callback: CallbackService;
 };
 
 export const createSummarizerService = async ({
   config,
   models,
-  langfuseEnabled,
+  callback,
 }: SummarizerServiceOptions): Promise<SummarizerService> => {
   const summaryModelId =
     config.getOptionalString('aiAssistant.conversation.summaryModel') ??
@@ -43,25 +43,17 @@ export const createSummarizerService = async ({
 
   const llm = model.chatModel;
 
-  // Initialize Langfuse CallbackHandler for tracing if credentials are available
-  const langfuseHandler = langfuseEnabled
-    ? new CallbackHandler({
-        userId: 'summarizer',
-        tags: ['backstage-ai-assistant', 'summarizer'],
-      })
-    : undefined;
-
   const chatPromptTemplate = ChatPromptTemplate.fromMessages([
     SystemMessagePromptTemplate.fromTemplate(`
       PURPOSE:
       {summaryPrompt}
-      
+
       Please summarize the following conversation in {summaryLength}.
     `),
     HumanMessagePromptTemplate.fromTemplate(`
       Conversation:
       {conversation}
-      
+
       Please provide a summary of this conversation.
     `),
   ]);
@@ -82,16 +74,17 @@ export const createSummarizerService = async ({
         .join('\n'),
     });
 
-    const invokeOptions: any = {
-      runName: 'conversation-summarizer',
-      tags: ['summarizer'],
-    };
+    const { callbacks, metadata } = await callback.getAgentCallbackData({
+      sessionId: 'summarizer',
+      userId: 'system',
+      modelId: summaryModelId,
+    });
 
-    if (langfuseEnabled) {
-      invokeOptions.callbacks = [langfuseHandler];
-    }
-
-    const { text } = await llm.invoke(prompt, invokeOptions);
+    const { text } = await llm.invoke(prompt, {
+      callbacks,
+      runName: 'summarizer',
+      metadata,
+    });
 
     return text.trim();
   };

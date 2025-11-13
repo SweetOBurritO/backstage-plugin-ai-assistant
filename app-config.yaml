@@ -102,12 +102,6 @@ aiAssistant:
       models:
         - '<your-model>'
 
-  # See ./docs/langfuse.md for more information
-  # langfuse:
-  #   secretKey: <<your-langfuse-secretKey>>>
-  #   publicKey: <<your-langfuse-publicKey>>>
-  #   baseUrl: <<your-langfuse-baseUrl>>>
-
   ingestors:
     # See ./plugins/ai-assistant-backend-module-ingestor-github/config.d.ts for more config options
     github:
@@ -152,3 +146,9 @@ aiAssistant:
       # wikis:
       #   - name: <wiki-name>
       # pagesBatchSize: <number-of-wiki-pages-to-process-in-batches> # default: 50
+
+  callbacks:
+    langfuse:
+      baseUrl: <your-langfuse-baseUrl>
+      publicKey: <your-langfuse-publicKey>
+      secretKey: <your-langfuse-secretKey>

@@ -12,6 +12,8 @@ import {
   modelProviderExtensionPoint,
   Tool,
   toolExtensionPoint,
+  callbackFactoryExtensionPoint,
+  CallbackFactory,
 } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
 import { createDataIngestionPipeline } from './services/ingestor';
 import { createChatService } from './services/chat';
@@ -22,7 +24,7 @@ import { createSearchKnowledgeTool } from './services/tools/searchKnowledge';
 import { catalogServiceRef } from '@backstage/plugin-catalog-node';
 import { createMcpService } from './services/mcp';
 
-import { initLangfuse } from './services/langfuse';
+import { createCallbackService } from './services/callbacks';
 /**
  * aiAssistantPlugin backend plugin
  *
@@ -35,6 +37,7 @@ export const aiAssistantPlugin = createBackendPlugin({
     const ingestors: Ingestor[] = [];
     const models: Model[] = [];
     const tools: Tool[] = [];
+    const callbacks: CallbackFactory[] = [];
 
     let embeddingsProvider: EmbeddingsProvider;
 
@@ -76,6 +79,12 @@ export const aiAssistantPlugin = createBackendPlugin({
       },
     });
 
+    env.registerExtensionPoint(callbackFactoryExtensionPoint, {
+      register: callbackFactory => {
+        callbacks.push(callbackFactory);
+      },
+    });
+
     env.registerInit({
       deps: {
         httpRouter: coreServices.httpRouter,
@@ -92,12 +101,7 @@ export const aiAssistantPlugin = createBackendPlugin({
       },
 
       async init(options) {
-        const { httpRouter, database, config, logger } = options;
-
-        const { langfuseEnabled, langfuseClient } = initLangfuse(
-          config,
-          logger,
-        );
+        const { httpRouter, database } = options;
 
         const client = await database.getClient();
 
@@ -122,13 +126,16 @@ export const aiAssistantPlugin = createBackendPlugin({
         const searchKnowledgeTool = createSearchKnowledgeTool({ vectorStore });
         tools.push(searchKnowledgeTool);
 
+        const callback = await createCallbackService({
+          callbacks,
+        });
+
         const chat = await createChatService({
           ...options,
           models,
           tools,
           mcp,
-          langfuseEnabled,
-          langfuseClient,
+          callback,
         });
 
         httpRouter.use(await createRouter({ ...options, chat, mcp }));
