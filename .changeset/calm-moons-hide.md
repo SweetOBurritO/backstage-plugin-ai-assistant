@@ -4,4 +4,4 @@
 '@sweetoburrito/backstage-plugin-ai-assistant-common': minor
 ---
 
-add path filtering
+add path filtering tom github and azure ingestors to allow ignoring specific files from ingestion
