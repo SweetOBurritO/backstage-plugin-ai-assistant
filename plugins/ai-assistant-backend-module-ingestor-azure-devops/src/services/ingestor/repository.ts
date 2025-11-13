@@ -11,8 +11,13 @@ import {
 import { AzureDevOpsService } from '../azure-devops';
 import { Config } from '../../../config';
 import { MODULE_ID } from '../../constants/module';
-import { getProgressStats } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
+import {
+  getProgressStats,
+  createPathFilter,
+  validateExclusionPatterns,
+} from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { DEFAULT_REPO_FILE_BATCH_SIZE } from '../../constants/default-repo-file-batch-size';
+import { DEFAULT_PATH_EXCLUSIONS } from '../../constants/default-path-exclusions';
 import {
   GitItem,
   GitRepository,
@@ -45,6 +50,30 @@ export const createRepositoryIngestor = async ({
     config.getOptionalNumber(
       'aiAssistant.ingestors.azureDevOps.filesBatchSize', // Reuse the same config for consistency
     ) ?? DEFAULT_REPO_FILE_BATCH_SIZE;
+
+  // Get global path exclusion patterns from configuration, defaulting to predefined patterns
+  const globalPathExclusions =
+    config.getOptionalStringArray(
+      'aiAssistant.ingestors.azureDevOps.pathExclusions',
+    ) ?? DEFAULT_PATH_EXCLUSIONS;
+
+  // Validate exclusion patterns
+  const validation = validateExclusionPatterns(globalPathExclusions);
+  if (!validation.isValid) {
+    logger.error(
+      `Invalid path exclusion patterns in Azure DevOps ingestor configuration: ${validation.errors.join(
+        ', ',
+      )}`,
+    );
+    throw new Error(
+      `Invalid path exclusion patterns: ${validation.errors.join(', ')}`,
+    );
+  }
+  if (validation.warnings.length > 0) {
+    logger.warn(
+      `Path exclusion pattern warnings: ${validation.warnings.join(', ')}`,
+    );
+  }
 
   /**
    * Ingest Azure DevOps repository items in batches
@@ -187,17 +216,58 @@ export const createRepositoryIngestor = async ({
           r => r.name.toLowerCase() === repo.name!.toLowerCase(),
         )?.fileTypes ?? fileTypes;
 
+      // Determine the path exclusions to use for this repository or use global default
+      const repositoryPathExclusions =
+        repositoriesFilter?.find(
+          r => r.name.toLowerCase() === repo.name!.toLowerCase(),
+        )?.pathExclusions ?? globalPathExclusions;
+
       logger.info(
         `Processing file types for repository ${
           repo.name
         }: [${repositoryFileTypesFilter.join(', ')}]`,
       );
 
+      logger.info(
+        `Using path exclusions for repository ${
+          repo.name
+        }: [${repositoryPathExclusions.join(', ')}]`,
+      );
+
       // Get the items to be ingested from the repository based on the file types filter
-      const items = await azureDevOpsService.getRepoItems(
+      let items = await azureDevOpsService.getRepoItems(
         repo.id!,
         repositoryFileTypesFilter,
       );
+
+      // Apply path exclusion filtering
+      const pathFilter = createPathFilter({
+        exclusionPatterns: repositoryPathExclusions,
+      });
+
+      const originalItemCount = items.length;
+
+      // Log excluded items for debugging
+      const excludedItems = items.filter(
+        item => item.path && pathFilter.shouldExcludePath(item.path),
+      );
+
+      if (excludedItems.length > 0) {
+        logger.debug(
+          `Items excluded from repository ${repo.name}: ${excludedItems
+            .map(i => i.path)
+            .join(', ')}`,
+        );
+      }
+
+      items = pathFilter.filterFiles(items);
+      const filteredItemCount = originalItemCount - items.length;
+
+      if (filteredItemCount > 0) {
+        logger.info(
+          `Filtered out ${filteredItemCount} items from repository ${repo.name} based on path exclusion patterns`,
+        );
+      }
 
       if (items.length === 0) {
         logger.warn(
