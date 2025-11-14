@@ -1,5 +1,24 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-azure-devops
 
+## 0.5.0
+
+### Minor Changes
+
+- dc46df1: add path filtering tom github and azure ingestors to allow ignoring specific files from ingestion
+
+### Patch Changes
+
+- Updated dependencies [dc46df1]
+- Updated dependencies [f26adee]
+- Updated dependencies [44b63b0]
+- Updated dependencies [f26adee]
+- Updated dependencies [95b7cec]
+- Updated dependencies [f26adee]
+- Updated dependencies [44b63b0]
+- Updated dependencies [0c1f2bf]
+  - @sweetoburrito/backstage-plugin-ai-assistant-common@0.6.0
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.6.0
+
 ## 0.4.2
 
 ### Patch Changes
