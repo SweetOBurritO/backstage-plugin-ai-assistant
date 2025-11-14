@@ -12,8 +12,8 @@ import {
   modelProviderExtensionPoint,
   Tool,
   toolExtensionPoint,
-  callbackFactoryExtensionPoint,
-  CallbackFactory,
+  callbackProviderExtensionPoint,
+  CallbackProvider,
 } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
 import { createDataIngestionPipeline } from './services/ingestor';
 import { createChatService } from './services/chat';
@@ -37,7 +37,7 @@ export const aiAssistantPlugin = createBackendPlugin({
     const ingestors: Ingestor[] = [];
     const models: Model[] = [];
     const tools: Tool[] = [];
-    const callbacks: CallbackFactory[] = [];
+    const callbacks: CallbackProvider[] = [];
 
     let embeddingsProvider: EmbeddingsProvider;
 
@@ -79,9 +79,9 @@ export const aiAssistantPlugin = createBackendPlugin({
       },
     });
 
-    env.registerExtensionPoint(callbackFactoryExtensionPoint, {
-      register: callbackFactory => {
-        callbacks.push(callbackFactory);
+    env.registerExtensionPoint(callbackProviderExtensionPoint, {
+      register: callbackProvider => {
+        callbacks.push(callbackProvider);
       },
     });
 

@@ -74,7 +74,13 @@ export const createSummarizerService = async ({
         .join('\n'),
     });
 
-    const { callbacks, metadata } = await callback.getAgentCallbackData({
+    const { callbacks } = await callback.getChainCallbacks({
+      conversationId: 'summarizer',
+      userId: 'system',
+      modelId: summaryModelId,
+    });
+
+    const { metadata } = await callback.getChainMetadata({
       conversationId: 'summarizer',
       userId: 'system',
       modelId: summaryModelId,

@@ -6061,6 +6061,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@langfuse/client@npm:^4.4.2":
+  version: 4.4.2
+  resolution: "@langfuse/client@npm:4.4.2"
+  dependencies:
+    "@langfuse/core": "npm:^4.4.2"
+    "@langfuse/tracing": "npm:^4.4.2"
+    mustache: "npm:^4.2.0"
+  peerDependencies:
+    "@opentelemetry/api": ^1.9.0
+  checksum: 10c0/56f536b20dc32d01f4580034fecadd25de2a4af05fe0c97adcde5749134310b871725e16528e058e60d6c98042a29230e3a44bf6476fcee725cdcba8d079302d
+  languageName: node
+  linkType: hard
+
 "@langfuse/core@npm:^4.4.2":
   version: 4.4.2
   resolution: "@langfuse/core@npm:4.4.2"
@@ -11262,6 +11275,7 @@ __metadata:
     "@backstage/backend-plugin-api": "backstage:^"
     "@backstage/backend-test-utils": "backstage:^"
     "@backstage/cli": "backstage:^"
+    "@langfuse/client": "npm:^4.4.2"
     "@langfuse/langchain": "npm:^4.4.2"
     "@langfuse/otel": "npm:^4.4.2"
     "@opentelemetry/sdk-node": "npm:^0.208.0"
@@ -11460,7 +11474,9 @@ __metadata:
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-node@workspace:plugins/ai-assistant-node"
   dependencies:
     "@backstage/backend-plugin-api": "backstage:^"
+    "@backstage/catalog-model": "backstage:^"
     "@backstage/cli": "backstage:^"
+    "@backstage/plugin-catalog-node": "backstage:^"
     "@langchain/core": "npm:^0.3.72"
     "@sweetoburrito/backstage-plugin-ai-assistant-common": "workspace:^"
     zod: "npm:^4.1.11"

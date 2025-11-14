@@ -1,6 +1,4 @@
-import { Model } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
 import { CatalogService } from '@backstage/plugin-catalog-node';
-import { UserEntity } from '@backstage/catalog-model';
 import {
   LoggerService,
   RootConfigService,
@@ -20,7 +18,11 @@ import {
   DEFAULT_SYSTEM_PROMPT,
   DEFAULT_TOOL_GUIDELINE,
 } from '../constants/prompts';
-import { Tool } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
+import {
+  Tool,
+  Model,
+  getUser,
+} from '@sweetoburrito/backstage-plugin-ai-assistant-node';
 import { DynamicStructuredTool } from '@langchain/core/tools';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { SystemMessagePromptTemplate } from '@langchain/core/prompts';
@@ -267,12 +269,19 @@ export const createChatService = async ({
         prompt: systemPrompt[0].text,
       });
 
-      const { metadata: promptMetadata, callbacks } =
-        await callback.getAgentCallbackData({
-          conversationId,
-          userId: userEntityRef,
-          modelId,
-        });
+      const { callbacks } = await callback.getChainCallbacks({
+        conversationId,
+        userId: userEntityRef,
+        modelId,
+      });
+
+      const { metadata: promptMetadata } = await callback.getChainMetadata({
+        conversationId,
+        userId: userEntityRef,
+        modelId,
+      });
+
+      const traceId = uuid();
 
       const promptStream = await agent.stream(
         {
@@ -281,6 +290,7 @@ export const createChatService = async ({
         {
           streamMode: ['values'],
           runName: 'ai-assistant-chat',
+          runId: traceId,
           metadata: promptMetadata,
           callbacks,
         },
@@ -292,21 +302,28 @@ export const createChatService = async ({
         const { messages: promptMessages } = chunk;
 
         const newMessages: MessageWithRequiredFields[] = promptMessages
-          .filter(m => responseMessages.findIndex(rm => rm.id === m.id) === -1)
+          .filter(
+            m =>
+              responseMessages.findIndex(
+                rm => m.id === rm.metadata.langGraphId,
+              ) === -1,
+          )
           .filter(
             m =>
               recentConversationMessages.findIndex(rm => rm.id === m.id) === -1,
           )
           .filter(m => m.getType() !== 'human')
           .map(m => {
-            const id = m.id ?? '';
+            const id = uuid();
             const role = m.getType();
             const content =
               typeof m.content === 'string'
                 ? m.content
                 : JSON.stringify(m.content);
 
-            const metadata: JsonObject = {};
+            const metadata: JsonObject = {
+              langGraphId: m.id ?? '',
+            };
 
             if (role === 'ai') {
               const aiMessage = m as AIMessage;
@@ -328,7 +345,7 @@ export const createChatService = async ({
               content,
               metadata,
               score: 0,
-              traceId: undefined,
+              traceId: traceId,
             };
           });
 
@@ -359,12 +376,10 @@ export const createChatService = async ({
         responseMessages.push(...newMessages);
       }
 
-      addMessages(
-        responseMessages.map(m => ({ ...m, id: uuid() })),
-        userEntityRef,
-        conversationId,
-        [...recentConversationMessages, ...messages],
-      );
+      addMessages(responseMessages, userEntityRef, conversationId, [
+        ...recentConversationMessages,
+        ...messages,
+      ]);
 
       return responseMessages;
     };
@@ -414,8 +429,12 @@ export const createChatService = async ({
       score,
     };
 
-    await chatStore.updateMessage(updatedMessage);
-    logger.info(`Message ${messageId} scored ${score}`);
+    chatStore.updateMessage(updatedMessage);
+
+    callback.handleScoreCallbacks({
+      name: 'helpfulness',
+      message: updatedMessage,
+    });
   };
 
   return {
@@ -427,23 +446,3 @@ export const createChatService = async ({
     scoreMessage,
   };
 };
-
-async function getUser(
-  cache: CacheService,
-  userEntityRef: string,
-  credentials: BackstageCredentials,
-  catalog: CatalogService,
-) {
-  const cached = await cache.get(userEntityRef);
-
-  if (cached) {
-    return JSON.parse(String(cached));
-  }
-
-  const user = (await catalog.getEntityByRef(userEntityRef, {
-    credentials,
-  })) as UserEntity | undefined;
-  await cache.set(userEntityRef, JSON.stringify(user));
-
-  return user;
-}

@@ -26,10 +26,6 @@ export const FeedbackButtons = ({
     // Toggle: if clicking the same button again, reset to 0
     const newScore = score === targetScore ? 0 : targetScore;
     setScore(newScore);
-    // eslint-disable-next-line no-console
-    console.log(
-      `User feedback: ${feedback} for message ${messageId}, score: ${newScore}`,
-    );
 
     chatApi.scoreMessage(messageId!, newScore);
   };

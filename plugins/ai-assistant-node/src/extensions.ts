@@ -2,7 +2,7 @@ import { createExtensionPoint } from '@backstage/backend-plugin-api';
 import { Ingestor } from './types/ingestor';
 import { Embeddings } from '@langchain/core/embeddings';
 import { BaseChatModel } from '@langchain/core/language_models/chat_models';
-import { CallbackFactory, Tool } from './types';
+import { CallbackProvider, Tool } from './types';
 import { ZodType } from 'zod';
 
 export type DataIngestorExtensionPoint = {
@@ -50,10 +50,10 @@ export const toolExtensionPoint = createExtensionPoint<ToolExtensionPoint>({
 });
 
 export type CallbackExtensionPoint = {
-  register: (callback: CallbackFactory) => void;
+  register: (callback: CallbackProvider) => void;
 };
 
-export const callbackFactoryExtensionPoint =
+export const callbackProviderExtensionPoint =
   createExtensionPoint<CallbackExtensionPoint>({
     id: 'ai-assistant.callback',
   });

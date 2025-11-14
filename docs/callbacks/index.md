@@ -54,9 +54,9 @@ aiAssistant:
 
 ## Available Providers
 
-| Name     | Service                                      | Link to Provider                                                                                                                                                | Documentation                                                                         |
-| -------- | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| Langfuse | [Langfuse](https://langfuse.com/)            | [Github](https://github.com/SweetOBurritO/backstage-plugin-ai-assistant/tree/main/plugins/ai-assistant-backend-module-callback-provider-langfuse)               | [Setup Guide](https://github.com/SweetOBurritO/backstage-plugin-ai-assistant/blob/main/docs/langfuse.md) |
+| Name     | Service                           | Link to Provider                                                                                                                                  | Documentation                                                                                            |
+| -------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Langfuse | [Langfuse](https://langfuse.com/) | [Github](https://github.com/SweetOBurritO/backstage-plugin-ai-assistant/tree/main/plugins/ai-assistant-backend-module-callback-provider-langfuse) | [Setup Guide](https://github.com/SweetOBurritO/backstage-plugin-ai-assistant/blob/main/docs/langfuse.md) |
 
 ## Why use callback providers?
 

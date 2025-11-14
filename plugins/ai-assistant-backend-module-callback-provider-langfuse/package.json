@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@backstage/backend-plugin-api": "backstage:^",
+    "@langfuse/client": "^4.4.2",
     "@langfuse/langchain": "^4.4.2",
     "@langfuse/otel": "^4.4.2",
     "@opentelemetry/sdk-node": "^0.208.0",
