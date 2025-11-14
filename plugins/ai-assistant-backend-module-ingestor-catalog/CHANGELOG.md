@@ -1,5 +1,16 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-catalog
 
+## 0.3.6
+
+### Patch Changes
+
+- Updated dependencies [44b63b0]
+- Updated dependencies [f26adee]
+- Updated dependencies [f26adee]
+- Updated dependencies [44b63b0]
+- Updated dependencies [0c1f2bf]
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.6.0
+
 ## 0.3.5
 
 ### Patch Changes

@@ -1,5 +1,24 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-node
 
+## 0.6.0
+
+### Minor Changes
+
+- 44b63b0: added user info utility fn
+- f26adee: - add mcp server configuration frontend
+  - add mcp server configuration validation and error handling on frontend and backend
+- f26adee: Added simple encryption and decryption utils
+- 44b63b0: updated callback extension point to add ability to define callbacks for scoring system
+- 0c1f2bf: Add support for extensible langchain callbacks through a new callback provider registration point
+
+### Patch Changes
+
+- Updated dependencies [dc46df1]
+- Updated dependencies [f26adee]
+- Updated dependencies [f26adee]
+- Updated dependencies [95b7cec]
+  - @sweetoburrito/backstage-plugin-ai-assistant-common@0.6.0
+
 ## 0.5.1
 
 ### Patch Changes

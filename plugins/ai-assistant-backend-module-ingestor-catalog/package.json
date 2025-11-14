@@ -1,6 +1,6 @@
 {
   "name": "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-catalog",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "license": "Apache-2.0",
   "description": "The ingestor-catalog backend module for the ai-assistant plugin.",
   "main": "src/index.ts",
@@ -28,7 +28,7 @@
     "@backstage/backend-plugin-api": "backstage:^",
     "@backstage/catalog-model": "backstage:^",
     "@backstage/plugin-catalog-node": "backstage:^",
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "^0.5.1"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "^0.6.0"
   },
   "devDependencies": {
     "@backstage/backend-defaults": "backstage:^",
