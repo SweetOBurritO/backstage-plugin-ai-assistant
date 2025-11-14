@@ -13,9 +13,6 @@ import { useChatModalSettings } from './store';
 import { useLocation } from 'react-router-dom';
 
 export interface AiAssistantChatModalProps {
-  // Whether to show the floating action button
-  showFloatingButton?: boolean;
-  // Props for controlled modal state
   open?: boolean;
   onClose?: () => void;
   conversationId?: string;
@@ -23,7 +20,6 @@ export interface AiAssistantChatModalProps {
 }
 
 export const AiAssistantChatModal = ({
-  showFloatingButton = true,
   open: controlledOpen,
   onClose: controlledOnClose,
   conversationId: controlledConversationId,
@@ -75,35 +71,34 @@ export const AiAssistantChatModal = ({
 
   return (
     <>
-      {showFloatingButton && (
-        <Box
-          sx={{
-            position: 'absolute',
-            bottom: theme => theme.spacing(2),
-            right: theme => theme.spacing(2),
-            borderRadius: '50%',
-            boxShadow: theme => theme.shadows[4],
-            bgcolor: theme => theme.palette.background.paper,
-            border: theme => `1px solid ${theme.palette.primary.main}`,
-            width: 50,
-            height: 50,
-            padding: theme => theme.spacing(1),
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: theme => theme.zIndex.modal - 1,
-            ':hover': {
-              cursor: 'pointer',
-              boxShadow: theme => theme.shadows[6],
-              bgcolor: theme => theme.palette.background.default,
-            },
-          }}
-          onClick={handleModalOpen}
-        >
-          <AutoAwesomeIcon />
-        </Box>
-      )}
-
+      (
+      <Box
+        sx={{
+          position: 'absolute',
+          bottom: theme => theme.spacing(2),
+          right: theme => theme.spacing(2),
+          borderRadius: '50%',
+          boxShadow: theme => theme.shadows[4],
+          bgcolor: theme => theme.palette.background.paper,
+          border: theme => `1px solid ${theme.palette.primary.main}`,
+          width: 50,
+          height: 50,
+          padding: theme => theme.spacing(1),
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: theme => theme.zIndex.modal - 1,
+          ':hover': {
+            cursor: 'pointer',
+            boxShadow: theme => theme.shadows[6],
+            bgcolor: theme => theme.palette.background.default,
+          },
+        }}
+        onClick={handleModalOpen}
+      >
+        <AutoAwesomeIcon />
+      </Box>
+      )
       <Modal open={isOpen} onClose={handleModalClose}>
         <Box
           sx={{
