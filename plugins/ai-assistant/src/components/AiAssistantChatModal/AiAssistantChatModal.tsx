@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Conversation } from '../Conversation';
 import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
@@ -9,6 +9,8 @@ import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import { useChatModalSettings } from './store';
+import { useLocation } from 'react-router-dom';
 
 export interface AiAssistantChatModalProps {
   // Whether to show the floating action button
@@ -29,6 +31,20 @@ export const AiAssistantChatModal = ({
 }: AiAssistantChatModalProps) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalConversationId, setModalConversationId] = useState<string>();
+
+  const { visible, setVisible } = useChatModalSettings();
+
+  const location = useLocation();
+
+  // Update visibility based on route changes
+  useEffect(() => {
+    setVisible(true);
+  }, [location, setVisible]);
+
+  // If the context says the modal is not visible, don't render anything
+  if (!visible) {
+    return <></>;
+  }
 
   // Use controlled props if provided, otherwise use internal state
   const isOpen = controlledOpen !== undefined ? controlledOpen : modalOpen;

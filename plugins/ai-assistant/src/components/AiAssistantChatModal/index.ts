@@ -1,1 +1,2 @@
-export * from './AiAssistantChatModal';
+export { AiAssistantChatModal } from './AiAssistantChatModal';
+export { useChatModalSettings } from './store';

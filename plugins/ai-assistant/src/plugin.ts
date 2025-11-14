@@ -56,3 +56,5 @@ export const AiAssistantChatModal = aiAssistantPlugin.provide(
     },
   }),
 );
+
+export { useChatModalSettings } from './components/AiAssistantChatModal';
