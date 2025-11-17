@@ -4,12 +4,12 @@ import { SummarizerService } from '../summarizer';
 import { validation } from './middleware/validation';
 import z from 'zod';
 
-export type ModelRouterOptions = {
+export type SummaryRouterOptions = {
   summarizer: SummarizerService;
 };
 
-export async function createModelRouter(
-  options: ModelRouterOptions,
+export async function createSummaryRouter(
+  options: SummaryRouterOptions,
 ): Promise<express.Router> {
   const { summarizer } = options;
   const router = Router();

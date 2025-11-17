@@ -8,8 +8,10 @@ import {
 } from '@backstage/backend-plugin-api';
 import { MiddlewareFactory } from '@backstage/backend-defaults/rootHttpRouter';
 import { createMcpRouter, McpRouterOptions } from './mcp';
+import { SummaryRouterOptions, createSummaryRouter } from './summary';
 
 export type RouterOptions = ChatRouterOptions &
+  SummaryRouterOptions &
   McpRouterOptions & {
     config: RootConfigService;
     logger: LoggerService;
@@ -24,6 +26,7 @@ export async function createRouter(
   router.use('/chat', await createChatRouter(options));
   router.use('/models', await createModelRouter(options));
   router.use('/mcp', await createMcpRouter(options));
+  router.use('/summary', await createSummaryRouter(options));
 
   const middleware = MiddlewareFactory.create(options);
 
