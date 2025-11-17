@@ -23,8 +23,8 @@ import { signalsServiceRef } from '@backstage/plugin-signals-node';
 import { createSearchKnowledgeTool } from './services/tools/searchKnowledge';
 import { catalogServiceRef } from '@backstage/plugin-catalog-node';
 import { createMcpService } from './services/mcp';
-
 import { createCallbackService } from './services/callbacks';
+import { createSummarizerService } from './services/summarizer';
 /**
  * aiAssistantPlugin backend plugin
  *
@@ -101,7 +101,7 @@ export const aiAssistantPlugin = createBackendPlugin({
       },
 
       async init(options) {
-        const { httpRouter, database } = options;
+        const { httpRouter, database, config } = options;
 
         const client = await database.getClient();
 
@@ -130,12 +130,19 @@ export const aiAssistantPlugin = createBackendPlugin({
           callbacks,
         });
 
+        const summarizer = await createSummarizerService({
+          config,
+          models,
+          callback,
+        });
+
         const chat = await createChatService({
           ...options,
           models,
           tools,
           mcp,
           callback,
+          summarizer,
         });
 
         httpRouter.use(await createRouter({ ...options, chat, mcp }));

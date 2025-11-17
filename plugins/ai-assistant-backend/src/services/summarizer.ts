@@ -1,19 +1,24 @@
 import { RootConfigService } from '@backstage/backend-plugin-api';
 import { Model } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
-import { DEFAULT_SUMMARY_PROMPT } from '../constants/prompts';
 import {
-  SystemMessagePromptTemplate,
-  HumanMessagePromptTemplate,
-  ChatPromptTemplate,
-} from '@langchain/core/prompts';
+  DEFAULT_CONVERSATION_SUMMARY_PROMPT,
+  DEFAULT_SUMMARY_PROMPT,
+} from '../constants/prompts';
+import { PromptTemplate } from '@langchain/core/prompts';
 import { Message } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { CallbackService } from './callbacks';
 
-type SummarizerService = {
-  summarize: (
-    conversationMessages: Message[],
-    summaryLength?: string,
-  ) => Promise<string>;
+export type SummarizerService = {
+  summarizeConversation: (options: {
+    messages: Message[];
+    length?: string;
+  }) => Promise<string>;
+
+  summarize: (options: {
+    content: string;
+    prompt?: string;
+    length?: string;
+  }) => Promise<string>;
 };
 
 type SummarizerServiceOptions = {
@@ -31,9 +36,9 @@ export const createSummarizerService = async ({
     config.getOptionalString('aiAssistant.conversation.summaryModel') ??
     models[0].id;
 
-  const summaryPrompt =
+  const conversationSummaryPrompt =
     config.getOptionalString('aiAssistant.conversation.summaryPrompt') ??
-    DEFAULT_SUMMARY_PROMPT;
+    DEFAULT_CONVERSATION_SUMMARY_PROMPT;
 
   const model = models.find(m => m.id === summaryModelId);
 
@@ -43,35 +48,25 @@ export const createSummarizerService = async ({
 
   const llm = model.chatModel;
 
-  const chatPromptTemplate = ChatPromptTemplate.fromMessages([
-    SystemMessagePromptTemplate.fromTemplate(`
-      PURPOSE:
-      {summaryPrompt}
+  const summaryPromptTemplate = PromptTemplate.fromTemplate(`
+    PURPOSE:
+    {summaryPrompt}
 
-      Please summarize the following conversation in {summaryLength}.
-    `),
-    HumanMessagePromptTemplate.fromTemplate(`
-      Conversation:
-      {conversation}
+    Summarize the following content in {length}.
 
-      Please provide a summary of this conversation.
-    `),
-  ]);
+    Content:
+    {content}
+  `);
 
   const summarize: SummarizerService['summarize'] = async (
-    messages,
-    summaryLength = 'as few words as possible',
+    content,
+    summaryPrompt = DEFAULT_SUMMARY_PROMPT,
+    length = 'as few words as possible',
   ) => {
-    const conversationMessages = messages.filter(
-      msg => msg.role === 'ai' || msg.role === 'human',
-    );
-
-    const prompt = await chatPromptTemplate.formatMessages({
+    const prompt = await summaryPromptTemplate.format({
       summaryPrompt,
-      summaryLength,
-      conversation: conversationMessages
-        .map(msg => `${msg.role}: ${msg.content}`)
-        .join('\n'),
+      content,
+      length,
     });
 
     const { callbacks } = await callback.getChainCallbacks({
@@ -95,5 +90,22 @@ export const createSummarizerService = async ({
     return text.trim();
   };
 
-  return { summarize };
+  const summarizeConversation: SummarizerService['summarizeConversation'] =
+    async ({ messages, length = 'as few words as possible' }) => {
+      const conversationMessages = messages.filter(
+        msg => msg.role === 'ai' || msg.role === 'human',
+      );
+
+      const conversation = conversationMessages
+        .map(msg => `${msg.role}: ${msg.content}`)
+        .join('\n');
+
+      return summarize({
+        content: conversation,
+        prompt: conversationSummaryPrompt,
+        length,
+      });
+    };
+
+  return { summarizeConversation, summarize };
 };
