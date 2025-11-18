@@ -1,0 +1,17 @@
+# @sweetoburrito/backstage-plugin-ai-assistant-backend-module-callback-provider-langfuse
+
+## 0.2.0
+
+### Minor Changes
+
+- 44b63b0: added callback to hook langfuse into scoring system
+- 0c1f2bf: refactored langchain out of the assistant core. Its now available as a seperate package which uses the new extensible callback providers
+
+### Patch Changes
+
+- Updated dependencies [44b63b0]
+- Updated dependencies [f26adee]
+- Updated dependencies [f26adee]
+- Updated dependencies [44b63b0]
+- Updated dependencies [0c1f2bf]
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.6.0
