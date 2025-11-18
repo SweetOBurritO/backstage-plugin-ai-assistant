@@ -30,7 +30,7 @@
     "@langfuse/langchain": "^4.4.2",
     "@langfuse/otel": "^4.4.2",
     "@opentelemetry/sdk-node": "^0.208.0",
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "^0.5.0"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "^0.6.0"
   },
   "devDependencies": {
     "@backstage/backend-test-utils": "backstage:^",

@@ -11279,7 +11279,7 @@ __metadata:
     "@langfuse/langchain": "npm:^4.4.2"
     "@langfuse/otel": "npm:^4.4.2"
     "@opentelemetry/sdk-node": "npm:^0.208.0"
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.5.0"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.6.0"
   languageName: unknown
   linkType: soft
 
@@ -11459,13 +11459,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@sweetoburrito/backstage-plugin-ai-assistant-common@npm:^0.5.0":
-  version: 0.5.0
-  resolution: "@sweetoburrito/backstage-plugin-ai-assistant-common@npm:0.5.0"
-  checksum: 10c0/e91263eb6c72354e73a854cf340260c05068fd1332ba2b996c939f0af05ef73f0d20ce02c246dd947d699543396c72cb29efb2dc3e099baaeb50e89098c1eb63
-  languageName: node
-  linkType: hard
-
 "@sweetoburrito/backstage-plugin-ai-assistant-common@npm:^0.6.0, @sweetoburrito/backstage-plugin-ai-assistant-common@workspace:plugins/ai-assistant-common":
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-common@workspace:plugins/ai-assistant-common"
@@ -11476,17 +11469,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@sweetoburrito/backstage-plugin-ai-assistant-node@npm:^0.5.0":
-  version: 0.5.1
-  resolution: "@sweetoburrito/backstage-plugin-ai-assistant-node@npm:0.5.1"
-  dependencies:
-    "@backstage/backend-plugin-api": "backstage:^"
-    "@langchain/core": "npm:^0.3.72"
-    zod: "npm:^4.1.11"
-  checksum: 10c0/8afdcb5d3046c444d532ab2bc14c9de11c1e5a71d1c607a6d92eac21af0b82428f7479a6d439199c680969bb3d3d86cc198cf742466e9a81d7772e861a5a831e
-  languageName: node
-  linkType: hard
-
 "@sweetoburrito/backstage-plugin-ai-assistant-node@npm:^0.6.0, @sweetoburrito/backstage-plugin-ai-assistant-node@workspace:plugins/ai-assistant-node":
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-node@workspace:plugins/ai-assistant-node"
@@ -11496,7 +11478,7 @@ __metadata:
     "@backstage/cli": "backstage:^"
     "@backstage/plugin-catalog-node": "backstage:^"
     "@langchain/core": "npm:^0.3.72"
-    "@sweetoburrito/backstage-plugin-ai-assistant-common": "npm:^0.5.0"
+    "@sweetoburrito/backstage-plugin-ai-assistant-common": "npm:^0.6.0"
     zod: "npm:^4.1.11"
   languageName: unknown
   linkType: soft

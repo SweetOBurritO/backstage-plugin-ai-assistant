@@ -39,7 +39,7 @@
     "@backstage/catalog-model": "backstage:^",
     "@backstage/plugin-catalog-node": "backstage:^",
     "@langchain/core": "^0.3.72",
-    "@sweetoburrito/backstage-plugin-ai-assistant-common": "^0.5.0",
+    "@sweetoburrito/backstage-plugin-ai-assistant-common": "^0.6.0",
     "zod": "^4.1.11"
   }
 }
