@@ -19,11 +19,13 @@ import { SettingsModal } from './SettingsModal';
 type ConversationOptions = {
   conversationId: string | undefined;
   setConversationId: (id: string) => void;
+  additionalSystemMessages?: Message[];
 };
 
 export const Conversation = ({
   conversationId,
   setConversationId,
+  additionalSystemMessages,
 }: ConversationOptions) => {
   const chatApi = useApi(chatApiRef);
   const errorApi = useApi(errorApiRef);
@@ -131,7 +133,9 @@ export const Conversation = ({
     const response = await chatApi.sendMessage({
       conversationId,
       modelId,
-      messages: newMessages,
+      messages: additionalSystemMessages
+        ? [...additionalSystemMessages, ...newMessages]
+        : newMessages,
     });
 
     setConversationId(response.conversationId);
@@ -193,13 +197,13 @@ export const Conversation = ({
               loading={false}
             />
           ))}
-          {(messages[messages.length - 1]?.role === 'human' ||
-            messages[messages.length - 1]?.role === 'tool') && (
-            <MessageCard
-              message={{ content: '', role: 'ai', metadata: {}, score: 0 }}
-              loading
-            />
-          )}
+          {messages[messages.length - 1] &&
+            messages[messages.length - 1]?.role !== 'ai' && (
+              <MessageCard
+                message={{ content: '', role: 'ai', metadata: {}, score: 0 }}
+                loading
+              />
+            )}
           <div ref={messageEndRef} />
         </Stack>
       )}

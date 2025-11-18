@@ -19,7 +19,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import AddIcon from '@mui/icons-material/Add';
 import { useApi } from '@backstage/core-plugin-api';
 import { signalApiRef } from '@backstage/plugin-signals-react';
-import { useChatModalSettings } from '../AiAssistantChatModal';
+import { useChatSettings } from '../../hooks/use-chat-settings';
 
 export const AiAssistantPage = () => {
   const chatApi = useApi(chatApiRef);
@@ -27,11 +27,11 @@ export const AiAssistantPage = () => {
 
   const theme = useTheme();
 
-  const chatModalSettings = useChatModalSettings();
+  const chatSettings = useChatSettings();
 
   useEffect(() => {
-    chatModalSettings.setVisible(false);
-  }, [chatModalSettings]);
+    chatSettings.setModalVisible(false);
+  }, [chatSettings]);
 
   const [conversationId, setConversationId] = useState<string>();
 

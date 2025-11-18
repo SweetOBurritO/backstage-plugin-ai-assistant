@@ -10,6 +10,7 @@ import {
 import { rootRouteRef } from './routes';
 import { chatApiRef, createChatService } from './api/chat';
 import { mcpApiRef, createMcpService } from './api/mcp';
+import { createSummarizerService, summarizerApiRef } from './api/summarizer';
 
 export const aiAssistantPlugin = createPlugin({
   id: 'ai-assistant',
@@ -32,6 +33,14 @@ export const aiAssistantPlugin = createPlugin({
         fetchApi: fetchApiRef,
       },
       factory: options => createMcpService(options),
+    }),
+    createApiFactory({
+      api: summarizerApiRef,
+      deps: {
+        discoveryApi: discoveryApiRef,
+        fetchApi: fetchApiRef,
+      },
+      factory: options => createSummarizerService(options),
     }),
   ],
 });
@@ -57,4 +66,4 @@ export const AiAssistantChatModal = aiAssistantPlugin.provide(
   }),
 );
 
-export { useChatModalSettings } from './components/AiAssistantChatModal';
+export { useChatSettings } from './hooks';

@@ -5,6 +5,7 @@ import {
   AiAssistantChatModal,
 } from '../src/plugin';
 import { signalsPlugin } from '@backstage/plugin-signals';
+import Typography from '@mui/material/Typography';
 
 createDevApp()
   .registerPlugin(signalsPlugin)
@@ -22,6 +23,12 @@ createDevApp()
   .addPage({
     element: (
       <>
+        <Typography>
+          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ea rerum
+          placeat sint assumenda reiciendis esse facere qui. Similique
+          perspiciatis cumque obcaecati, eveniet exercitationem incidunt
+          perferendis at odio totam, suscipit eligendi.
+        </Typography>
         <AiAssistantChatModal />
       </>
     ),
