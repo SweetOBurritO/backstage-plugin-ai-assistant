@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-node
 
+## 0.6.1
+
+### Patch Changes
+
+- 4a98fcc: fix package resolution issue
+
 ## 0.6.0
 
 ### Minor Changes
