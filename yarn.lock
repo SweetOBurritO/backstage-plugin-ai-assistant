@@ -11279,7 +11279,7 @@ __metadata:
     "@langfuse/langchain": "npm:^4.4.2"
     "@langfuse/otel": "npm:^4.4.2"
     "@opentelemetry/sdk-node": "npm:^0.208.0"
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "workspace:^"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.5.0"
   languageName: unknown
   linkType: soft
 
@@ -11459,7 +11459,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@sweetoburrito/backstage-plugin-ai-assistant-common@npm:^0.5.0, @sweetoburrito/backstage-plugin-ai-assistant-common@workspace:^, @sweetoburrito/backstage-plugin-ai-assistant-common@workspace:plugins/ai-assistant-common":
+"@sweetoburrito/backstage-plugin-ai-assistant-common@npm:^0.5.0, @sweetoburrito/backstage-plugin-ai-assistant-common@workspace:plugins/ai-assistant-common":
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-common@workspace:plugins/ai-assistant-common"
   dependencies:
@@ -11469,7 +11469,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@sweetoburrito/backstage-plugin-ai-assistant-node@npm:^0.5.0, @sweetoburrito/backstage-plugin-ai-assistant-node@npm:^0.5.1, @sweetoburrito/backstage-plugin-ai-assistant-node@workspace:^, @sweetoburrito/backstage-plugin-ai-assistant-node@workspace:plugins/ai-assistant-node":
+"@sweetoburrito/backstage-plugin-ai-assistant-node@npm:^0.5.0, @sweetoburrito/backstage-plugin-ai-assistant-node@npm:^0.5.1, @sweetoburrito/backstage-plugin-ai-assistant-node@workspace:plugins/ai-assistant-node":
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-node@workspace:plugins/ai-assistant-node"
   dependencies:
@@ -11478,7 +11478,7 @@ __metadata:
     "@backstage/cli": "backstage:^"
     "@backstage/plugin-catalog-node": "backstage:^"
     "@langchain/core": "npm:^0.3.72"
-    "@sweetoburrito/backstage-plugin-ai-assistant-common": "workspace:^"
+    "@sweetoburrito/backstage-plugin-ai-assistant-common": "npm:^0.5.0"
     zod: "npm:^4.1.11"
   languageName: unknown
   linkType: soft
