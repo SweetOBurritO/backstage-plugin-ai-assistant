@@ -246,8 +246,10 @@ export const createChatService = async ({
         .map(tool => new DynamicStructuredTool(tool))
         .concat(mcpTools.map(tool => new DynamicStructuredTool(tool)));
 
+      const messagesWithoutSystem = messages.filter(m => m.role !== 'system');
+
       addMessages(
-        messages,
+        messagesWithoutSystem,
         userEntityRef,
         conversationId,
         recentConversationMessages,

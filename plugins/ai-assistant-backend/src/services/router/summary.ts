@@ -12,6 +12,7 @@ export async function createSummaryRouter(
   options: SummaryRouterOptions,
 ): Promise<express.Router> {
   const { summarizer } = options;
+
   const router = Router();
 
   const contentSchema = z.object({
@@ -24,6 +25,7 @@ export async function createSummaryRouter(
     validation(contentSchema, 'body'),
     async (req, res) => {
       const { content, length } = req.body;
+
       const summary = await summarizer.summarize({
         content,
         length,

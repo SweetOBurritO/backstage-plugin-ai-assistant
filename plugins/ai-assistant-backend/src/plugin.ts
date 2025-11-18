@@ -145,7 +145,9 @@ export const aiAssistantPlugin = createBackendPlugin({
           summarizer,
         });
 
-        httpRouter.use(await createRouter({ ...options, chat, mcp }));
+        httpRouter.use(
+          await createRouter({ ...options, chat, mcp, summarizer }),
+        );
         dataIngestionPipeline.start();
       },
     });
