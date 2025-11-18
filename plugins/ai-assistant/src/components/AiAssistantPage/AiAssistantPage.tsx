@@ -20,12 +20,40 @@ import AddIcon from '@mui/icons-material/Add';
 import { useApi } from '@backstage/core-plugin-api';
 import { signalApiRef } from '@backstage/plugin-signals-react';
 import { useChatSettings } from '../../hooks/use-chat-settings';
+import { Page, Content, Header } from '@backstage/core-components';
 
-export const AiAssistantPage = () => {
+import { makeStyles } from 'tss-react/mui';
+
+export type AiAssistantPageProps = {
+  title?: string;
+  subtitle?: string;
+};
+
+const useStyles = makeStyles()(() => ({
+  page: {
+    height: '100vh',
+    maxHeight: '100vh',
+    overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  content: {
+    flex: 1,
+    minHeight: 0,
+    display: 'flex',
+    flexDirection: 'column',
+  },
+}));
+
+export const AiAssistantPage = ({
+  title = 'AI Assistant',
+  subtitle,
+}: AiAssistantPageProps) => {
   const chatApi = useApi(chatApiRef);
   const signalApi = useApi(signalApiRef);
 
   const theme = useTheme();
+  const { classes } = useStyles();
 
   const chatSettings = useChatSettings();
 
@@ -82,78 +110,74 @@ export const AiAssistantPage = () => {
   };
 
   return (
-    <>
-      <Stack
-        padding={2}
-        spacing={2}
-        flex={1}
-        height="100vh"
-        maxHeight="100vh"
-        boxSizing="border-box"
-      >
-        <Stack direction="row" spacing={2} justifyContent="flex-end">
-          <Tooltip title="New Chat">
-            <IconButton onClick={openNewChat}>
-              <AddIcon />
-            </IconButton>
-          </Tooltip>
-
-          {conversations.length > 0 && (
-            <Tooltip title="Chat History">
-              <IconButton onClick={toggleDrawer(true)}>
-                <MenuIcon />
+    <Page themeId="tool" className={classes.page}>
+      <Header title={title} subtitle={subtitle} />
+      <Content className={classes.content}>
+        <Stack spacing={2} flex={1} boxSizing="border-box" height="100%">
+          <Stack direction="row" spacing={2} justifyContent="flex-end">
+            <Tooltip title="New Chat">
+              <IconButton onClick={openNewChat}>
+                <AddIcon />
               </IconButton>
             </Tooltip>
-          )}
+
+            {conversations.length > 0 && (
+              <Tooltip title="Chat History">
+                <IconButton onClick={toggleDrawer(true)}>
+                  <MenuIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Stack>
+          <Conversation
+            conversationId={conversationId}
+            setConversationId={setConversationId}
+          />
         </Stack>
-        <Conversation
-          conversationId={conversationId}
-          setConversationId={setConversationId}
-        />
-      </Stack>
-      <Drawer anchor="right" open={open} onClose={toggleDrawer(false)}>
-        <Box
-          sx={{ width: 300 }}
-          role="presentation"
-          onClick={toggleDrawer(false)}
-        >
-          <List>
-            {conversations.map(conversation => (
-              <ListItem
-                key={conversation.id}
-                sx={{
-                  fontSize: theme.typography.body1.fontSize,
-                }}
-              >
-                <ListItemButton
+        <Drawer anchor="right" open={open} onClose={toggleDrawer(false)}>
+          <Box
+            sx={{ width: 300 }}
+            role="presentation"
+            onClick={toggleDrawer(false)}
+          >
+            <List>
+              {conversations.map(conversation => (
+                <ListItem
+                  key={conversation.id}
                   sx={{
-                    justifyContent: 'flex-start !important',
-                    padding: `${theme.spacing(1)} !important`,
-                    borderRadius: `${theme.spacing(1)} !important`,
-                    backgroundColor:
-                      conversationId === conversation.id
-                        ? `${theme.palette.action.selected} !important`
-                        : 'transparent !important',
+                    fontSize: theme.typography.body1.fontSize,
                   }}
-                  onClick={() => setConversationId(conversation.id)}
                 >
-                  <Typography
-                    variant="body1"
+                  <ListItemButton
                     sx={{
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                      width: '100%',
+                      justifyContent: 'flex-start !important',
+                      padding: `${theme.spacing(1)} !important`,
+                      borderRadius: `${theme.spacing(1)} !important`,
+                      backgroundColor:
+                        conversationId === conversation.id
+                          ? `${theme.palette.action.selected} !important`
+                          : 'transparent !important',
                     }}
+                    onClick={() => setConversationId(conversation.id)}
                   >
-                    {conversation.title}
-                  </Typography>
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-        </Box>
-      </Drawer>
-    </>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        width: '100%',
+                      }}
+                    >
+                      {conversation.title}
+                    </Typography>
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
+          </Box>
+        </Drawer>
+      </Content>
+    </Page>
   );
 };
