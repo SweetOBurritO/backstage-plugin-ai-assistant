@@ -1,6 +1,6 @@
 {
   "name": "@sweetoburrito/backstage-plugin-ai-assistant-node",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "license": "Apache-2.0",
   "description": "Node.js library for the ai-assistant plugin",
   "main": "src/index.ts",

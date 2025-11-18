@@ -1,6 +1,6 @@
 {
   "name": "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-tool-provider-backstage",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "license": "Apache-2.0",
   "description": "The tool-provider-backstage backend module for the ai-assistant plugin.",
   "main": "src/index.ts",
@@ -27,7 +27,7 @@
   "dependencies": {
     "@backstage/backend-plugin-api": "^1.4.3",
     "@n8n/json-schema-to-zod": "1.1.0",
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "^0.5.1"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "^0.6.0"
   },
   "devDependencies": {
     "@backstage/backend-test-utils": "^1.9.0",

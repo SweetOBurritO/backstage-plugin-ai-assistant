@@ -1,6 +1,6 @@
 {
   "name": "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-azure-open-ai",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "license": "Apache-2.0",
   "description": "The embeddings-provider-azure-open-ai backend module for the ai-assistant plugin.",
   "main": "src/index.ts",
@@ -27,7 +27,7 @@
   "dependencies": {
     "@backstage/backend-plugin-api": "backstage:^",
     "@langchain/openai": "^0.6.11",
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "^0.5.0"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "^0.6.0"
   },
   "devDependencies": {
     "@backstage/backend-test-utils": "backstage:^",
