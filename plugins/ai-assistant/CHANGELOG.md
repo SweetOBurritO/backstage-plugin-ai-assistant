@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant
 
+## 0.7.1
+
+### Patch Changes
+
+- 3300eca: update assistant page to use backstage page component
+
 ## 0.7.0
 
 ### Minor Changes

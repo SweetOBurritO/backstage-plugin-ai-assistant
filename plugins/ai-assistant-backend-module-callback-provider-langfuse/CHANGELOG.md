@@ -1,5 +1,13 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-callback-provider-langfuse
 
+## 0.2.1
+
+### Patch Changes
+
+- 4a98fcc: fix package resolution issue
+- Updated dependencies [4a98fcc]
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.6.1
+
 ## 0.2.0
 
 ### Minor Changes

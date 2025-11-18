@@ -11279,7 +11279,7 @@ __metadata:
     "@langfuse/langchain": "npm:^4.4.2"
     "@langfuse/otel": "npm:^4.4.2"
     "@opentelemetry/sdk-node": "npm:^0.208.0"
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.6.0"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.6.1"
   languageName: unknown
   linkType: soft
 
@@ -11469,7 +11469,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@sweetoburrito/backstage-plugin-ai-assistant-node@npm:^0.6.0, @sweetoburrito/backstage-plugin-ai-assistant-node@workspace:plugins/ai-assistant-node":
+"@sweetoburrito/backstage-plugin-ai-assistant-node@npm:^0.6.0, @sweetoburrito/backstage-plugin-ai-assistant-node@npm:^0.6.1, @sweetoburrito/backstage-plugin-ai-assistant-node@workspace:plugins/ai-assistant-node":
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-node@workspace:plugins/ai-assistant-node"
   dependencies:
