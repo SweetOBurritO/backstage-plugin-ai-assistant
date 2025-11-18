@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Conversation } from '../Conversation';
 import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
@@ -7,10 +7,13 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
+import Chip from '@mui/material/Chip';
 import AddIcon from '@mui/icons-material/Add';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
-import { useChatModalSettings } from './store';
+import { useChatSettings } from '../../hooks/use-chat-settings';
 import { useLocation } from 'react-router-dom';
+import { usePageSummary } from '../../hooks/use-page-summary';
+import { Message } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 
 export interface AiAssistantChatModalProps {
   open?: boolean;
@@ -28,19 +31,58 @@ export const AiAssistantChatModal = ({
   const [modalOpen, setModalOpen] = useState(false);
   const [modalConversationId, setModalConversationId] = useState<string>();
 
-  const { visible, setVisible } = useChatModalSettings();
+  const { modalVisible, setModalVisible, setSummaryEnabled, summaryEnabled } =
+    useChatSettings();
 
   const location = useLocation();
 
+  const { summary, loading, error } = usePageSummary();
+
   // Update visibility based on route changes
   useEffect(() => {
-    setVisible(true);
-  }, [location, setVisible]);
+    setModalVisible(true);
+  }, [location, setModalVisible, setSummaryEnabled]);
+
+  useEffect(() => {
+    if (!modalOpen) return;
+    setSummaryEnabled(true);
+  }, [modalOpen, setSummaryEnabled]);
+
+  const additionalSystemMessages: Message[] = useMemo(() => {
+    if (!summaryEnabled || !summary) return [];
+
+    const path = location.pathname;
+    const title = document.title;
+    const content = `The user is currently on the page titled "${title}" located at "${path}". The page has the following context: ${summary}. Use this context to inform your responses where relevant.`;
+
+    return [
+      {
+        role: 'system',
+        content,
+        metadata: {},
+        score: 0,
+      },
+    ];
+  }, [summaryEnabled, summary, location.pathname]);
 
   // If the context says the modal is not visible, don't render anything
-  if (!visible) {
+  if (!modalVisible) {
     return <></>;
   }
+
+  const getChipColor = () => {
+    if (loading) return 'primary';
+    if (error) return 'error';
+    if (summary) return 'success';
+    return undefined;
+  };
+
+  const getChipLabel = () => {
+    if (loading) return 'Loading page context...';
+    if (error) return 'Error loading page context';
+    if (summary) return 'Page Context Loaded';
+    return 'No page context available';
+  };
 
   // Use controlled props if provided, otherwise use internal state
   const isOpen = controlledOpen !== undefined ? controlledOpen : modalOpen;
@@ -71,7 +113,6 @@ export const AiAssistantChatModal = ({
 
   return (
     <>
-      (
       <Box
         sx={{
           position: 'absolute',
@@ -98,7 +139,7 @@ export const AiAssistantChatModal = ({
       >
         <AutoAwesomeIcon />
       </Box>
-      )
+
       <Modal open={isOpen} onClose={handleModalClose}>
         <Box
           sx={{
@@ -125,8 +166,20 @@ export const AiAssistantChatModal = ({
               <Typography variant="h6" component="h2">
                 AI Assistant
               </Typography>
+              {summaryEnabled && (
+                <Tooltip
+                  title={summary ?? 'No summary available'}
+                  placement="bottom"
+                >
+                  <Chip
+                    label={getChipLabel()}
+                    color={getChipColor()}
+                    variant="outlined"
+                  />
+                </Tooltip>
+              )}
               <Stack direction="row" spacing={1}>
-                <Tooltip title="New Chat">
+                <Tooltip title="New Chat" placement="bottom">
                   <IconButton onClick={openNewModalChat}>
                     <AddIcon />
                   </IconButton>
@@ -136,12 +189,11 @@ export const AiAssistantChatModal = ({
                 </Button>
               </Stack>
             </Stack>
-            <Box flex={1} sx={{ minHeight: 0 }}>
-              <Conversation
-                conversationId={conversationId}
-                setConversationId={setConversationId}
-              />
-            </Box>
+            <Conversation
+              conversationId={conversationId}
+              setConversationId={setConversationId}
+              additionalSystemMessages={additionalSystemMessages}
+            />
           </Stack>
         </Box>
       </Modal>

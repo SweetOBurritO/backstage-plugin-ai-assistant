@@ -26,7 +26,7 @@ import {
 import { DynamicStructuredTool } from '@langchain/core/tools';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { SystemMessagePromptTemplate } from '@langchain/core/prompts';
-import { createSummarizerService } from './summarizer';
+import { SummarizerService } from './summarizer';
 import { v4 as uuid } from 'uuid';
 import type {
   BackstageCredentials,
@@ -50,6 +50,7 @@ export type ChatServiceOptions = {
   mcp: McpService;
   userInfo: UserInfoService;
   callback: CallbackService;
+  summarizer: SummarizerService;
 };
 
 type PromptOptions = {
@@ -104,6 +105,7 @@ export const createChatService = async ({
   mcp,
   userInfo,
   callback,
+  summarizer,
 }: ChatServiceOptions): Promise<ChatService> => {
   logger.info(`Available models: ${models.map(m => m.id).join(', ')}`);
   logger.info(`Available tools: ${tools.map(t => t.name).join(', ')}`);
@@ -127,11 +129,6 @@ export const createChatService = async ({
     DEFAULT_TOOL_GUIDELINE;
 
   const chatStore = await ChatStore.fromConfig({ database });
-  const summarizer = await createSummarizerService({
-    config,
-    models,
-    callback,
-  });
 
   const systemPromptTemplate = SystemMessagePromptTemplate.fromTemplate(`
     PURPOSE:
@@ -197,7 +194,10 @@ export const createChatService = async ({
       return;
     }
 
-    const summary = await summarizer.summarize(recentMessages, '25 characters');
+    const summary = await summarizer.summarizeConversation({
+      messages: recentMessages,
+      length: '25 characters',
+    });
 
     conversation.title = summary;
 
@@ -246,8 +246,10 @@ export const createChatService = async ({
         .map(tool => new DynamicStructuredTool(tool))
         .concat(mcpTools.map(tool => new DynamicStructuredTool(tool)));
 
+      const messagesWithoutSystem = messages.filter(m => m.role !== 'system');
+
       addMessages(
-        messages,
+        messagesWithoutSystem,
         userEntityRef,
         conversationId,
         recentConversationMessages,

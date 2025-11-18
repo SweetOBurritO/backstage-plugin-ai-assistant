@@ -1,5 +1,8 @@
-export const DEFAULT_SUMMARY_PROMPT =
+export const DEFAULT_CONVERSATION_SUMMARY_PROMPT =
   "Summarize this conversation in a concise manner. The summary should capture the main points. Return the summary only, without any additional text. Do not include any introductions or other part of the conversation that doesn't contribute to the summary or form part of the overall conversation as part of the summary.";
+
+export const DEFAULT_SUMMARY_PROMPT =
+  "Summarize the following content in a concise manner. The summary should capture the main points. Return the summary only, without any additional text. Do not include any introductions or other part of the content that doesn't contribute to the summary.";
 
 export const DEFAULT_IDENTITY_PROMPT = `
 You are a helpful assistant that answers questions based on provided context from various documents. The context may come from sources such as internal wikis, code repositories, technical documentation, or other structured or unstructured data.

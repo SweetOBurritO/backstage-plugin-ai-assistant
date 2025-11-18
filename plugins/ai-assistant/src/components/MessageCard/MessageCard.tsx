@@ -12,6 +12,10 @@ import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import Stack from '@mui/material/Stack';
+import Tooltip from '@mui/material/Tooltip';
+
+import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
+import ConstructionIcon from '@mui/icons-material/Construction';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
@@ -71,13 +75,50 @@ export const MessageCard = ({ message, loading }: MessageCardProps) => {
 
   if (message.role === 'tool') {
     return (
-      <Typography
-        variant="caption"
-        sx={{ fontStyle: 'italic', color: theme.palette.text.secondary }}
+      <Tooltip
+        title={<Markdown>{message.content}</Markdown>}
+        placement="bottom-start"
       >
-        Used tool{message.metadata.name ? ` ${message.metadata.name}` : ''} to
-        enhance response...
-      </Typography>
+        <Stack
+          direction="row"
+          spacing={1}
+          alignItems="end"
+          justifyItems="start"
+        >
+          <ConstructionIcon />
+          <Typography
+            variant="caption"
+            sx={{ fontStyle: 'italic', color: theme.palette.text.secondary }}
+          >
+            Used tool{message.metadata.name ? ` ${message.metadata.name}` : ''}{' '}
+            to enhance response...
+          </Typography>
+        </Stack>
+      </Tooltip>
+    );
+  }
+
+  if (message.role === 'system') {
+    return (
+      <Tooltip
+        title={<Markdown>{message.content}</Markdown>}
+        placement="bottom-start"
+      >
+        <Stack
+          direction="row"
+          spacing={1}
+          alignItems="end"
+          justifyItems="start"
+        >
+          <SettingsSuggestIcon />
+          <Typography
+            variant="caption"
+            sx={{ fontStyle: 'italic', color: theme.palette.text.secondary }}
+          >
+            Additional Context Provided
+          </Typography>
+        </Stack>
+      </Tooltip>
     );
   }
 
