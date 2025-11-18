@@ -1,6 +1,6 @@
 {
   "name": "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "license": "Apache-2.0",
   "description": "The model-provider-azure-ai backend module for the ai-assistant plugin.",
   "main": "src/index.ts",
@@ -31,7 +31,7 @@
     "@backstage/backend-plugin-api": "backstage:^",
     "@langchain/core": "^0.3.72",
     "@langchain/openai": "^0.6.13",
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "^0.5.0"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "^0.6.0"
   },
   "devDependencies": {
     "@backstage/backend-test-utils": "backstage:^",

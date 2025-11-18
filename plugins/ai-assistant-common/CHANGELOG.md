@@ -1,5 +1,15 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-common
 
+## 0.6.0
+
+### Minor Changes
+
+- dc46df1: add path filtering tom github and azure ingestors to allow ignoring specific files from ingestion
+- f26adee: Added mcp server types
+- f26adee: - add mcp server configuration frontend
+  - add mcp server configuration validation and error handling on frontend and backend
+- 95b7cec: Add message scoring system (with optional langfuse integration)
+
 ## 0.5.0
 
 ### Minor Changes
