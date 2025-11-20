@@ -10,6 +10,8 @@ import {
   Conversation,
   Message,
   JsonObject,
+  Tool,
+  UserTool,
 } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { SignalsService } from '@backstage/plugin-signals-node';
 import {
@@ -19,7 +21,6 @@ import {
   DEFAULT_TOOL_GUIDELINE,
 } from '../constants/prompts';
 import {
-  Tool,
   Model,
   getUser,
 } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
@@ -90,6 +91,9 @@ export type ChatService = {
     recentConversationMessages?: Message[],
   ) => Promise<void>;
   scoreMessage: (messageId: string, score: number) => Promise<void>;
+  getAvailableTools: (options: {
+    credentials: BackstageCredentials;
+  }) => Promise<UserTool[]>;
 };
 
 export const createChatService = async ({
@@ -439,6 +443,19 @@ export const createChatService = async ({
     });
   };
 
+  const getAvailableTools: ChatService['getAvailableTools'] = async ({
+    credentials,
+  }) => {
+    const mcpTools = await mcp.getTools(credentials);
+
+    const availableTools: UserTool[] = tools.concat(mcpTools).map(tool => ({
+      name: tool.name,
+      provider: tool.provider ?? 'unknown',
+    }));
+
+    return availableTools;
+  };
+
   return {
     prompt,
     getAvailableModels,
@@ -446,5 +463,6 @@ export const createChatService = async ({
     getConversations,
     addMessages,
     scoreMessage,
+    getAvailableTools,
   };
 };

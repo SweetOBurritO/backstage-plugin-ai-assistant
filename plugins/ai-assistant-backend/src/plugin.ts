@@ -10,11 +10,11 @@ import {
   Ingestor,
   Model,
   modelProviderExtensionPoint,
-  Tool,
   toolExtensionPoint,
   callbackProviderExtensionPoint,
   CallbackProvider,
 } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
+import { Tool } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { createDataIngestionPipeline } from './services/ingestor';
 import { createChatService } from './services/chat';
 import { applyDatabaseMigrations } from './database/migrations';

@@ -8,16 +8,14 @@ import { MultiServerMCPClient } from '@langchain/mcp-adapters';
 import {
   McpServerConfig,
   McpServerConfigOptions,
-} from '@sweetoburrito/backstage-plugin-ai-assistant-common';
-import {
-  createAssistantTool,
   Tool,
-} from '@sweetoburrito/backstage-plugin-ai-assistant-node';
-import { McpStore } from '../database/mcp-store';
+} from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import {
   encrypt,
   decrypt,
 } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
+import { McpStore } from '../../database/mcp-store';
+import { getToolsForServer } from './helpers';
 
 type CreateMcpServiceOptions = {
   config: RootConfigService;
@@ -54,24 +52,17 @@ export const createMcpService = async ({
   );
   const encryptionKey = config.getString('aiAssistant.mcp.encryptionKey');
 
-  const preConfiguredMcpServers = serversConfig
-    ? serversConfig.reduce((acc, server) => {
-        const serverName = server.getString('name');
-        const options = server.get<McpServerConfigOptions>('options');
+  const preConfiguredMcpServers: Record<string, McpServerConfigOptions> =
+    serversConfig
+      ? serversConfig.reduce((acc, server) => {
+          const serverName = server.getString('name');
+          const options = server.get<McpServerConfigOptions>('options');
 
-        acc[serverName] = options;
+          acc[serverName] = options;
 
-        return acc;
-      }, {} as Record<string, McpServerConfigOptions>)
-    : null;
-
-  const preConfiguredMcpClient = preConfiguredMcpServers
-    ? new MultiServerMCPClient({
-        prefixToolNameWithServerName: true,
-        useStandardContentBlocks: true,
-        mcpServers: preConfiguredMcpServers,
-      })
-    : null;
+          return acc;
+        }, {} as Record<string, McpServerConfigOptions>)
+      : {};
 
   const mcpStore = await McpStore.fromConfig({ database });
 
@@ -99,51 +90,40 @@ export const createMcpService = async ({
   const getTools: McpService['getTools'] = async credentials => {
     const userMcpConfig = await getUserMcpServerConfig(credentials);
 
-    const userMcpServers = userMcpConfig.length
-      ? userMcpConfig.reduce((acc, server) => {
-          const { name, options } = server;
+    const userMcpServers: Record<string, McpServerConfigOptions> =
+      userMcpConfig.length
+        ? userMcpConfig.reduce((acc, server) => {
+            const { name, options } = server;
 
-          acc[name] = options;
+            acc[name] = options;
 
-          return acc;
-        }, {} as Record<string, McpServerConfigOptions>)
-      : null;
+            return acc;
+          }, {} as Record<string, McpServerConfigOptions>)
+        : {};
 
-    const userConfigClient = userMcpServers
-      ? new MultiServerMCPClient({
-          prefixToolNameWithServerName: true,
-          useStandardContentBlocks: true,
-          mcpServers: userMcpServers,
-        })
-      : null;
+    const mcpServers: Record<string, McpServerConfigOptions> = {
+      ...preConfiguredMcpServers,
+      ...userMcpServers,
+    };
 
-    const userMcpTools = userConfigClient
-      ? await userConfigClient.getTools()
-      : [];
-    const preConfiguredMcpTools = preConfiguredMcpClient
-      ? await preConfiguredMcpClient.getTools()
-      : [];
+    const serverNames = Object.keys(mcpServers);
 
-    const mcpTools = [...userMcpTools, ...preConfiguredMcpTools];
+    if (serverNames.length === 0) {
+      return [];
+    }
 
-    const tools = mcpTools.map(mcpTool => {
-      const { name, description, schema } = mcpTool;
-      return createAssistantTool({
-        tool: {
-          name,
-          description,
-          schema: schema as Tool['schema'],
-          func: async (params: any) => {
-            const result = await mcpTool.invoke(params);
-            return {
-              content: JSON.stringify(result),
-            };
-          },
-        },
-      });
+    const mcpClient = new MultiServerMCPClient({
+      prefixToolNameWithServerName: true,
+      useStandardContentBlocks: true,
+      mcpServers,
     });
 
-    return tools;
+    const serverToolPromises = serverNames.map(serverName =>
+      getToolsForServer(mcpClient, serverName),
+    );
+    const toolsByServer = await Promise.all(serverToolPromises);
+
+    return toolsByServer.flat();
   };
 
   const validateMcpServerConfig = async (

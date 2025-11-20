@@ -1,8 +1,8 @@
 import {
   createAssistantTool,
-  Tool,
   VectorStore,
 } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
+import { Tool } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import z from 'zod';
 
 type CreateSearchKnowledgeToolOptions = {

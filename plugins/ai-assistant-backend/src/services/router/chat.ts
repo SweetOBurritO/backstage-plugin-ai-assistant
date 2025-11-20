@@ -113,5 +113,13 @@ export async function createChatRouter(
     },
   );
 
+  router.get('/tools', async (req, res) => {
+    const credentials = await httpAuth.credentials(req);
+
+    const tools = await chat.getAvailableTools({ credentials });
+
+    res.json({ tools });
+  });
+
   return router;
 }
