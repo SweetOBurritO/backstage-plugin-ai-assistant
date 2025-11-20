@@ -1,7 +1,5 @@
-import {
-  createAssistantTool,
-  Tool,
-} from '@sweetoburrito/backstage-plugin-ai-assistant-node';
+import { createAssistantTool } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
+import { Tool } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import z from 'zod';
 import { SearchResults, PageResult, Page } from '../types/wikipedia';
 

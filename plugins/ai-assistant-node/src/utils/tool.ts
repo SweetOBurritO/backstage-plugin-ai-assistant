@@ -1,5 +1,5 @@
 import { ZodType } from 'zod';
-import { Tool } from '../types';
+import { Tool } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 
 type CreateAssistantToolOptions<T extends ZodType<any, any, any>> = {
   tool: Tool<T>;

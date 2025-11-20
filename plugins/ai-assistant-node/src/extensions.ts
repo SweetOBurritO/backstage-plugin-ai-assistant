@@ -2,7 +2,8 @@ import { createExtensionPoint } from '@backstage/backend-plugin-api';
 import { Ingestor } from './types/ingestor';
 import { Embeddings } from '@langchain/core/embeddings';
 import { BaseChatModel } from '@langchain/core/language_models/chat_models';
-import { CallbackProvider, Tool } from './types';
+import { CallbackProvider } from './types';
+import { Tool } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { ZodType } from 'zod';
 
 export type DataIngestorExtensionPoint = {

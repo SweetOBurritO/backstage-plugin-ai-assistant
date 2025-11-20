@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@backstage/backend-plugin-api": "^1.4.3",
+    "@sweetoburrito/backstage-plugin-ai-assistant-common": "^0.6.0",
     "@sweetoburrito/backstage-plugin-ai-assistant-node": "^0.6.0",
     "zod": "^4.1.11"
   },
