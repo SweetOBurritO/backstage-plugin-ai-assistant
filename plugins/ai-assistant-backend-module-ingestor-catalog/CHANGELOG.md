@@ -1,5 +1,16 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-catalog
 
+## 0.4.0
+
+### Minor Changes
+
+- c5b3126: Update ingestors and tools to return urls in metadata
+
+### Patch Changes
+
+- Updated dependencies [c5b3126]
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.7.0
+
 ## 0.3.6
 
 ### Patch Changes

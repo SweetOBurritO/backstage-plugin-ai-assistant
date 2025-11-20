@@ -1,5 +1,12 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-azure-open-ai
 
+## 0.3.6
+
+### Patch Changes
+
+- Updated dependencies [c5b3126]
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.7.0
+
 ## 0.3.5
 
 ### Patch Changes

@@ -1,5 +1,17 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend
 
+## 0.11.0
+
+### Minor Changes
+
+- c5b3126: Update tools schema to allow returning metadata along side content
+
+### Patch Changes
+
+- c5b3126: Update default prompts to return sources in responses from AI from tools that contain urls
+- Updated dependencies [c5b3126]
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.7.0
+
 ## 0.10.0
 
 ### Minor Changes
