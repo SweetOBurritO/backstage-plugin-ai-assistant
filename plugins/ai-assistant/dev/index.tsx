@@ -11,7 +11,7 @@ import {
   CatalogIndexPage,
   CatalogEntityPage,
 } from '@backstage/plugin-catalog';
-import { entityPage } from './entityPage';
+import { entityPage } from './EntityPage';
 
 createDevApp()
   .registerPlugin(signalsPlugin)
