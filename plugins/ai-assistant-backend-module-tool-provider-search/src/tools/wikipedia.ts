@@ -39,7 +39,10 @@ export const createSearchWikipediaTool =
             const baseUrl = 'https://en.wikipedia.org/w/api.php';
 
             const searchResults = await fetchSearchResults(baseUrl, query);
-            const summaries: string[] = [];
+            const summaries: {
+              summary: string;
+              url?: string;
+            }[] = [];
 
             for (
               let i = 0;
@@ -51,19 +54,38 @@ export const createSearchWikipediaTool =
 
               if (pageDetails && pageDetails.extract) {
                 const summary = `Page: ${pageTitle}\nSummary: ${pageDetails.extract}`;
-                summaries.push(summary);
+                summaries.push({
+                  summary,
+                  url: `https://en.wikipedia.org/wiki/${encodeURIComponent(
+                    pageTitle,
+                  )}`,
+                });
               }
             }
 
             if (summaries.length === 0) {
-              return 'No good Wikipedia search results were found for the query.';
+              return {
+                content: 'No relevant Wikipedia articles found for the query.',
+              };
             }
 
-            return summaries.join('\n\n').slice(0, maxContentLength);
+            return {
+              content: summaries
+                .map(s => s.summary)
+                .join('\n\n')
+                .slice(0, maxContentLength),
+              metadata: {
+                urls: summaries
+                  .map(s => s.url)
+                  .filter(url => url !== undefined),
+              },
+            };
           } catch (error) {
-            return `Error searching Wikipedia: ${
-              error instanceof Error ? error.message : 'Unknown error'
-            }`;
+            return {
+              content: `Error searching Wikipedia: ${
+                error instanceof Error ? error.message : 'Unknown error'
+              }`,
+            };
           }
         },
       },

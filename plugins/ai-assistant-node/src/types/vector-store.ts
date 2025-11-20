@@ -11,6 +11,7 @@ export type EmbeddingsSource = string;
 export type EmbeddingDocumentMetadata = {
   source: EmbeddingsSource;
   id: string;
+  url: string;
   [key: string]: string;
 };
 

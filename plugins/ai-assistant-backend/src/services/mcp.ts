@@ -135,7 +135,9 @@ export const createMcpService = async ({
           schema: schema as Tool['schema'],
           func: async (params: any) => {
             const result = await mcpTool.invoke(params);
-            return JSON.stringify(result);
+            return {
+              content: JSON.stringify(result),
+            };
           },
         },
       });

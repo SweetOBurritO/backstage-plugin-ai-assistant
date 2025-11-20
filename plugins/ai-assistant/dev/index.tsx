@@ -6,10 +6,17 @@ import {
 } from '../src/plugin';
 import { signalsPlugin } from '@backstage/plugin-signals';
 import Typography from '@mui/material/Typography';
+import {
+  catalogPlugin,
+  CatalogIndexPage,
+  CatalogEntityPage,
+} from '@backstage/plugin-catalog';
+import { entityPage } from './entityPage';
 
 createDevApp()
   .registerPlugin(signalsPlugin)
   .registerPlugin(aiAssistantPlugin)
+  .registerPlugin(catalogPlugin)
   .addPage({
     element: (
       <>
@@ -34,5 +41,15 @@ createDevApp()
     ),
     title: 'AI Assistant',
     path: '/modal',
+  })
+  .addPage({
+    element: <CatalogIndexPage />,
+    title: 'Catalog',
+    path: '/catalog',
+  })
+  .addPage({
+    path: '/catalog/:namespace/:kind/:name',
+    element: <CatalogEntityPage />,
+    children: entityPage,
   })
   .render();

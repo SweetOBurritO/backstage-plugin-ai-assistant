@@ -42,7 +42,11 @@ export const aiAssistantModuleToolProviderBackstage = createBackendModule({
                   input: params as JsonObject,
                 });
 
-                return JSON.stringify(output);
+                const content = JSON.stringify(output);
+
+                return {
+                  content,
+                };
               },
             },
           });

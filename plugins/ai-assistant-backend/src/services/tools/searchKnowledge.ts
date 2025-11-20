@@ -42,10 +42,25 @@ Do NOT use for general knowledge that doesn't require company-specific informati
           filter,
           amount,
         );
+
+        console.log(results);
+
         if (results.length === 0) {
-          return 'No relevant information found.';
+          return {
+            content: 'No relevant information found in the knowledge base.',
+          };
         }
-        return results.map(r => r.content).join('\n---\n');
+
+        const content = results.map(r => r.content).join('\n---\n');
+
+        const urls = results.map(r => r.metadata.url);
+
+        return {
+          content,
+          metadata: {
+            urls,
+          },
+        };
       },
     },
   });

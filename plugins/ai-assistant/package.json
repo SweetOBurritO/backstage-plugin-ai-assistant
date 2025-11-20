@@ -51,7 +51,10 @@
   "devDependencies": {
     "@backstage/cli": "backstage:^",
     "@backstage/core-app-api": "backstage:^",
-    "@backstage/dev-utils": "backstage:^"
+    "@backstage/dev-utils": "backstage:^",
+    "@backstage/plugin-api-docs": "backstage:^",
+    "@backstage/plugin-catalog": "backstage:^",
+    "@backstage/plugin-org": "backstage:^"
   },
   "files": [
     "dist"
