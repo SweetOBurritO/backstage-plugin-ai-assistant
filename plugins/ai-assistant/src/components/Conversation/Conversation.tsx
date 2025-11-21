@@ -14,7 +14,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import Button from '@mui/material/Button';
 import { Message } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { MessageCard } from '../MessageCard';
-import { SettingsModal } from './SettingsModal';
+import { SettingsModal } from '../SettingsModal';
 
 type ConversationOptions = {
   conversationId: string | undefined;

@@ -12,4 +12,4 @@ export type Tool<T extends ZodType<any, any, any> = ZodType<any, any, any>> = {
   }>;
 };
 
-export type UserTool = Pick<Tool, 'name' | 'provider'>;
+export type UserTool = Pick<Tool, 'name' | 'provider' | 'description'>;

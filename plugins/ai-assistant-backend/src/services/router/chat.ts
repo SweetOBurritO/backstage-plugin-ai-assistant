@@ -33,7 +33,7 @@ export async function createChatRouter(
       }),
     ),
     modelId: z.string(),
-    conversationId: z.string().uuid().optional().default(uuid),
+    conversationId: z.uuid().optional().default(uuid),
     stream: z.boolean().optional(),
   });
 
@@ -61,7 +61,7 @@ export async function createChatRouter(
   );
 
   const chatSchema = z.object({
-    id: z.string().uuid(),
+    id: z.uuid(),
   });
 
   router.get('/conversations', async (req, res) => {
@@ -73,6 +73,14 @@ export async function createChatRouter(
     });
 
     res.json({ conversations });
+  });
+
+  router.get('/tools', async (req, res) => {
+    const credentials = await httpAuth.credentials(req);
+
+    const tools = await chat.getAvailableTools({ credentials });
+
+    res.json({ tools });
   });
 
   router.get('/:id', validation(chatSchema, 'params'), async (req, res) => {
@@ -112,14 +120,6 @@ export async function createChatRouter(
       res.status(204).end();
     },
   );
-
-  router.get('/tools', async (req, res) => {
-    const credentials = await httpAuth.credentials(req);
-
-    const tools = await chat.getAvailableTools({ credentials });
-
-    res.json({ tools });
-  });
 
   return router;
 }

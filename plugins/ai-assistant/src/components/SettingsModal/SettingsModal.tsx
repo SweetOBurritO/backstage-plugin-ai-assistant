@@ -12,34 +12,8 @@ import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { McpServersTab } from './McpServersTab';
-
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <Box
-      role="tabpanel"
-      hidden={value !== index}
-      id={`vertical-tabpanel-${index}`}
-      aria-labelledby={`vertical-tab-${index}`}
-      {...other}
-      sx={{
-        width: '100%',
-        height: '100%',
-        overflow: 'auto', // Allow content to scroll independently
-      }}
-    >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
-    </Box>
-  );
-}
+import { TabPanel } from './TabPanel';
+import tabs from './tabs';
 
 interface SettingsModalProps {
   open: boolean;
@@ -62,8 +36,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       onClose={onClose}
       maxWidth="lg"
       fullWidth
-      PaperProps={{
-        sx: { height: '80vh', maxHeight: 800 },
+      slotProps={{
+        paper: {
+          sx: { height: '80vh', maxHeight: 800 },
+        },
       }}
     >
       <DialogTitle>
@@ -109,32 +85,28 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 '& .MuiTab-root': {
                   alignItems: 'flex-start',
                   textAlign: 'left',
-                  minHeight: 48,
-                  pl: 1, // Add additional left padding to individual tabs
+                  pl: 1,
+                  minHeight: theme => theme.spacing(5), // Increase minHeight for better spacing
                 },
               }}
             >
-              <Tab label="MCP Servers" />
+              {tabs.map((tab, index) => (
+                <Tab key={index} label={tab.name} aria-label={tab.title} />
+              ))}
             </Tabs>
           </Box>
 
-          <TabPanel value={selectedTab} index={0}>
-            <McpServersTab />
-          </TabPanel>
-
-          <TabPanel value={selectedTab} index={1}>
-            <Typography variant="h6">Other Settings</Typography>
-            <Typography color="text.secondary" sx={{ mt: 1 }}>
-              Additional configuration options will be available here.
-            </Typography>
-          </TabPanel>
-
-          <TabPanel value={selectedTab} index={2}>
-            <Typography variant="h6">Advanced Settings</Typography>
-            <Typography color="text.secondary" sx={{ mt: 1 }}>
-              Advanced configuration options will be available here.
-            </Typography>
-          </TabPanel>
+          {tabs.map((tab, index) => (
+            <TabPanel
+              key={index}
+              value={selectedTab}
+              index={index}
+              title={tab.title}
+              description={tab.description}
+            >
+              <tab.Tab />
+            </TabPanel>
+          ))}
         </Box>
       </DialogContent>
 

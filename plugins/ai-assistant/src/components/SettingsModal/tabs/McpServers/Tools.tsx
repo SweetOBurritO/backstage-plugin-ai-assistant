@@ -7,7 +7,6 @@ import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import Paper from '@mui/material/Paper';
 import IconButton from '@mui/material/IconButton';
-import Divider from '@mui/material/Divider';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
@@ -18,16 +17,14 @@ import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
 import Tooltip from '@mui/material/Tooltip';
 import { McpServerConfig } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
-import { mcpApiRef } from '../../api/mcp';
+import { mcpApiRef } from '../../../../api/mcp';
 
-interface McpConfigFormData {
+type McpConfigFormData = {
   name: string;
   options: string;
-}
+};
 
-interface McpServersTabProps {}
-
-export const McpServersTab: React.FC<McpServersTabProps> = () => {
+export const Tab = () => {
   const mcpApi = useApi(mcpApiRef);
   const alertApi = useApi(alertApiRef);
 
@@ -204,44 +201,20 @@ export const McpServersTab: React.FC<McpServersTabProps> = () => {
   );
 
   if (loading) {
-    return (
-      <Stack spacing={3}>
-        <Typography variant="h6">
-          Model Context Protocol (MCP) Servers
-        </Typography>
-        <Alert severity="info">Loading MCP server configurations...</Alert>
-      </Stack>
-    );
+    return <Alert severity="info">Loading MCP server configurations...</Alert>;
   }
 
   if (fetchError) {
     return (
-      <Stack spacing={3}>
-        <Typography variant="h6">
-          Model Context Protocol (MCP) Servers
-        </Typography>
-        <Alert severity="error">
-          Failed to load MCP server configurations. Please try refreshing the
-          page.
-        </Alert>
-      </Stack>
+      <Alert severity="error">
+        Failed to load MCP server configurations. Please try refreshing the
+        page.
+      </Alert>
     );
   }
 
   return (
     <Stack spacing={3}>
-      <Stack direction="row" justifyContent="space-between" alignItems="center">
-        <Box>
-          <Typography variant="h6">
-            Model Context Protocol (MCP) Servers
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Configure MCP servers to extend the AI assistant with additional
-            tools and capabilities.
-          </Typography>
-        </Box>
-      </Stack>
-
       {showForm && (
         <Paper variant="outlined" sx={{ p: 3 }} ref={formRef}>
           <Typography variant="subtitle1" gutterBottom>
@@ -329,8 +302,6 @@ export const McpServersTab: React.FC<McpServersTabProps> = () => {
           </Stack>
         </Paper>
       )}
-
-      <Divider />
 
       {/* Existing Configurations */}
       <Stack spacing={2}>
