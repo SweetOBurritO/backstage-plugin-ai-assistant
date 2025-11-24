@@ -28,7 +28,8 @@
     "@backstage/backend-plugin-api": "backstage:^",
     "@backstage/catalog-model": "backstage:^",
     "@backstage/plugin-catalog-node": "backstage:^",
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "^0.7.0"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "^0.7.0",
+    "fetch-retry": "^6.0.0"
   },
   "devDependencies": {
     "@backstage/backend-defaults": "backstage:^",

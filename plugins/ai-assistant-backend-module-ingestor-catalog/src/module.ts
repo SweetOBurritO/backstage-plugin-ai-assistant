@@ -14,6 +14,7 @@ export const aiAssistantModuleIngestorCatalog = createBackendModule({
         dataIngestor: dataIngestorExtensionPoint,
         auth: coreServices.auth,
         discovery: coreServices.discovery,
+        logger: coreServices.logger,
       },
       async init(options) {
         const { dataIngestor } = options;
