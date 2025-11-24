@@ -3,21 +3,30 @@ import {
   Ingestor,
   IngestorOptions,
 } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
-import { AuthService, DiscoveryService } from '@backstage/backend-plugin-api';
+import {
+  AuthService,
+  DiscoveryService,
+  LoggerService,
+} from '@backstage/backend-plugin-api';
 import { Entity } from '@backstage/catalog-model';
 import { mapEntityToEmbeddingDoc } from './helpers/entity-to-embedding-doc';
 import { MODULE_ID } from '../../constants/module';
+import fetchRetry from 'fetch-retry';
+
+const fetch = fetchRetry(global.fetch);
 
 type CatalogIngestorOptions = {
   auth: AuthService;
   discovery: DiscoveryService;
+  logger: LoggerService;
 };
 
-const MAX_RESULTS = 50;
+const MAX_RESULTS = 25;
 
 export const createCatalogIngestor = async ({
   auth,
   discovery,
+  logger,
 }: CatalogIngestorOptions): Promise<Ingestor> => {
   const ingestCatalogBatch = async (
     saveDocumentsBatch: IngestorOptions['saveDocumentsBatch'],
@@ -38,16 +47,33 @@ export const createCatalogIngestor = async ({
 
     params.set('limit', MAX_RESULTS.toString());
 
+    logger.debug(
+      `Fetching catalog entities batch, cursor: ${cursor || 'initial'}`,
+    );
+
     const response = await fetch(
       `${baseUrl}/entities/by-query?${params.toString()}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        retries: 3,
+        retryDelay: attempt => {
+          // Adds exponential backoff with jitter for retries
+
+          logger.debug(`Retrying catalog fetch, attempt: ${attempt}`);
+
+          const exponentialDelay = Math.pow(2, attempt) * 500;
+          const jitter = Math.random() * 500;
+          return exponentialDelay + jitter;
+        },
       },
     );
 
     if (!response.ok) {
+      logger.error(
+        `Failed to fetch catalog entities: ${response.status} ${response.statusText}`,
+      );
       return;
     }
 
@@ -63,6 +89,7 @@ export const createCatalogIngestor = async ({
     await saveDocumentsBatch(documents);
 
     if (!nextCursor) {
+      logger.info('Catalog ingestion completed - no more pages');
       return;
     }
 
