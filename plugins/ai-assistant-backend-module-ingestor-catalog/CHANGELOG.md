@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-catalog
 
+## 0.4.1
+
+### Patch Changes
+
+- 64c6ba1: Added retry mechanism to catalog ingestion
+
 ## 0.4.0
 
 ### Minor Changes
