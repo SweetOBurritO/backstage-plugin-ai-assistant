@@ -44,8 +44,6 @@ Do NOT use for general knowledge that doesn't require company-specific informati
           amount,
         );
 
-        console.log(results);
-
         if (results.length === 0) {
           return {
             content: 'No relevant information found in the knowledge base.',
