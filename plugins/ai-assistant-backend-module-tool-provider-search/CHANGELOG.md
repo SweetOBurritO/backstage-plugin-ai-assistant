@@ -1,5 +1,20 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-tool-provider-search
 
+## 0.4.0
+
+### Minor Changes
+
+- 711a9ce: Add provider IDs to tool providers
+
+### Patch Changes
+
+- 711a9ce: Update tool import source
+- Updated dependencies [711a9ce]
+- Updated dependencies [7db5593]
+- Updated dependencies [711a9ce]
+  - @sweetoburrito/backstage-plugin-ai-assistant-common@0.7.0
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.8.0
+
 ## 0.3.0
 
 ### Minor Changes

@@ -1,5 +1,18 @@
 # @sweetoburrito/backstage-plugin-ai-assistant
 
+## 0.8.0
+
+### Minor Changes
+
+- 711a9ce: Added a new tab in the chat settings modal to allow users to choose what tools the ai assistant will have access to when being prompted
+
+### Patch Changes
+
+- Updated dependencies [711a9ce]
+- Updated dependencies [7db5593]
+- Updated dependencies [711a9ce]
+  - @sweetoburrito/backstage-plugin-ai-assistant-common@0.7.0
+
 ## 0.7.1
 
 ### Patch Changes
