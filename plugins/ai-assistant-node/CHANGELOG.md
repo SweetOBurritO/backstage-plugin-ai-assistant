@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-node
 
+## 0.7.0
+
+### Minor Changes
+
+- c5b3126: Update tools schema to allow returning metadata along side content
+
 ## 0.6.1
 
 ### Patch Changes
