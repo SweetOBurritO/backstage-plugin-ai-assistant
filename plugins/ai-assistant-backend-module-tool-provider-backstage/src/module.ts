@@ -33,6 +33,7 @@ export const aiAssistantModuleToolProviderBackstage = createBackendModule({
               name: action.name,
               description: action.description,
               schema: jsonSchemaToZod(action.schema.input),
+              provider: 'backstage',
               func: async params => {
                 const callCredentials = await auth.getOwnServiceCredentials();
 

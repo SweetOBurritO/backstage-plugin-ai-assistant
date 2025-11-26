@@ -17,6 +17,7 @@ export const createSearchWikipediaTool =
       - Historical facts, biographical information, scientific concepts
       - Definitions and explanations of topics
       `,
+        provider: 'search',
         schema: z.object({
           query: z
             .string()
