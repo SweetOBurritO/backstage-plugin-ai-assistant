@@ -1,4 +1,10 @@
-import { SyntheticEvent, useEffect, useMemo, useState } from 'react';
+import {
+  SyntheticEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useAsync } from 'react-use';
 import {
   fetchApiRef,
@@ -64,9 +70,9 @@ export const Tab = () => {
   const discoveryApi = useApi(discoveryApiRef);
 
   const {
-    loading,
-    error,
-    value: userTools,
+    loading: availableUserToolsLoading,
+    error: availableUserToolsError,
+    value: availableUserTools,
   } = useAsync(async () => {
     const baseUrl = await discoveryApi.getBaseUrl('ai-assistant');
 
@@ -77,21 +83,71 @@ export const Tab = () => {
     };
 
     return tools;
-  }, []);
+  }, [discoveryApi, fetchApi]);
+
+  const {
+    loading: userEnabledToolsLoading,
+    error: userEnabledToolsError,
+    value: userEnabledTools,
+  } = useAsync(async () => {
+    const baseUrl = await discoveryApi.getBaseUrl('ai-assistant');
+
+    const query = new URLSearchParams({
+      type: 'user-tools',
+    });
+
+    const response = await fetchApi.fetch(
+      `${baseUrl}/settings?${query.toString()}`,
+    );
+
+    const {
+      settings: { tools },
+    } = (await response.json()) as {
+      settings: { tools: string[] };
+    };
+
+    return tools;
+  }, [discoveryApi, fetchApi]);
 
   const providers = useMemo(() => {
-    if (loading || error || !userTools) {
+    if (
+      availableUserToolsLoading ||
+      availableUserToolsError ||
+      !availableUserTools
+    ) {
       return [];
     }
-    return userTools
+    return availableUserTools
       .map(tool => tool.provider)
       .filter((v, i, a) => a.indexOf(v) === i);
-  }, [userTools, error, loading]);
+  }, [availableUserTools, availableUserToolsError, availableUserToolsLoading]);
 
-  const [enabledTools, setEnabledTools] = useState<string[]>(() => {
-    const stored = localStorage.getItem('ai-assistant.user-tools');
-    return stored ? JSON.parse(stored) : [];
-  });
+  const [enabledTools, setEnabledTools] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (userEnabledToolsLoading || userEnabledToolsError || !userEnabledTools) {
+      return;
+    }
+
+    setEnabledTools(userEnabledTools);
+  }, [userEnabledTools, userEnabledToolsError, userEnabledToolsLoading]);
+
+  const setEnabledToolsCallback = useCallback(
+    async (tools: string[]) => {
+      setEnabledTools(tools);
+
+      const baseUrl = await discoveryApi.getBaseUrl('ai-assistant');
+
+      await fetchApi.fetch(`${baseUrl}/settings`, {
+        method: 'PATCH',
+        body: JSON.stringify({ type: 'user-tools', settings: { tools } }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    },
+    [discoveryApi, fetchApi],
+  );
 
   useEffect(() => {
     localStorage.setItem(
@@ -102,7 +158,7 @@ export const Tab = () => {
 
   const [expanded, setExpanded] = useState<string | false>('panel1');
 
-  if (loading) {
+  if (availableUserToolsLoading) {
     return <Alert severity="info">Loading Tool configurations...</Alert>;
   }
 
@@ -111,11 +167,10 @@ export const Tab = () => {
       setExpanded(newExpanded ? panel : false);
     };
 
-  if (error) {
+  if (availableUserToolsError) {
     return (
       <Alert severity="error">
         Failed to load Tool configurations. Please try refreshing the page.
-        Alternatively, please validate your MCP server configurations.
       </Alert>
     );
   }
@@ -125,26 +180,31 @@ export const Tab = () => {
   }
 
   const handleProviderClick = (provider: string, checked: boolean) => {
-    const providerTools = userTools!
+    const providerTools = availableUserTools!
       .filter(tool => tool.provider === provider)
       .map(tool => tool.name);
 
-    setEnabledTools(current => {
-      if (checked) {
-        return Array.from(new Set([...current!, ...providerTools]));
-      }
+    if (checked) {
+      setEnabledToolsCallback(
+        Array.from(new Set([...enabledTools!, ...providerTools])),
+      );
+      return;
+    }
 
-      return current!.filter(tool => !providerTools.includes(tool));
-    });
+    setEnabledToolsCallback(
+      enabledTools!.filter(tool => !providerTools.includes(tool)),
+    );
   };
 
   const handleToolClick = (toolName: string, checked: boolean) => {
-    setEnabledTools(current => {
-      if (checked) {
-        return Array.from(new Set([...(current! || []), toolName]));
-      }
-      return current!.filter(tool => tool !== toolName);
-    });
+    if (checked) {
+      setEnabledToolsCallback(
+        Array.from(new Set([...(enabledTools! || []), toolName])),
+      );
+      return;
+    }
+
+    setEnabledToolsCallback(enabledTools!.filter(tool => tool !== toolName));
   };
 
   return (
@@ -166,11 +226,11 @@ export const Tab = () => {
                 onChange={(_e, checked) =>
                   handleProviderClick(provider, checked)
                 }
-                checked={userTools!
+                checked={availableUserTools!
                   .filter(tool => tool.provider === provider)
                   .every(tool => enabledTools?.includes(tool.name))}
               />
-              {userTools!
+              {availableUserTools!
                 .filter(tool => tool.provider === provider)
                 .map(tool => (
                   <Tooltip title={tool.description} key={tool.name} arrow>
