@@ -466,7 +466,7 @@ export const createChatService = async ({
 
     const availableTools: UserTool[] = tools.concat(mcpTools).map(tool => ({
       name: tool.name,
-      provider: tool.provider ?? 'unknown',
+      provider: tool.provider,
       description: tool.description,
     }));
 

@@ -3,7 +3,7 @@ import { JsonObject } from './json';
 
 export type Tool<T extends ZodType<any, any, any> = ZodType<any, any, any>> = {
   name: string;
-  provider?: string;
+  provider: string;
   description: string;
   schema: T;
   func: (params: z.infer<T>) => Promise<{

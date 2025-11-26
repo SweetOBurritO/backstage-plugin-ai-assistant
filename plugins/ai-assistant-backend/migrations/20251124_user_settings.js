@@ -30,7 +30,7 @@ exports.down = async knex => {
   });
 
   const mcpSettings = await knex(newConfigTable)
-    .where('type', 'mcp_config')
+    .where('type', 'mcp_server_config')
     .select('*');
 
   for (const setting of mcpSettings) {
@@ -120,7 +120,7 @@ exports.up = async knex => {
     newConfigTable,
     Object.values(configsByUser).map(userConfig => ({
       userRef: userConfig.userRef,
-      type: 'mcp_config',
+      type: 'mcp_server_config',
       data: userConfig.servers,
       created_at: userConfig.created_at,
       updated_at: userConfig.updated_at,

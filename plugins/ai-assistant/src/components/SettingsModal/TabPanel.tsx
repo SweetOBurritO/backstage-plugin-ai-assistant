@@ -8,13 +8,15 @@ import { ReactNode } from 'react';
 export type TabPanelProps = {
   title: string;
   description: string;
-
   children: ReactNode;
   index: number;
   value: number;
 };
 
-const TabPanelHeader = ({ title, description }: TabPanelProps) => {
+const TabPanelHeader = ({
+  title,
+  description,
+}: Pick<TabPanelProps, 'title' | 'description'>) => {
   return (
     <Stack direction="column" justifyContent="space-between" alignItems="start">
       <Typography variant="h6">{title}</Typography>

@@ -78,7 +78,7 @@ export const Tab = () => {
     const response = await fetchApi.fetch(`${baseUrl}/chat/tools`);
 
     const { tools } = (await response.json()) as {
-      tools: Required<UserTool>[];
+      tools: UserTool[];
     };
 
     return tools;
@@ -97,7 +97,7 @@ export const Tab = () => {
       .filter((v, i, a) => a.indexOf(v) === i);
   }, [availableUserTools, availableUserToolsError, availableUserToolsLoading]);
 
-  const [expanded, setExpanded] = useState<string | false>('panel1');
+  const [expanded, setExpanded] = useState<string | false>(false);
 
   const handleChange =
     (panel: string) => (_event: SyntheticEvent, newExpanded: boolean) => {
@@ -173,13 +173,13 @@ export const Tab = () => {
           expanded={expanded === provider}
           onChange={handleChange(provider)}
         >
-          <AccordionSummary aria-controls="panel1d-content" id="panel1d-header">
+          <AccordionSummary>
             <Typography component="span">{provider}</Typography>
           </AccordionSummary>
           <AccordionDetails>
             <FormGroup>
               <FormControlLabel
-                control={<Checkbox defaultChecked />}
+                control={<Checkbox />}
                 label="All"
                 onChange={(_e, checked) =>
                   handleProviderClick(provider, checked)

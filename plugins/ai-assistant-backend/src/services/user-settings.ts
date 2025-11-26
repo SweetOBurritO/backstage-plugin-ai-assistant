@@ -5,7 +5,7 @@ import {
 } from '@backstage/backend-plugin-api';
 import { UserSettingsStore } from '../database/user-settings-store';
 
-type CreateMcpServiceOptions = {
+type CreateUserSettingsServiceOptions = {
   userInfo: UserInfoService;
   database: DatabaseService;
 };
@@ -29,7 +29,7 @@ export type UserSettingsService = {
 export const createUserSettingsService = async ({
   userInfo,
   database,
-}: CreateMcpServiceOptions): Promise<UserSettingsService> => {
+}: CreateUserSettingsServiceOptions): Promise<UserSettingsService> => {
   const userSettingsStore = await UserSettingsStore.fromConfig({ database });
 
   const getSettingsForType: UserSettingsService['getSettingsForType'] = async (

@@ -52,11 +52,10 @@ export class UserSettingsStore {
     type: string,
     data: Partial<T>,
   ): Promise<void> {
-    const jsonData = JSON.stringify(data);
     await this.userSettingsTable()
-      .insert({ userRef, type, data: jsonData })
+      .insert({ userRef, type, data })
       .onConflict(['userRef', 'type'])
-      .merge({ data: jsonData, updated_at: this.client.fn.now() });
+      .merge({ data, updated_at: this.client.fn.now() });
   }
 
   async deleteUserSettings(userRef: string, type: string): Promise<void> {
