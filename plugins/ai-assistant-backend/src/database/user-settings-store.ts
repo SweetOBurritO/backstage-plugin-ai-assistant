@@ -44,8 +44,7 @@ export class UserSettingsStore {
       return null;
     }
 
-    const data: T = JSON.parse(row.data);
-    return data;
+    return row.data;
   }
 
   async setUserSettings<T extends Record<string, unknown>>(
