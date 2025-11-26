@@ -21,6 +21,7 @@ Use this tool when users ask about:
 - General questions about the company or internal information
 
 Do NOT use for general knowledge that doesn't require company-specific information.`,
+      provider: 'core',
       schema: z.object({
         query: z.string().describe('The query to search for.'),
         filter: z

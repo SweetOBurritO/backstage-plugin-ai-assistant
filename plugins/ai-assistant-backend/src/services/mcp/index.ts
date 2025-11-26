@@ -14,8 +14,8 @@ import {
   encrypt,
   decrypt,
 } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
-import { McpStore } from '../../database/mcp-store';
 import { getToolsForServer } from './helpers';
+import { UserSettingsStore } from '../../database/user-settings-store';
 
 type CreateMcpServiceOptions = {
   config: RootConfigService;
@@ -23,22 +23,20 @@ type CreateMcpServiceOptions = {
   database: DatabaseService;
 };
 
+const MCP_SETTINGS_TYPE = 'mcp_server_config';
+
 export type McpService = {
   getTools: (credentials: BackstageCredentials) => Promise<Tool[]>;
-  createUserMcpServerConfig: (
-    credentials: BackstageCredentials,
-    config: McpServerConfig,
-  ) => Promise<void>;
-  updateUserMcpServerConfig: (
-    credentials: BackstageCredentials,
-    config: McpServerConfig,
-  ) => Promise<void>;
   getUserMcpServerConfigNames: (
     credentials: BackstageCredentials,
   ) => Promise<string[]>;
   deleteUserMcpServerConfig: (
     credentials: BackstageCredentials,
     name: string,
+  ) => Promise<void>;
+  setUserMcpServerConfig: (
+    credentials: BackstageCredentials,
+    config: McpServerConfig,
   ) => Promise<void>;
 };
 
@@ -64,12 +62,24 @@ export const createMcpService = async ({
         }, {} as Record<string, McpServerConfigOptions>)
       : {};
 
-  const mcpStore = await McpStore.fromConfig({ database });
+  // const mcpStore = await McpStore.fromConfig({ database });
+  const userSettingsStore = await UserSettingsStore.fromConfig({ database });
 
   const getUserMcpServerConfigNames: McpService['getUserMcpServerConfigNames'] =
     async credentials => {
       const { userEntityRef } = await userInfo.getUserInfo(credentials);
-      return mcpStore.getUserUserMcpConfigNames(userEntityRef);
+
+      const mcpConfig = await userSettingsStore.getUserSettingsByType(
+        userEntityRef,
+        MCP_SETTINGS_TYPE,
+      );
+      if (!mcpConfig) {
+        return [];
+      }
+
+      const names = Object.keys(mcpConfig);
+
+      return names;
     };
 
   const getUserMcpServerConfig = async (
@@ -77,12 +87,20 @@ export const createMcpService = async ({
   ): Promise<McpServerConfig[]> => {
     const { userEntityRef } = await userInfo.getUserInfo(credentials);
 
-    const encryptedMcpConfig = await mcpStore.getUserMcpConfigs(userEntityRef);
+    const mcpConfigEncrypted = await userSettingsStore.getUserSettingsByType<
+      Record<string, string>
+    >(userEntityRef, MCP_SETTINGS_TYPE);
 
-    const mcpConfig: McpServerConfig[] = encryptedMcpConfig.map(c => ({
-      name: c.name,
-      options: JSON.parse(decrypt(c.encryptedOptions, encryptionKey)),
-    }));
+    if (!mcpConfigEncrypted) {
+      return [];
+    }
+
+    const mcpConfig: McpServerConfig[] = Object.entries(mcpConfigEncrypted).map(
+      ([name, data]) => ({
+        name,
+        options: JSON.parse(decrypt(data, encryptionKey)),
+      }),
+    );
 
     return mcpConfig;
   };
@@ -152,39 +170,72 @@ export const createMcpService = async ({
     }
   };
 
-  const createUserMcpServerConfig: McpService['createUserMcpServerConfig'] =
-    async (credentials, mcpConfig) => {
-      await validateMcpServerConfig([mcpConfig]);
-      const { userEntityRef } = await userInfo.getUserInfo(credentials);
-      const { name, options } = mcpConfig;
+  const setUserMcpServerConfig: McpService['setUserMcpServerConfig'] = async (
+    credentials,
+    mcpConfig,
+  ) => {
+    const { userEntityRef } = await userInfo.getUserInfo(credentials);
+    const { name } = mcpConfig;
 
-      const encryptedOptions = encrypt(JSON.stringify(options), encryptionKey);
+    const existingConfig = await getUserMcpServerConfig(credentials);
 
-      await mcpStore.createUserMcpConfig(userEntityRef, name, encryptedOptions);
-    };
+    const existingServerIndex = existingConfig.findIndex(
+      server => server.name === name,
+    );
 
-  const updateUserMcpServerConfig: McpService['updateUserMcpServerConfig'] =
-    async (credentials, mcpConfig) => {
-      await validateMcpServerConfig([mcpConfig]);
-      const { userEntityRef } = await userInfo.getUserInfo(credentials);
-      const { name, options } = mcpConfig;
+    if (existingServerIndex === -1) {
+      existingConfig.push(mcpConfig);
+    } else {
+      existingConfig[existingServerIndex] = mcpConfig;
+    }
 
-      const encryptedOptions = encrypt(JSON.stringify(options), encryptionKey);
+    await validateMcpServerConfig(existingConfig);
 
-      await mcpStore.updateUserMcpConfig(userEntityRef, name, encryptedOptions);
-    };
+    const updatedConfig: Record<string, string> = existingConfig.reduce(
+      (acc, server) => {
+        acc[server.name] = encrypt(
+          JSON.stringify(server.options),
+          encryptionKey,
+        );
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
+
+    await userSettingsStore.setUserSettings(
+      userEntityRef,
+      MCP_SETTINGS_TYPE,
+      updatedConfig,
+    );
+  };
 
   const deleteUserMcpServerConfig: McpService['deleteUserMcpServerConfig'] =
     async (credentials, name) => {
       const { userEntityRef } = await userInfo.getUserInfo(credentials);
-      await mcpStore.deleteUserMcpConfig(userEntityRef, name);
+
+      const existingConfig = await getUserMcpServerConfig(credentials);
+
+      const updatedConfig: Record<string, string> = existingConfig
+        .filter(server => server.name !== name)
+        .reduce((acc, server) => {
+          acc[server.name] = encrypt(
+            JSON.stringify(server.options),
+            encryptionKey,
+          );
+          return acc;
+        }, {} as Record<string, string>);
+
+      await userSettingsStore.setUserSettings(
+        userEntityRef,
+        MCP_SETTINGS_TYPE,
+        updatedConfig,
+      );
     };
 
   return {
     getTools,
-    createUserMcpServerConfig,
-    updateUserMcpServerConfig,
     getUserMcpServerConfigNames,
     deleteUserMcpServerConfig,
+    setUserMcpServerConfig,
   };
 };

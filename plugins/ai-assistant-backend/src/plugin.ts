@@ -20,11 +20,12 @@ import { createChatService } from './services/chat';
 import { applyDatabaseMigrations } from './database/migrations';
 import { PgVectorStore } from './database';
 import { signalsServiceRef } from '@backstage/plugin-signals-node';
-import { createSearchKnowledgeTool } from './services/tools/searchKnowledge';
+import { createSearchKnowledgeTool } from './tools/searchKnowledge';
 import { catalogServiceRef } from '@backstage/plugin-catalog-node';
 import { createMcpService } from './services/mcp';
 import { createCallbackService } from './services/callbacks';
 import { createSummarizerService } from './services/summarizer';
+import { createUserSettingsService } from './services/user-settings';
 /**
  * aiAssistantPlugin backend plugin
  *
@@ -145,8 +146,16 @@ export const aiAssistantPlugin = createBackendPlugin({
           summarizer,
         });
 
+        const userSettings = await createUserSettingsService(options);
+
         httpRouter.use(
-          await createRouter({ ...options, chat, mcp, summarizer }),
+          await createRouter({
+            ...options,
+            chat,
+            mcp,
+            summarizer,
+            userSettings,
+          }),
         );
         dataIngestionPipeline.start();
       },
