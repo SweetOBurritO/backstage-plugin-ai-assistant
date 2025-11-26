@@ -31,7 +31,7 @@ export function createPathFilter(options: PathFilterOptions) {
     return exclusionPatterns.some(pattern =>
       minimatch(normalizedPath, pattern, {
         nocase: caseInsensitive,
-        matchBase: true,
+        dot: true,
       }),
     );
   };

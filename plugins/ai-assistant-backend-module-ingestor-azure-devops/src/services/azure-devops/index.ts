@@ -80,6 +80,12 @@ export const createAzureDevOpsService = async ({
       VersionControlRecursionType.Full,
     );
 
+    // Handle case where repository is empty or returns null
+    if (!items || items.length === 0) {
+      logger.info(`No items found in Azure DevOps repository ${repoId}`);
+      return [];
+    }
+
     logger.info(
       `Found ${items.length} items in Azure DevOps repository ${repoId}`,
     );
