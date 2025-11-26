@@ -1,5 +1,15 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-github
 
+## 0.3.2
+
+### Patch Changes
+
+- Updated dependencies [711a9ce]
+- Updated dependencies [7db5593]
+- Updated dependencies [711a9ce]
+  - @sweetoburrito/backstage-plugin-ai-assistant-common@0.7.0
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.8.0
+
 ## 0.3.1
 
 ### Patch Changes

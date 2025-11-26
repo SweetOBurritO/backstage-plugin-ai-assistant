@@ -1,5 +1,12 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai
 
+## 0.4.5
+
+### Patch Changes
+
+- Updated dependencies [711a9ce]
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.8.0
+
 ## 0.4.4
 
 ### Patch Changes

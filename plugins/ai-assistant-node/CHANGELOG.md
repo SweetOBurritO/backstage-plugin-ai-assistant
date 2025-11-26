@@ -1,5 +1,18 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-node
 
+## 0.8.0
+
+### Minor Changes
+
+- 711a9ce: Moved Tool type definition from @sweetoburrito/backstage-plugin-ai-assistant-node to @sweetoburrito/backstage-plugin-ai-assistant-common
+
+### Patch Changes
+
+- Updated dependencies [711a9ce]
+- Updated dependencies [7db5593]
+- Updated dependencies [711a9ce]
+  - @sweetoburrito/backstage-plugin-ai-assistant-common@0.7.0
+
 ## 0.7.0
 
 ### Minor Changes

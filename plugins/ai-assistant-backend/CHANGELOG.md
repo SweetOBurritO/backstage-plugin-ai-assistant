@@ -1,5 +1,20 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend
 
+## 0.12.0
+
+### Minor Changes
+
+- 711a9ce: Added new mechanism to generically store user settings for the AI assistant
+- 711a9ce: Added new endpoint to fetch tools available to the user
+
+### Patch Changes
+
+- Updated dependencies [711a9ce]
+- Updated dependencies [7db5593]
+- Updated dependencies [711a9ce]
+  - @sweetoburrito/backstage-plugin-ai-assistant-common@0.7.0
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.8.0
+
 ## 0.11.0
 
 ### Minor Changes

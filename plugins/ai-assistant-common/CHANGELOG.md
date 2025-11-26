@@ -1,5 +1,16 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-common
 
+## 0.7.0
+
+### Minor Changes
+
+- 711a9ce: Moved Tool type definition from @sweetoburrito/backstage-plugin-ai-assistant-node to @sweetoburrito/backstage-plugin-ai-assistant-common
+- 711a9ce: Added new UserTool type
+
+### Patch Changes
+
+- 7db5593: fix filtering logic for paths
+
 ## 0.6.0
 
 ### Minor Changes

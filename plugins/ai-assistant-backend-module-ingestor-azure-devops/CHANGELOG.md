@@ -1,5 +1,17 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-azure-devops
 
+## 0.5.2
+
+### Patch Changes
+
+- 7db5593: The change fixed a null pointer error in the Azure DevOps ingestor that was crashing during repository ingestion.
+- 7db5593: Update default exclusions to support matching paths that dont start with the exclusion
+- Updated dependencies [711a9ce]
+- Updated dependencies [7db5593]
+- Updated dependencies [711a9ce]
+  - @sweetoburrito/backstage-plugin-ai-assistant-common@0.7.0
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.8.0
+
 ## 0.5.1
 
 ### Patch Changes
