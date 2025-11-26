@@ -35,13 +35,21 @@ export async function createChatRouter(
     modelId: z.string(),
     conversationId: z.uuid().optional().default(uuid),
     stream: z.boolean().optional(),
+    tools: z
+      .array(
+        z.object({
+          name: z.string(),
+          provider: z.string(),
+        }),
+      )
+      .optional(),
   });
 
   router.post(
     '/message',
     validation(messageSchema, 'body'),
     async (req, res) => {
-      const { messages, conversationId, modelId, stream } = req.body;
+      const { messages, conversationId, modelId, stream, tools } = req.body;
 
       const userCredentials = await httpAuth.credentials(req);
 
@@ -51,6 +59,7 @@ export async function createChatRouter(
         conversationId,
         stream,
         userCredentials,
+        tools,
       });
 
       res.json({
