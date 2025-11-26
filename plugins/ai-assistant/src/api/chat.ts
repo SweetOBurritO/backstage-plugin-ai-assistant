@@ -2,6 +2,7 @@ import { createApiRef } from '@backstage/core-plugin-api';
 import { DiscoveryApi, FetchApi } from '@backstage/core-plugin-api';
 import {
   Conversation,
+  EnabledTool,
   Message,
 } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 
@@ -10,6 +11,7 @@ type SendMessageOptions = {
   modelId: string;
   messages: Message[];
   stream?: boolean;
+  tools?: EnabledTool[];
 };
 
 export type ChatApi = {
@@ -60,6 +62,7 @@ export const createChatService = ({
     modelId,
     messages,
     stream,
+    tools,
   }) => {
     const assistantBaseUrl = await discoveryApi.getBaseUrl('ai-assistant');
     const response = await fetchApi.fetch(`${assistantBaseUrl}/chat/message`, {
@@ -69,6 +72,7 @@ export const createChatService = ({
         modelId,
         messages,
         stream,
+        tools,
       }),
       headers: {
         'Content-Type': 'application/json',

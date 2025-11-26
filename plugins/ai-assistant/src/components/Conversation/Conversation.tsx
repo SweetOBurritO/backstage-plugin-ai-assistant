@@ -14,7 +14,8 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import Button from '@mui/material/Button';
 import { Message } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { MessageCard } from '../MessageCard';
-import { SettingsModal } from './SettingsModal';
+import { SettingsModal } from '../SettingsModal';
+import { useChatSettings } from '../../hooks';
 
 type ConversationOptions = {
   conversationId: string | undefined;
@@ -52,6 +53,8 @@ export const Conversation = ({
   );
 
   const [messages, setMessages] = useState<Message[]>([]);
+
+  const { toolsEnabled } = useChatSettings();
 
   useEffect(() => {
     if (!history || !history.length) {
@@ -136,6 +139,7 @@ export const Conversation = ({
       messages: additionalSystemMessages
         ? [...additionalSystemMessages, ...newMessages]
         : newMessages,
+      tools: toolsEnabled,
     });
 
     setConversationId(response.conversationId);
@@ -150,6 +154,7 @@ export const Conversation = ({
     modelId,
     errorApi,
     setInput,
+    toolsEnabled,
   ]);
 
   const messageEndRef = useRef<HTMLDivElement>(null);

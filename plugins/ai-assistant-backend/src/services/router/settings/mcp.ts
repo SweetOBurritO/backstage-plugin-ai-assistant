@@ -1,9 +1,9 @@
 import express from 'express';
 import Router from 'express-promise-router';
-import { McpService } from '../mcp';
+import { McpService } from '../../mcp';
 import { HttpAuthService } from '@backstage/backend-plugin-api';
 import z from 'zod';
-import { validation } from './middleware/validation';
+import { validation } from '../middleware/validation';
 
 export type McpRouterOptions = {
   mcp: McpService;
@@ -35,7 +35,7 @@ export async function createMcpRouter(
     const credentials = await httpAuth.credentials(req);
     const { name, options: mcpOptions } = req.body;
     try {
-      await mcp.createUserMcpServerConfig(credentials, {
+      await mcp.setUserMcpServerConfig(credentials, {
         name,
         options: mcpOptions,
       });
@@ -58,7 +58,7 @@ export async function createMcpRouter(
       const { name, options: mcpOptions } = req.body;
 
       try {
-        await mcp.updateUserMcpServerConfig(credentials, {
+        await mcp.setUserMcpServerConfig(credentials, {
           name,
           options: mcpOptions,
         });

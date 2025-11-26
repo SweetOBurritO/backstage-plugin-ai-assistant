@@ -1,7 +1,5 @@
-import {
-  createAssistantTool,
-  Tool,
-} from '@sweetoburrito/backstage-plugin-ai-assistant-node';
+import { createAssistantTool } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
+import { Tool } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import z from 'zod';
 import { SearchResults, PageResult, Page } from '../types/wikipedia';
 
@@ -19,6 +17,7 @@ export const createSearchWikipediaTool =
       - Historical facts, biographical information, scientific concepts
       - Definitions and explanations of topics
       `,
+        provider: 'search',
         schema: z.object({
           query: z
             .string()

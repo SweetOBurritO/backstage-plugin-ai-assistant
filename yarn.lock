@@ -13738,6 +13738,7 @@ __metadata:
     "@backstage/backend-plugin-api": "npm:^1.4.3"
     "@backstage/backend-test-utils": "npm:^1.9.0"
     "@backstage/cli": "npm:^0.34.3"
+    "@sweetoburrito/backstage-plugin-ai-assistant-common": "npm:^0.6.0"
     "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.7.0"
     zod: "npm:^4.1.11"
   languageName: unknown
@@ -13796,6 +13797,7 @@ __metadata:
     "@backstage/cli": "backstage:^"
     "@langchain/mcp-adapters": "npm:^1.0.0"
     minimatch: "npm:^10.0.1"
+    zod: "npm:^4.1.12"
   languageName: unknown
   linkType: soft
 
@@ -34857,7 +34859,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:^3.25.76 || ^4, zod@npm:^4.1.11":
+"zod@npm:^3.25.76 || ^4, zod@npm:^4.1.11, zod@npm:^4.1.12":
   version: 4.1.12
   resolution: "zod@npm:4.1.12"
   checksum: 10c0/b64c1feb19e99d77075261eaf613e0b2be4dfcd3551eff65ad8b4f2a079b61e379854d066f7d447491fcf193f45babd8095551a9d47973d30b46b6d8e2c46774
