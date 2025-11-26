@@ -62,7 +62,6 @@ export const createMcpService = async ({
         }, {} as Record<string, McpServerConfigOptions>)
       : {};
 
-  // const mcpStore = await McpStore.fromConfig({ database });
   const userSettingsStore = await UserSettingsStore.fromConfig({ database });
 
   const getUserMcpServerConfigNames: McpService['getUserMcpServerConfigNames'] =
