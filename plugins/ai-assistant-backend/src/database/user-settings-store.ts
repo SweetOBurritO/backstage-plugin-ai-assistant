@@ -10,7 +10,7 @@ export type UserSettingsStoreOptions = {
 
 export class UserSettingsStore {
   /**
-   * Creates an instance of ChatStore.
+   * Creates an instance of UserSettingsStore.
    * @param client - The Knex client to interact with the PostgreSQL database.
    */
   constructor(private readonly client: Knex) {}
