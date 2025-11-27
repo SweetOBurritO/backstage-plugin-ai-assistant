@@ -17,6 +17,7 @@ jobs:
   snapshot-release:
     name: Publish Snapshot
     runs-on: ubuntu-latest
+    if: github.head_ref != 'changeset-release/main'
     steps:
       - uses: actions/checkout@v4
 
