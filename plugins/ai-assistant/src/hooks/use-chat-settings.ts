@@ -77,10 +77,10 @@ export const useChatSettings = () => {
     const {
       settings: { tools },
     } = (await response.json()) as {
-      settings: { tools: EnabledTool[] };
+      settings: { tools?: EnabledTool[] };
     };
 
-    setToolsEnabledState(tools);
+    setToolsEnabledState(tools ?? []);
   }, [discoveryApi, fetchApi, setToolsEnabledState]);
 
   useEffect(() => {
