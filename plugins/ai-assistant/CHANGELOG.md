@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant
 
+## 0.8.1
+
+### Patch Changes
+
+- 444c2aa: fix an issue where tools are not clickable if no settings have been set for tools yet
+
 ## 0.8.0
 
 ### Minor Changes
