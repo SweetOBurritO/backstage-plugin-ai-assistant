@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend
 
+## 0.12.1
+
+### Patch Changes
+
+- 68948f1: fixed an issue where when ingesting large documents the servie would hangup until complted
+
 ## 0.12.0
 
 ### Minor Changes
