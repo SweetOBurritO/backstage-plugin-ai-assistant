@@ -21,6 +21,10 @@ const DEFAULT_DATA_INGESTION_SCHEDULE: SchedulerServiceTaskScheduleDefinition =
     },
   };
 
+const DEFAULT_MAX_CHUNK_PROCESSING_SIZE = 100;
+const DEFAULT_CHUNK_SIZE = 1000;
+const DEFAULT_CHUNK_OVERLAP = 100;
+
 export const createDataIngestionPipeline = ({
   config,
   logger,
@@ -33,6 +37,19 @@ export const createDataIngestionPipeline = ({
         config.getConfig('aiAssistant.ingestion.schedule'),
       )
     : DEFAULT_DATA_INGESTION_SCHEDULE;
+
+  const chunkSize =
+    config.getOptionalNumber('aiAssistant.ingestion.chunking.chunkSize') ??
+    DEFAULT_CHUNK_SIZE;
+
+  const chunkOverlap =
+    config.getOptionalNumber('aiAssistant.ingestion.chunking.chunkOverlap') ??
+    DEFAULT_CHUNK_OVERLAP;
+
+  const maxChunkProcessingSize =
+    config.getOptionalNumber(
+      'aiAssistant.ingestion.chunking.maxChunkProcessingSize',
+    ) ?? DEFAULT_MAX_CHUNK_PROCESSING_SIZE;
 
   const taskRunner = scheduler.createScheduledTaskRunner(schedule);
 
@@ -57,11 +74,11 @@ export const createDataIngestionPipeline = ({
         );
 
         const splitter = new RecursiveCharacterTextSplitter({
-          chunkSize: 500, // TODO: Make chunk size configurable
-          chunkOverlap: 50, // TODO: Make chunk overlap configurable
+          chunkSize,
+          chunkOverlap,
         });
 
-        const docs = await Promise.all(
+        const documentChunks = await Promise.all(
           documents.map(async document => {
             // Delete existing documents with this document id and ingestor source
             logger.debug(
@@ -73,19 +90,33 @@ export const createDataIngestionPipeline = ({
 
             const chunks = await splitter.splitText(document.content);
 
-            const chunkDocs: EmbeddingDocument[] = chunks.flatMap(
+            const docChunks: EmbeddingDocument[] = chunks.flatMap(
               (chunk, i) => ({
                 metadata: { ...document.metadata, chunk: String(i) },
                 content: chunk,
               }),
             );
 
-            return chunkDocs;
+            return docChunks;
           }),
         );
 
         logger.info(`Adding documents to vector store...`);
-        await vectorStore.addDocuments(docs.flat());
+        const allChunks = documentChunks.flat();
+
+        logger.info(
+          `Total document chunks for batch to add for ${ingestor.id}: ${allChunks.length}`,
+        );
+
+        for (let i = 0; i < allChunks.length; i += maxChunkProcessingSize) {
+          const chunkBatch = allChunks.slice(i, i + maxChunkProcessingSize);
+          logger.info(
+            `Adding batch of ${chunkBatch.length} document chunks to vector store for ${ingestor.id}`,
+          );
+
+          await vectorStore.addDocuments(chunkBatch);
+        }
+
         logger.info(`Added documents to vector store for ${ingestor.id}`);
       };
 

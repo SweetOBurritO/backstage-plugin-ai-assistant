@@ -28,6 +28,22 @@ export interface Config {
     };
     ingestion?: {
       schedule?: SchedulerServiceTaskScheduleDefinitionConfig;
+      chunking?: {
+        /**
+         * The size of text chunks to split documents into during ingestion
+         */
+        chunkSize?: number;
+
+        /**
+         * The amount of overlap between text chunks during ingestion
+         */
+        chunkOverlap?: number;
+
+        /**
+         * The maximum number of chunks to process in a single batch when ingesting documents
+         */
+        maxChunkProcessingSize?: number;
+      };
     };
     mcp: {
       /**
