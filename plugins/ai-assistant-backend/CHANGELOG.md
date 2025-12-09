@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend
 
+## 0.13.0
+
+### Minor Changes
+
+- 1fda684: Fix ingestion process to retrieve raw markdown content from Azure DevOps wiki pages instead of HTML, ensuring correct formatting and data consistency.
+
 ## 0.12.1
 
 ### Patch Changes
