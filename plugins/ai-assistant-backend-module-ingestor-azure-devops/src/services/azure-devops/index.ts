@@ -159,16 +159,17 @@ export const createAzureDevOpsService = async ({
   /**
    * Get the content of a specific page in an Azure DevOps wiki
    * @param wikiName The name of the wiki
-   * @param pageId The ID of the page
-   * @returns The content of the specified wiki page
+   * @param pagePath The path of the page (e.g., "/My-Page" or "/Folder/Sub-Page")
+   * @returns The content of the specified wiki page as plain markdown text
    */
-  const getWikiPageContent = async (wikiName: string, pageId: number) => {
-    const pageStream = await wikiApi.getPageByIdText(
+  const getWikiPageContent = async (wikiName: string, pagePath: string) => {
+    // Use getPageText with the page path to get raw markdown content
+    // The path-based method with Accept: text/plain returns the actual markdown content
+    const pageStream = await wikiApi.getPageText(
       project,
       wikiName,
-      pageId,
+      pagePath,
       VersionControlRecursionType.None,
-      true,
     );
 
     return pageStream;

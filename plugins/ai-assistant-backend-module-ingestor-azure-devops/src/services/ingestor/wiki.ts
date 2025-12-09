@@ -88,7 +88,7 @@ export const createWikiIngestor = async ({
 
         const content = await azureDevOpsService.getWikiPageContent(
           wiki.id!,
-          page.id!,
+          page.path!,
         );
 
         const completionStats = getProgressStats(globalIndex + 1, pages.length);
@@ -97,19 +97,38 @@ export const createWikiIngestor = async ({
           `Retrieved content for Azure DevOps page: "${page.path}" in wiki: "${wiki.name}" [Progress: ${completionStats.completed}/${completionStats.total} (${completionStats.percentage}%) completed of wiki]`,
         );
 
-        const text = await streamToString(content);
+        // The API returns plain markdown text directly
+        const pageContent = await streamToString(content);
+
+        logger.debug(
+          `Raw response for page "${page.path}" (length: ${pageContent.length})`,
+        );
+        // Use remoteUrl which points to the user-facing wiki page, not the API endpoint
+        const pageUrl = page.remoteUrl || page.url!;
+
+        // Check if we have actual content (not empty or just whitespace)
+        if (!pageContent || pageContent.trim().length === 0) {
+          logger.warn(
+            `No content found for Azure DevOps page: "${page.path}" in wiki: "${wiki.name}". Skipping.`,
+          );
+          continue;
+        }
 
         const document: EmbeddingDocument = {
           metadata: {
             source: MODULE_ID,
             id: `${wiki.id}:${page.path}`,
-            url: page.url!,
+            url: pageUrl,
             organization: azureDevOpsService.organization,
             project: azureDevOpsService.project,
             wiki: wiki.name!,
           },
-          content: text,
+          content: pageContent,
         };
+
+        logger.debug(
+          `Created embedding document for Azure DevOps page: "${page.path}" in wiki: "${wiki.name}" content length: "${document.content.length}", page url: "${document.metadata.url}"`,
+        );
 
         documents.push(document);
       }
