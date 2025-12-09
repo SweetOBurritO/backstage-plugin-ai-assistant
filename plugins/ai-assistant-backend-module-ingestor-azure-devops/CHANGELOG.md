@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-azure-devops
 
+## 0.6.0
+
+### Minor Changes
+
+- 1fda684: Fix ingestion process to retrieve raw markdown content from Azure DevOps wiki pages instead of HTML, ensuring correct formatting and data consistency.
+
 ## 0.5.2
 
 ### Patch Changes

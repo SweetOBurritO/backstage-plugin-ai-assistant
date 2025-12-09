@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant
 
+## 0.9.0
+
+### Minor Changes
+
+- 001a89b: change feedback buttons to be hidden until hovered on
+
 ## 0.8.1
 
 ### Patch Changes
