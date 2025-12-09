@@ -1,58 +1,62 @@
-import { CatalogService } from '@backstage/plugin-catalog-node';
 import {
-  LoggerService,
-  RootConfigService,
-  DatabaseService,
-  AuthService,
-} from '@backstage/backend-plugin-api';
+  CatalogService,
+  catalogServiceRef,
+} from '@backstage/plugin-catalog-node';
+import {
+  SignalsService,
+  signalsServiceRef,
+} from '@backstage/plugin-signals-node';
+import { SummarizerService, summarizerServiceRef } from './summarizer';
+import { CallbackService, callbackServiceRef } from './callbacks';
+import { ModelService, modelServiceRef } from './model';
+import { ToolsService, toolsServiceRef } from './tools';
+
 import { ChatStore } from '../database/chat-store';
 import {
   Conversation,
   Message,
   JsonObject,
-  Tool,
-  UserTool,
   EnabledTool,
 } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
-import { SignalsService } from '@backstage/plugin-signals-node';
 import {
   DEFAULT_FORMATTING_PROMPT,
   DEFAULT_IDENTITY_PROMPT,
   DEFAULT_SYSTEM_PROMPT,
   DEFAULT_TOOL_GUIDELINE,
 } from '../constants/prompts';
-import {
-  Model,
-  getUser,
-} from '@sweetoburrito/backstage-plugin-ai-assistant-node';
+import { getUser } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
 import { DynamicStructuredTool } from '@langchain/core/tools';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { SystemMessagePromptTemplate } from '@langchain/core/prompts';
-import { SummarizerService } from './summarizer';
 import { v4 as uuid } from 'uuid';
 import type {
   BackstageCredentials,
   CacheService,
   UserInfoService,
+  RootConfigService,
+  DatabaseService,
+  AuthService,
+  ServiceRef,
+} from '@backstage/backend-plugin-api';
+import {
+  coreServices,
+  createServiceFactory,
+  createServiceRef,
 } from '@backstage/backend-plugin-api';
 import { AIMessage, ToolMessage } from '@langchain/core/messages';
-import { McpService } from './mcp';
-import { CallbackService } from './callbacks';
 
 export type ChatServiceOptions = {
-  models: Model[];
-  tools: Tool[];
-  logger: LoggerService;
+  model: ModelService;
   config: RootConfigService;
   database: DatabaseService;
   signals: SignalsService;
   catalog: CatalogService;
   cache: CacheService;
   auth: AuthService;
-  mcp: McpService;
   userInfo: UserInfoService;
   callback: CallbackService;
   summarizer: SummarizerService;
+  tool: ToolsService;
 };
 
 type PromptOptions = {
@@ -79,7 +83,6 @@ type MessageWithRequiredFields = Required<Omit<Message, 'traceId'>> &
 
 export type ChatService = {
   prompt: (options: PromptOptions) => Promise<MessageWithRequiredFields[]>;
-  getAvailableModels: () => Promise<string[]>;
   getConversation: (
     options: GetConversationOptions,
   ) => Promise<MessageWithRequiredFields[]>;
@@ -93,29 +96,21 @@ export type ChatService = {
     recentConversationMessages?: Message[],
   ) => Promise<void>;
   scoreMessage: (messageId: string, score: number) => Promise<void>;
-  getAvailableTools: (options: {
-    credentials: BackstageCredentials;
-  }) => Promise<UserTool[]>;
 };
 
 export const createChatService = async ({
-  models,
-  tools,
-  logger,
+  model,
   database,
   signals,
   config,
   catalog,
   cache,
   auth,
-  mcp,
   userInfo,
   callback,
   summarizer,
+  tool,
 }: ChatServiceOptions): Promise<ChatService> => {
-  logger.info(`Available models: ${models.map(m => m.id).join(', ')}`);
-  logger.info(`Available tools: ${tools.map(t => t.name).join(', ')}`);
-
   const identityPrompt =
     config.getOptionalString('aiAssistant.prompt.identity') ||
     DEFAULT_IDENTITY_PROMPT;
@@ -228,11 +223,7 @@ export const createChatService = async ({
     userCredentials,
     tools: enabledTools,
   }: PromptOptions) => {
-    const model = models.find(m => m.id === modelId)?.chatModel;
-
-    if (!model) {
-      throw new Error(`Model with id ${modelId} not found`);
-    }
+    const { chatModel, id: resolvedModelId } = model.getModel(modelId);
 
     const { userEntityRef } = await userInfo.getUserInfo(userCredentials);
 
@@ -247,10 +238,10 @@ export const createChatService = async ({
       const credentials = await auth.getOwnServiceCredentials();
       const user = await getUser(cache, userEntityRef, credentials, catalog);
 
-      const mcpTools = await mcp.getTools(userCredentials);
+      const tools = await tool.getUserTools({ credentials: userCredentials });
 
-      const agentTools = [...tools, ...mcpTools]
-        .filter(tool => {
+      const agentTools = tools
+        .filter(t => {
           // If tools parameter is undefined, allow all tools
           if (enabledTools === undefined) return true;
 
@@ -259,12 +250,12 @@ export const createChatService = async ({
           // Otherwise, only allow tools that are in the enabled list
           const enabled = enabledTools.find(
             enabledTool =>
-              enabledTool.name === tool.name &&
-              enabledTool.provider === tool.provider,
+              enabledTool.name === t.name &&
+              enabledTool.provider === t.provider,
           );
           return !!enabled;
         })
-        .map(tool => new DynamicStructuredTool(tool));
+        .map(t => new DynamicStructuredTool(t));
 
       const messagesWithoutSystem = messages.filter(m => m.role !== 'system');
 
@@ -279,14 +270,14 @@ export const createChatService = async ({
         basePrompt: combinedBasePrompt,
         toolGuideline,
         toolList: agentTools
-          .map(tool => `- ${tool.name}: ${tool.description}`)
+          .map(t => `- ${t.name}: ${t.description}`)
           .join('\n'),
         context: `none`,
         user,
       });
 
       const agent = createReactAgent({
-        llm: model,
+        llm: chatModel,
         tools: agentTools,
         prompt: systemPrompt[0].text,
       });
@@ -294,13 +285,13 @@ export const createChatService = async ({
       const { callbacks } = await callback.getChainCallbacks({
         conversationId,
         userId: userEntityRef,
-        modelId,
+        modelId: resolvedModelId,
       });
 
       const { metadata: promptMetadata } = await callback.getChainMetadata({
         conversationId,
         userId: userEntityRef,
-        modelId,
+        modelId: resolvedModelId,
       });
 
       const traceId = uuid();
@@ -411,10 +402,6 @@ export const createChatService = async ({
     return stream ? [] : result;
   };
 
-  const getAvailableModels: ChatService['getAvailableModels'] = async () => {
-    return models.map(x => x.id);
-  };
-
   const getConversation: ChatService['getConversation'] = async (
     options: GetConversationOptions,
   ) => {
@@ -459,27 +446,36 @@ export const createChatService = async ({
     });
   };
 
-  const getAvailableTools: ChatService['getAvailableTools'] = async ({
-    credentials,
-  }) => {
-    const mcpTools = await mcp.getTools(credentials);
-
-    const availableTools: UserTool[] = tools.concat(mcpTools).map(tool => ({
-      name: tool.name,
-      provider: tool.provider,
-      description: tool.description,
-    }));
-
-    return availableTools;
-  };
-
   return {
     prompt,
-    getAvailableModels,
     getConversation,
     getConversations,
     addMessages,
     scoreMessage,
-    getAvailableTools,
   };
 };
+
+export const chatServiceRef: ServiceRef<ChatService, 'plugin', 'singleton'> =
+  createServiceRef<ChatService>({
+    id: 'ai-assistant.chat-service',
+    defaultFactory: async service =>
+      createServiceFactory({
+        service,
+        deps: {
+          config: coreServices.rootConfig,
+          database: coreServices.database,
+          cache: coreServices.cache,
+          auth: coreServices.auth,
+          userInfo: coreServices.userInfo,
+          callback: callbackServiceRef,
+          summarizer: summarizerServiceRef,
+          tool: toolsServiceRef,
+          model: modelServiceRef,
+          signals: signalsServiceRef,
+          catalog: catalogServiceRef,
+        },
+        factory: async options => {
+          return createChatService(options);
+        },
+      }),
+  });

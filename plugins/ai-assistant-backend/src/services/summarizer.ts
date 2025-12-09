@@ -1,12 +1,17 @@
-import { RootConfigService } from '@backstage/backend-plugin-api';
-import { Model } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
+import { coreServices, RootConfigService } from '@backstage/backend-plugin-api';
+import { ModelService, modelServiceRef } from './model';
 import {
   DEFAULT_CONVERSATION_SUMMARY_PROMPT,
   DEFAULT_SUMMARY_PROMPT,
 } from '../constants/prompts';
 import { PromptTemplate } from '@langchain/core/prompts';
 import { Message } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
-import { CallbackService } from './callbacks';
+import { CallbackService, callbackServiceRef } from './callbacks';
+import {
+  createServiceFactory,
+  createServiceRef,
+  ServiceRef,
+} from '@backstage/backend-plugin-api';
 
 export type SummarizerService = {
   summarizeConversation: (options: {
@@ -21,32 +26,24 @@ export type SummarizerService = {
   }) => Promise<string>;
 };
 
-type SummarizerServiceOptions = {
+export type SummarizerServiceOptions = {
   config: RootConfigService;
-  models: Model[];
+  model: ModelService;
   callback: CallbackService;
 };
 
-export const createSummarizerService = async ({
+const createSummarizerService = async ({
   config,
-  models,
+  model,
   callback,
 }: SummarizerServiceOptions): Promise<SummarizerService> => {
-  const summaryModelId =
-    config.getOptionalString('aiAssistant.conversation.summaryModel') ??
-    models[0].id;
+  const summaryModelId = config.getOptionalString(
+    'aiAssistant.conversation.summaryModel',
+  );
 
   const conversationSummaryPrompt =
     config.getOptionalString('aiAssistant.conversation.summaryPrompt') ??
     DEFAULT_CONVERSATION_SUMMARY_PROMPT;
-
-  const model = models.find(m => m.id === summaryModelId);
-
-  if (!model) {
-    throw new Error(`Summary model with id ${summaryModelId} not found`);
-  }
-
-  const llm = model.chatModel;
 
   const summaryPromptTemplate = PromptTemplate.fromTemplate(`
     PURPOSE:
@@ -58,11 +55,13 @@ export const createSummarizerService = async ({
     {content}
   `);
 
-  const summarize: SummarizerService['summarize'] = async (
+  const summarize: SummarizerService['summarize'] = async ({
     content,
-    summaryPrompt = DEFAULT_SUMMARY_PROMPT,
     length = 'as few words as possible',
-  ) => {
+    prompt: summaryPrompt = DEFAULT_SUMMARY_PROMPT,
+  }) => {
+    const { id, chatModel: llm } = model.getModel(summaryModelId ?? 'default');
+
     const prompt = await summaryPromptTemplate.format({
       summaryPrompt,
       content,
@@ -72,13 +71,13 @@ export const createSummarizerService = async ({
     const { callbacks } = await callback.getChainCallbacks({
       conversationId: 'summarizer',
       userId: 'system',
-      modelId: summaryModelId,
+      modelId: id,
     });
 
     const { metadata } = await callback.getChainMetadata({
       conversationId: 'summarizer',
       userId: 'system',
-      modelId: summaryModelId,
+      modelId: id,
     });
 
     const { text } = await llm.invoke(prompt, {
@@ -109,3 +108,23 @@ export const createSummarizerService = async ({
 
   return { summarizeConversation, summarize };
 };
+
+export const summarizerServiceRef: ServiceRef<
+  SummarizerService,
+  'plugin',
+  'singleton'
+> = createServiceRef<SummarizerService>({
+  id: 'ai-assistant.summarizer-service',
+  defaultFactory: async service =>
+    createServiceFactory({
+      service,
+      deps: {
+        config: coreServices.rootConfig,
+        callback: callbackServiceRef,
+        model: modelServiceRef,
+      },
+      factory: async options => {
+        return createSummarizerService(options);
+      },
+    }),
+});

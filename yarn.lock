@@ -6889,6 +6889,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@langchain/mcp-adapters@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "@langchain/mcp-adapters@npm:1.0.3"
+  dependencies:
+    "@modelcontextprotocol/sdk": "npm:^1.18.2"
+    debug: "npm:^4.4.3"
+    extended-eventsource: "npm:^1.7.0"
+    zod: "npm:^3.25.76 || ^4"
+  peerDependencies:
+    "@langchain/core": ^1.0.0
+    "@langchain/langgraph": ^1.0.0
+  dependenciesMeta:
+    extended-eventsource:
+      optional: true
+  peerDependenciesMeta:
+    "@langchain/core":
+      optional: false
+    "@langchain/langgraph":
+      optional: false
+  checksum: 10c0/ea0e4f0529f5fe62e647eb965c0370c66de4e60eb922ecb5116785e5cf3a51876e9aa40b5f736cb88e556aa1451aa4d4efce41c840444bcc80b34af50c8bef2f
+  languageName: node
+  linkType: hard
+
 "@langchain/ollama@npm:^0.2.3":
   version: 0.2.4
   resolution: "@langchain/ollama@npm:0.2.4"
@@ -13810,6 +13833,7 @@ __metadata:
     "@backstage/cli": "backstage:^"
     "@backstage/plugin-catalog-node": "backstage:^"
     "@langchain/core": "npm:^0.3.72"
+    "@langchain/mcp-adapters": "npm:^1.0.3"
     "@sweetoburrito/backstage-plugin-ai-assistant-common": "npm:^0.7.0"
     zod: "npm:^4.1.11"
   languageName: unknown

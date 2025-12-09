@@ -16,16 +16,19 @@ import {
 } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
 import { Tool } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { createDataIngestionPipeline } from './services/ingestor';
-import { createChatService } from './services/chat';
 import { applyDatabaseMigrations } from './database/migrations';
 import { PgVectorStore } from './database';
-import { signalsServiceRef } from '@backstage/plugin-signals-node';
 import { createSearchKnowledgeTool } from './tools/searchKnowledge';
-import { catalogServiceRef } from '@backstage/plugin-catalog-node';
-import { createMcpService } from './services/mcp';
-import { createCallbackService } from './services/callbacks';
-import { createSummarizerService } from './services/summarizer';
-import { createUserSettingsService } from './services/user-settings';
+import {
+  callbackServiceRef,
+  summarizerServiceRef,
+  modelServiceRef,
+  mcpServiceRef,
+  toolsServiceRef,
+  chatServiceRef,
+  userSettingsServiceRef,
+} from './services';
+
 /**
  * aiAssistantPlugin backend plugin
  *
@@ -95,14 +98,27 @@ export const aiAssistantPlugin = createBackendPlugin({
         scheduler: coreServices.scheduler,
         httpAuth: coreServices.httpAuth,
         userInfo: coreServices.userInfo,
-        signals: signalsServiceRef,
-        catalog: catalogServiceRef,
-        cache: coreServices.cache,
-        auth: coreServices.auth,
+        callback: callbackServiceRef,
+        summarizer: summarizerServiceRef,
+        model: modelServiceRef,
+        mcp: mcpServiceRef,
+        tool: toolsServiceRef,
+        chat: chatServiceRef,
+        userSettings: userSettingsServiceRef,
       },
 
       async init(options) {
-        const { httpRouter, database, config } = options;
+        const {
+          httpRouter,
+          database,
+          callback,
+          summarizer,
+          model,
+          mcp,
+          tool,
+          chat,
+          userSettings,
+        } = options;
 
         const client = await database.getClient();
 
@@ -122,31 +138,11 @@ export const aiAssistantPlugin = createBackendPlugin({
           ingestors,
         });
 
-        const mcp = await createMcpService(options);
-
         const searchKnowledgeTool = createSearchKnowledgeTool({ vectorStore });
-        tools.push(searchKnowledgeTool);
 
-        const callback = await createCallbackService({
-          callbacks,
-        });
-
-        const summarizer = await createSummarizerService({
-          config,
-          models,
-          callback,
-        });
-
-        const chat = await createChatService({
-          ...options,
-          models,
-          tools,
-          mcp,
-          callback,
-          summarizer,
-        });
-
-        const userSettings = await createUserSettingsService(options);
+        tool.registerTools([...tools, searchKnowledgeTool]);
+        callback.registerCallbacks(callbacks);
+        model.registerModels(models);
 
         httpRouter.use(
           await createRouter({

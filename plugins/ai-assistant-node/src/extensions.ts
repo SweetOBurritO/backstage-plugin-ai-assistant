@@ -1,7 +1,7 @@
 import { createExtensionPoint } from '@backstage/backend-plugin-api';
 import { Ingestor } from './types/ingestor';
+import { Model } from './types/model';
 import { Embeddings } from '@langchain/core/embeddings';
-import { BaseChatModel } from '@langchain/core/language_models/chat_models';
 import { CallbackProvider } from './types';
 import { Tool } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { ZodType } from 'zod';
@@ -27,11 +27,6 @@ export const embeddingsProviderExtensionPoint =
   createExtensionPoint<EmbeddingsProviderExtensionPoint>({
     id: 'ai-assistant.embeddings-provider',
   });
-
-export type Model = {
-  id: string;
-  chatModel: BaseChatModel;
-};
 
 export type ModelProviderExtensionPoint = {
   register: (model: Model) => void;

@@ -5,22 +5,22 @@ import z from 'zod';
 import { validation } from './middleware/validation';
 import { v4 as uuid } from 'uuid';
 import {
-  DatabaseService,
   HttpAuthService,
   UserInfoService,
 } from '@backstage/backend-plugin-api';
+import { ToolsService } from '../tools';
 
 export type ChatRouterOptions = {
   chat: ChatService;
-  database: DatabaseService;
   httpAuth: HttpAuthService;
   userInfo: UserInfoService;
+  tool: ToolsService;
 };
 
 export async function createChatRouter(
   options: ChatRouterOptions,
 ): Promise<express.Router> {
-  const { chat, httpAuth, userInfo } = options;
+  const { chat, httpAuth, userInfo, tool } = options;
 
   const router = Router();
 
@@ -87,7 +87,7 @@ export async function createChatRouter(
   router.get('/tools', async (req, res) => {
     const credentials = await httpAuth.credentials(req);
 
-    const tools = await chat.getAvailableTools({ credentials });
+    const tools = await tool.getAvailableUserTools({ credentials });
 
     res.json({ tools });
   });
