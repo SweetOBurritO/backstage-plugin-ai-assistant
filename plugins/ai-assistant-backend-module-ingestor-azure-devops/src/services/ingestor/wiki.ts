@@ -97,15 +97,12 @@ export const createWikiIngestor = async ({
           `Retrieved content for Azure DevOps page: "${page.path}" in wiki: "${wiki.name}" [Progress: ${completionStats.completed}/${completionStats.total} (${completionStats.percentage}%) completed of wiki]`,
         );
 
-        const text = await streamToString(content);
-
-        // Log raw response for debugging
-        logger.info(
-          `Raw response for page "${page.path}" (length: ${text.length})`,
-        );
-
         // The API returns plain markdown text directly
-        const pageContent = text;
+        const pageContent = await streamToString(content);
+
+        logger.debug(
+          `Raw response for page "${page.path}" (length: ${pageContent.length})`,
+        );
         // Use remoteUrl which points to the user-facing wiki page, not the API endpoint
         const pageUrl = page.remoteUrl || page.url!;
 
