@@ -3,4 +3,4 @@
 '@sweetoburrito/backstage-plugin-ai-assistant-backend': major
 ---
 
-fix ingestion
+Fix ingestion process to retrieve raw markdown content from Azure DevOps wiki pages instead of HTML, ensuring correct formatting and data consistency.
