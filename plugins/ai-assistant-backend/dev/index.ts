@@ -49,11 +49,11 @@ backend.add(
   ),
 );
 
-backend.add(
-  import(
-    '@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-azure-devops'
-  ),
-);
+// backend.add(
+//   import(
+//     '@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-azure-devops'
+//   ),
+// );
 
 // backend.add(
 //   import(
@@ -67,11 +67,11 @@ backend.add(
   ),
 );
 
-// // Uncomment to enable langfuse tracing for prompts
-// backend.add(
-//   import(
-//     '@sweetoburrito/backstage-plugin-ai-assistant-backend-module-callback-provider-langfuse'
-//   ),
-// );
+// Uncomment to enable langfuse tracing for prompts
+backend.add(
+  import(
+    '@sweetoburrito/backstage-plugin-ai-assistant-backend-module-callback-provider-langfuse'
+  ),
+);
 
 backend.start();
