@@ -24,11 +24,6 @@ backend:
     pluginSources:
       - 'catalog'
 
-  # langfuse:
-  #   secretKey: <<your-langfuse-secretKey>>>
-  #   publicKey: <<your-langfuse-publicKey>>>
-  #   baseUrl: <<your-langfuse-baseUrl>>>
-
 auth:
   providers:
     guest:
@@ -58,101 +53,78 @@ catalog:
       target: ../../catalog.local-dev.yaml
 
 aiAssistant:
+  prompt:
+    identity: You are Platty, the Nintex Developer Portal's AI assistant. Your mission is to help users navigate Nintex's internal tools, infrastructure, and documentation.  Your context may come from sources such as internal wikis, code repositories, technical documentation, or other structured or unstructured data.
+
   mcp:
-    encryptionKey: <your encryption key>
-    # servers:
-    # - name: 'foo'
-    #   options: {}
+    encryptionKey:
+      $file: ../../platform-ndp/etc/ndp-secrets/MCP-INGESTION-ENCRYPTION-KEY
+    servers:
+      - name: 'microsoft_docs'
+        options:
+          'type': 'http'
+          'url': 'https://learn.microsoft.com/api/mcp'
 
   storage:
     pgVector:
       chunkSize: 800
       amount: 10
+
   ingestion:
     schedule:
       frequency:
-        days: 1
+        days: 7
       timeout:
-        hours: 1
+        hours: 6 # increase timeout to 6 hours to allow for larger ingestions (should monitor and adjust as needed)
     chunking:
       chunkSize: 1000
       chunkOverlap: 100
       maxChunkProcessingSize: 100
+
   embeddings:
-    ollama:
-      model: '<your-model>'
-      apiKey: '<your-api-key>'
-      baseUrl: '<your-base-url>'
     azureOpenAi:
-      deploymentName: '<your-deployment-name>'
-      instanceName: '<your-instance-name>'
-      apiKey: '<your-api-key>'
-      endpoint: '<your-azure-openai-endpoint>'
-      openAIApiVersion: <your-deployments-openai-version>
+      deploymentName: 'text-embedding-3-large'
+      instanceName: eastus
+      apiKey:
+        $file: ../../platform-ndp/etc/ndp-secrets/AZURE-AI-API-KEY
+      endpoint: https://eastus.api.cognitive.microsoft.com/openai/deployments/text-embedding-3-large/embeddings?api-version=2023-05-15
+      openAIApiVersion: 2024-12-01-preview
 
   models:
-    ollama:
-      baseUrl: '<your-base-url>'
-      apiKey: '<your-api-key>'
-      models:
-        - '<your-model>'
     azureAi:
-      apiKey: <your-api-key>
+      apiKey:
+        $file: ../../platform-ndp/etc/ndp-secrets/AZURE-AI-API-KEY
       models:
-        - endpoint: <your-azure-ai-foundry-endpoint>
-          modelName: '<your-model>'
-    googleVertexAi:
-      apiKey: '<your-api-key>'
-      models:
-        - '<your-model>'
+        - endpoint: https://eastus.api.cognitive.microsoft.com/openai/v1/
+          modelName: gpt-5-mini
+        - endpoint: https://eastus.api.cognitive.microsoft.com/openai/v1/
+          modelName: DeepSeek-V3.1
+        - endpoint: https://eastus.api.cognitive.microsoft.com/openai/v1/
+          modelName: Phi-4-reasoning
+        - endpoint: https://eastus.api.cognitive.microsoft.com/openai/v1/
+          modelName: grok-4-fast-reasoning
 
   ingestors:
-    # See ./plugins/ai-assistant-backend-module-ingestor-github/config.d.ts for more config options
-    github:
-      owner: <your-github-org-or-username>
-      appId: <your-github-app-id>
-      privateKey: <your-github-private-key>
-      installationId: <your-github-installation-id>
-
-      # optional config to filter what to ingest
-      # filesBatchSize: <number-of-files-to-process-in-batches> # default: 50
-      # baseUrl: <your-github-enterprise-instance-url> # only needed for GitHub Enterprise
-      # fileTypes:
-      #   - '.md'
-      # repositories:
-      #   - name: <repository-name>
-      #     fileTypes:
-      #       - '.json'
-
-    # See ./plugins/ai-assistant-backend-module-ingestor-azure-devops/config.d.ts for more config options
+    #github:
+    #  owner: 'NintexGlobal'
+    #  appId:
+    #    $file: ../../platform-ndp/etc/ndp-secrets/AUTH-GITHUB-APP-ID
+    #  privateKey:
+    #    $file: ../../platform-ndp/etc/ndp-secrets/AUTH-GITHUB-PRIVATE-KEY
+    #  installationId:
+    #    $file: ../../platform-ndp/etc/ndp-secrets/AUTH-GITHUB-INSTALLATION-ID
+    #  fileTypes:
+    #    - '.md'
     azureDevOps:
-      organization: <your-azure-devops-org-name>
-      project: <your-project-name>
-      token: <your-azure-ado-token>
+      organization: 'Nintex'
+      project: 'nintex'
+      token:
+        $file: ../../platform-ndp/etc/ndp-secrets/ADO-INTEGRATION-PAT
       resourceTypes:
-        # specify one or both of the following resource types to ingest
-        - 'repository'
+        #- 'repository'
         - 'wiki'
+      fileTypes:
+        - '.md'
 
-      # optional config to filter what to ingest
-      # fileTypes:
-      #   - '.md'
-      #   - '.json'
-      #   - '.txt'
-      # repositories:
-      #   - name: <repository-name>
-      #     fileTypes:
-      #       - '.json'
-      #       - '.md'
-      #       - '.txt'
-      # filesBatchSize: <number-of-repository-files-to-process-in-batches> # default: 50
-
-      # wikis:
-      #   - name: <wiki-name>
-      # pagesBatchSize: <number-of-wiki-pages-to-process-in-batches> # default: 50
-
-  callbacks:
-    langfuse:
-      baseUrl: <your-langfuse-baseUrl>
-      publicKey: <your-langfuse-publicKey>
-      secretKey: <your-langfuse-secretKey>
+      wikis:
+        - name: 'Nintex.wiki'
