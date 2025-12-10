@@ -9,25 +9,27 @@ import {
   UserInfoService,
 } from '@backstage/backend-plugin-api';
 import { ToolsService } from '../tools';
+import { ConversationService } from '../conversation';
 
 export type ChatRouterOptions = {
   chat: ChatService;
   httpAuth: HttpAuthService;
   userInfo: UserInfoService;
   tool: ToolsService;
+  conversation: ConversationService;
 };
 
 export async function createChatRouter(
   options: ChatRouterOptions,
 ): Promise<express.Router> {
-  const { chat, httpAuth, userInfo, tool } = options;
+  const { chat, httpAuth, userInfo, tool, conversation } = options;
 
   const router = Router();
 
   const messageSchema = z.object({
     messages: z.array(
       z.object({
-        id: z.string().uuid().optional().default(uuid),
+        id: z.uuid().optional().default(uuid),
         role: z.string(),
         content: z.string(),
       }),
@@ -51,14 +53,14 @@ export async function createChatRouter(
     async (req, res) => {
       const { messages, conversationId, modelId, stream, tools } = req.body;
 
-      const userCredentials = await httpAuth.credentials(req);
+      const credentials = await httpAuth.credentials(req);
 
       const responseMessages = await chat.prompt({
         modelId,
         messages,
         conversationId,
         stream,
-        userCredentials,
+        credentials,
         tools,
       });
 
@@ -77,7 +79,7 @@ export async function createChatRouter(
     const credentials = await httpAuth.credentials(req);
     const { userEntityRef } = await userInfo.getUserInfo(credentials);
 
-    const conversations = await chat.getConversations({
+    const conversations = await conversation.getConversations({
       userEntityRef,
     });
 
@@ -98,12 +100,12 @@ export async function createChatRouter(
     const credentials = await httpAuth.credentials(req);
     const { userEntityRef } = await userInfo.getUserInfo(credentials);
 
-    const conversation = await chat.getConversation({
+    const conversationMessages = await conversation.getConversation({
       conversationId: id,
       userEntityRef,
     });
 
-    res.json({ conversation });
+    res.json({ conversation: conversationMessages });
   });
 
   router.post(
@@ -124,7 +126,7 @@ export async function createChatRouter(
       const { messageId } = req.params;
       const { score } = req.body;
 
-      await chat.scoreMessage(messageId, score);
+      await conversation.scoreMessage(messageId, score);
 
       res.status(204).end();
     },

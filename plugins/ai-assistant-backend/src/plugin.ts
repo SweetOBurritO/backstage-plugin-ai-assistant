@@ -27,6 +27,7 @@ import {
   toolsServiceRef,
   chatServiceRef,
   userSettingsServiceRef,
+  conversationServiceRef,
 } from './services';
 
 /**
@@ -105,6 +106,7 @@ export const aiAssistantPlugin = createBackendPlugin({
         tool: toolsServiceRef,
         chat: chatServiceRef,
         userSettings: userSettingsServiceRef,
+        conversation: conversationServiceRef,
       },
 
       async init(options) {
@@ -118,6 +120,7 @@ export const aiAssistantPlugin = createBackendPlugin({
           tool,
           chat,
           userSettings,
+          conversation,
         } = options;
 
         const client = await database.getClient();
@@ -151,6 +154,7 @@ export const aiAssistantPlugin = createBackendPlugin({
             mcp,
             summarizer,
             userSettings,
+            conversation,
           }),
         );
         dataIngestionPipeline.start();

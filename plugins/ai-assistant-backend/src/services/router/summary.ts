@@ -18,17 +18,19 @@ export async function createSummaryRouter(
   const contentSchema = z.object({
     content: z.string(),
     length: z.string().optional(),
+    prompt: z.string().optional(),
   });
 
   router.post(
     '/content',
     validation(contentSchema, 'body'),
     async (req, res) => {
-      const { content, length } = req.body;
+      const { content, length, prompt } = req.body;
 
       const summary = await summarizer.summarize({
         content,
         length,
+        prompt,
       });
       res.json({ summary });
     },

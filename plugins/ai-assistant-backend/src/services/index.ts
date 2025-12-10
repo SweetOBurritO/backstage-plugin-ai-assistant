@@ -7,3 +7,5 @@ export * from './summarizer';
 export * from './user-settings';
 export * from './model';
 export * from './tools';
+export * from './conversation';
+export * from './agent';

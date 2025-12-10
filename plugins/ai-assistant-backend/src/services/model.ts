@@ -27,6 +27,11 @@ const createModelService = async ({
   };
 
   const getModel: ModelService['getModel'] = id => {
+    if (models.length === 0) {
+      logger.error('No models have been registered.');
+      throw new Error('No models have been registered.');
+    }
+
     const provider = models.find(m => m.id === id);
 
     if (!provider) {

@@ -1,17 +1,22 @@
-import { coreServices, RootConfigService } from '@backstage/backend-plugin-api';
-import { ModelService, modelServiceRef } from './model';
+import {
+  coreServices,
+  RootConfigService,
+  AuthService,
+} from '@backstage/backend-plugin-api';
+import { AgentService, agentServiceRef } from './agent';
+
 import {
   DEFAULT_CONVERSATION_SUMMARY_PROMPT,
   DEFAULT_SUMMARY_PROMPT,
 } from '../constants/prompts';
 import { PromptTemplate } from '@langchain/core/prompts';
 import { Message } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
-import { CallbackService, callbackServiceRef } from './callbacks';
 import {
   createServiceFactory,
   createServiceRef,
   ServiceRef,
 } from '@backstage/backend-plugin-api';
+import { v4 as uuid } from 'uuid';
 
 export type SummarizerService = {
   summarizeConversation: (options: {
@@ -28,14 +33,14 @@ export type SummarizerService = {
 
 export type SummarizerServiceOptions = {
   config: RootConfigService;
-  model: ModelService;
-  callback: CallbackService;
+  agent: AgentService;
+  auth: AuthService;
 };
 
 const createSummarizerService = async ({
   config,
-  model,
-  callback,
+  agent,
+  auth,
 }: SummarizerServiceOptions): Promise<SummarizerService> => {
   const summaryModelId = config.getOptionalString(
     'aiAssistant.conversation.summaryModel',
@@ -50,9 +55,6 @@ const createSummarizerService = async ({
     {summaryPrompt}
 
     Summarize the following content in {length}.
-
-    Content:
-    {content}
   `);
 
   const summarize: SummarizerService['summarize'] = async ({
@@ -60,33 +62,37 @@ const createSummarizerService = async ({
     length = 'as few words as possible',
     prompt: summaryPrompt = DEFAULT_SUMMARY_PROMPT,
   }) => {
-    const { id, chatModel: llm } = model.getModel(summaryModelId ?? 'default');
-
     const prompt = await summaryPromptTemplate.format({
       summaryPrompt,
       content,
       length,
     });
 
-    const { callbacks } = await callback.getChainCallbacks({
-      conversationId: 'summarizer',
-      userId: 'system',
-      modelId: id,
+    const credentials = await auth.getOwnServiceCredentials();
+
+    const messages = await agent.prompt({
+      messages: [{ role: 'system', content, score: 0, metadata: {} }],
+      metadata: {
+        conversationId: 'summarizer',
+        userId: 'system:summarizer',
+        runId: uuid(),
+        runName: 'summarizer',
+      },
+      systemPrompt: prompt,
+      modelId: summaryModelId,
+      credentials,
+      tools: [],
     });
 
-    const { metadata } = await callback.getChainMetadata({
-      conversationId: 'summarizer',
-      userId: 'system',
-      modelId: id,
-    });
+    const aiMessages = messages.filter(m => m.role === 'ai');
 
-    const { text } = await llm.invoke(prompt, {
-      callbacks,
-      runName: 'summarizer',
-      metadata,
-    });
+    if (aiMessages.length === 0) {
+      throw new Error('Failed to summarize content');
+    }
 
-    return text.trim();
+    const response = messages.pop()!;
+
+    return response.content.trim();
   };
 
   const summarizeConversation: SummarizerService['summarizeConversation'] =
@@ -120,8 +126,8 @@ export const summarizerServiceRef: ServiceRef<
       service,
       deps: {
         config: coreServices.rootConfig,
-        callback: callbackServiceRef,
-        model: modelServiceRef,
+        agent: agentServiceRef,
+        auth: coreServices.auth,
       },
       factory: async options => {
         return createSummarizerService(options);
