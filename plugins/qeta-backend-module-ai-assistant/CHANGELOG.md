@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-qeta-backend-module-ai-assistant
 
+## 0.2.1
+
+### Patch Changes
+
+- 9d62473: fix dependancy resolution error
+
 ## 0.2.0
 
 ### Minor Changes
