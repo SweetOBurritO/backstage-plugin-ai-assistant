@@ -2,6 +2,7 @@
 '@sweetoburrito/backstage-plugin-ai-assistant-backend': minor
 '@sweetoburrito/backstage-plugin-ai-assistant-node': minor
 ---
+
 Add conversation service and agent service
 
 - Introduced `ConversationService` to manage conversation-related functionalities.
