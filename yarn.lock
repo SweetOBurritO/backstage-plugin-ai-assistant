@@ -14437,17 +14437,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@sweetoburrito/backstage-plugin-ai-assistant-common@npm:^0.7.0":
-  version: 0.7.0
-  resolution: "@sweetoburrito/backstage-plugin-ai-assistant-common@npm:0.7.0"
-  dependencies:
-    "@langchain/mcp-adapters": "npm:^1.0.0"
-    minimatch: "npm:^10.0.1"
-    zod: "npm:^4.1.12"
-  checksum: 10c0/86890d8cab94b74fd39ec8c610eda7b6d14e6f2b623effc387ab3eab27b24f7c9ef16fbb2a2dce757f656891fd4df7f600d78d61283502d22bb5c5792b4a76a8
-  languageName: node
-  linkType: hard
-
 "@sweetoburrito/backstage-plugin-ai-assistant-common@npm:^0.8.0, @sweetoburrito/backstage-plugin-ai-assistant-common@workspace:plugins/ai-assistant-common":
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-common@workspace:plugins/ai-assistant-common"
@@ -14458,20 +14447,6 @@ __metadata:
     zod: "npm:^4.1.12"
   languageName: unknown
   linkType: soft
-
-"@sweetoburrito/backstage-plugin-ai-assistant-node@npm:^0.8.0":
-  version: 0.8.0
-  resolution: "@sweetoburrito/backstage-plugin-ai-assistant-node@npm:0.8.0"
-  dependencies:
-    "@backstage/backend-plugin-api": "backstage:^"
-    "@backstage/catalog-model": "backstage:^"
-    "@backstage/plugin-catalog-node": "backstage:^"
-    "@langchain/core": "npm:^0.3.72"
-    "@sweetoburrito/backstage-plugin-ai-assistant-common": "npm:^0.7.0"
-    zod: "npm:^4.1.11"
-  checksum: 10c0/90b78439da8a1f78e425d33e0bc0f569006b450a92e7c7b32b5b5d58f9b4f8da34aa296c283ada32339cc8b67b49a1b43893631607641e39636cfb130f968cdd
-  languageName: node
-  linkType: hard
 
 "@sweetoburrito/backstage-plugin-ai-assistant-node@npm:^0.9.0, @sweetoburrito/backstage-plugin-ai-assistant-node@workspace:plugins/ai-assistant-node":
   version: 0.0.0-use.local
@@ -14526,7 +14501,7 @@ __metadata:
     "@backstage/backend-test-utils": "backstage:^"
     "@backstage/cli": "backstage:^"
     "@drodil/backstage-plugin-qeta-node": "npm:^3.46.0"
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.8.0"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.9.0"
   languageName: unknown
   linkType: soft
 
