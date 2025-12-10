@@ -1,5 +1,33 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend
 
+## 0.14.0
+
+### Minor Changes
+
+- 6370262: Add conversation service and agent service
+
+  - Introduced `ConversationService` to manage conversation-related functionalities.
+  - Updated `ChatService` to utilize `ConversationService` for message handling and conversation management.
+  - Implemented message parsing and filtering helpers for better message handling.
+  - Introduced new `AgentService` to abstract llm logic to shared service
+  - Refactored `ChatRouter` to accommodate new conversation and agent services.
+  - Added new utility functions for user retrieval and tool filtering.
+  - Updated summarization logic to leverage the new agent-based approach.
+  - Improved error handling in model service to ensure model registration.
+
+- 6370262: Add router integration for integrating directly with agent
+- 593cee0: refactor tools registration and add non disableable core tools system
+- 6370262: refactor AI assistant backend services and integrate new model management
+
+### Patch Changes
+
+- Updated dependencies [593cee0]
+- Updated dependencies [6370262]
+- Updated dependencies [6370262]
+- Updated dependencies [6370262]
+  - @sweetoburrito/backstage-plugin-ai-assistant-common@0.8.0
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.9.0
+
 ## 0.13.0
 
 ### Minor Changes

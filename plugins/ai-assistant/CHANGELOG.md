@@ -1,5 +1,16 @@
 # @sweetoburrito/backstage-plugin-ai-assistant
 
+## 0.10.0
+
+### Minor Changes
+
+- 593cee0: refactor tool fetching to set core tools as default enabled for first time users and ensure core tools are always enabled
+
+### Patch Changes
+
+- Updated dependencies [593cee0]
+  - @sweetoburrito/backstage-plugin-ai-assistant-common@0.8.0
+
 ## 0.9.0
 
 ### Minor Changes
