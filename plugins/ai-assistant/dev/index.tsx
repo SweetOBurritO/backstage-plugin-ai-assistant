@@ -12,11 +12,13 @@ import {
   CatalogEntityPage,
 } from '@backstage/plugin-catalog';
 import { entityPage } from './EntityPage';
+import { QetaPage, qetaPlugin } from '@drodil/backstage-plugin-qeta';
 
 createDevApp()
   .registerPlugin(signalsPlugin)
   .registerPlugin(aiAssistantPlugin)
   .registerPlugin(catalogPlugin)
+  .registerPlugin(qetaPlugin)
   .addPage({
     element: (
       <>
@@ -51,5 +53,10 @@ createDevApp()
     path: '/catalog/:namespace/:kind/:name',
     element: <CatalogEntityPage />,
     children: entityPage,
+  })
+  .addPage({
+    element: <QetaPage />,
+    title: 'Q&A',
+    path: '/qeta',
   })
   .render();

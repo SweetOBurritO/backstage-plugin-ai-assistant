@@ -57,6 +57,7 @@
     "@backstage/plugin-events-backend": "backstage:^",
     "@backstage/plugin-signals-backend": "backstage:^",
     "@backstage/types": "backstage:^",
+    "@drodil/backstage-plugin-qeta-backend": "^3.46.0",
     "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-callback-provider-langfuse": "workspace:^",
     "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-azure-open-ai": "workspace:^",
     "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-ollama": "workspace:^",
@@ -67,6 +68,7 @@
     "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-google-vertex-ai": "workspace:^",
     "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama": "workspace:^",
     "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-tool-provider-backstage": "workspace:^",
+    "@sweetoburrito/backstage-plugin-qeta-backend-module-ai-assistant": "workspace:^",
     "@types/express": "^4.0.0",
     "@types/supertest": "^2.0.12",
     "supertest": "^6.2.4"
