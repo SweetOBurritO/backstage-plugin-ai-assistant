@@ -27,7 +27,7 @@
   "dependencies": {
     "@backstage/backend-plugin-api": "backstage:^",
     "@drodil/backstage-plugin-qeta-node": "^3.46.0",
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "workspace:^"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "^0.8.0"
   },
   "devDependencies": {
     "@backstage/backend-test-utils": "backstage:^",
