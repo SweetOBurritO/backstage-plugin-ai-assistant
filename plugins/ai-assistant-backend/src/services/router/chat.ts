@@ -8,21 +8,19 @@ import {
   HttpAuthService,
   UserInfoService,
 } from '@backstage/backend-plugin-api';
-import { ToolsService } from '../tools';
 import { ConversationService } from '../conversation';
 
 export type ChatRouterOptions = {
   chat: ChatService;
   httpAuth: HttpAuthService;
   userInfo: UserInfoService;
-  tool: ToolsService;
   conversation: ConversationService;
 };
 
 export async function createChatRouter(
   options: ChatRouterOptions,
 ): Promise<express.Router> {
-  const { chat, httpAuth, userInfo, tool, conversation } = options;
+  const { chat, httpAuth, userInfo, conversation } = options;
 
   const router = Router();
 
@@ -84,14 +82,6 @@ export async function createChatRouter(
     });
 
     res.json({ conversations });
-  });
-
-  router.get('/tools', async (req, res) => {
-    const credentials = await httpAuth.credentials(req);
-
-    const tools = await tool.getAvailableUserTools({ credentials });
-
-    res.json({ tools });
   });
 
   router.get('/:id', validation(chatSchema, 'params'), async (req, res) => {

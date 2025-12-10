@@ -1,14 +1,7 @@
 import { SyntheticEvent, useMemo, useState } from 'react';
 import { useAsync } from 'react-use';
-import {
-  fetchApiRef,
-  useApi,
-  discoveryApiRef,
-} from '@backstage/core-plugin-api';
-import {
-  EnabledTool,
-  UserTool,
-} from '@sweetoburrito/backstage-plugin-ai-assistant-common';
+
+import { EnabledTool } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import Alert from '@mui/material/Alert';
 
 import { styled } from '@mui/material/styles';
@@ -64,25 +57,14 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
 }));
 
 export const Tab = () => {
-  const fetchApi = useApi(fetchApiRef);
-  const discoveryApi = useApi(discoveryApiRef);
-  const { toolsEnabled, setToolsEnabled } = useChatSettings();
+  const { toolsEnabled, setToolsEnabled, getAvailableTools } =
+    useChatSettings();
 
   const {
     loading: availableUserToolsLoading,
     error: availableUserToolsError,
     value: availableUserTools,
-  } = useAsync(async () => {
-    const baseUrl = await discoveryApi.getBaseUrl('ai-assistant');
-
-    const response = await fetchApi.fetch(`${baseUrl}/chat/tools`);
-
-    const { tools } = (await response.json()) as {
-      tools: UserTool[];
-    };
-
-    return tools;
-  }, [discoveryApi, fetchApi]);
+  } = useAsync(getAvailableTools, [getAvailableTools]);
 
   const providers = useMemo(() => {
     if (
@@ -108,9 +90,9 @@ export const Tab = () => {
     if (!availableUserTools) {
       return;
     }
-    const providerTools: EnabledTool[] = availableUserTools
-      .filter(tool => tool.provider === provider)
-      .map(tool => ({ name: tool.name, provider: tool.provider }));
+    const providerTools: EnabledTool[] = availableUserTools.filter(
+      tool => tool.provider === provider,
+    );
 
     if (checked) {
       const combined = [...toolsEnabled, ...providerTools];
@@ -131,12 +113,10 @@ export const Tab = () => {
     );
   };
 
-  const handleToolClick = (tool: UserTool, checked: boolean) => {
+  const handleToolClick = (tool: EnabledTool, checked: boolean) => {
     if (checked) {
       const toolMap = new Map(
-        [...toolsEnabled, { name: tool.name, provider: tool.provider }].map(
-          t => [`${t.provider}-${t.name}`, t],
-        ),
+        [...toolsEnabled, tool].map(t => [`${t.provider}-${t.name}`, t]),
       );
       setToolsEnabled(Array.from(toolMap.values()));
       return;
@@ -184,6 +164,7 @@ export const Tab = () => {
                 onChange={(_e, checked) =>
                   handleProviderClick(provider, checked)
                 }
+                disabled={provider === 'core'}
                 checked={availableUserTools!
                   .filter(tool => tool.provider === provider)
                   .every(tool =>
@@ -206,6 +187,7 @@ export const Tab = () => {
                             t.provider === tool.provider,
                         ) || false
                       }
+                      disabled={tool.provider === 'core'}
                       onChange={(_e, checked) => handleToolClick(tool, checked)}
                     />
                   </Tooltip>

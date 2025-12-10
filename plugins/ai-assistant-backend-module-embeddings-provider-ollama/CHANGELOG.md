@@ -1,5 +1,14 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-embeddings-provider-ollama
 
+## 0.3.8
+
+### Patch Changes
+
+- Updated dependencies [6370262]
+- Updated dependencies [6370262]
+- Updated dependencies [6370262]
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.9.0
+
 ## 0.3.7
 
 ### Patch Changes
