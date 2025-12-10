@@ -105,15 +105,13 @@ export const useChatSettings = () => {
     // Persist to backend
     await fetchApi.fetch(`${baseUrl}/settings`, {
       method: 'PATCH',
-      body: JSON.stringify({ type: 'user-tools', settings: { tools: coreTools } }),
+      body: JSON.stringify({
+        type: 'user-tools',
+        settings: { tools: coreTools },
+      }),
       headers: { 'Content-Type': 'application/json' },
     });
-  }, [
-    discoveryApi,
-    fetchApi,
-    setToolsEnabledState,
-    getAvailableTools,
-  ]);
+  }, [discoveryApi, fetchApi, setToolsEnabledState, getAvailableTools]);
 
   useEffect(() => {
     fetchUserEnabledTools();
