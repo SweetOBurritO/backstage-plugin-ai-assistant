@@ -1,12 +1,22 @@
-import { RootConfigService } from '@backstage/backend-plugin-api';
-import { Model } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
+import {
+  coreServices,
+  RootConfigService,
+  AuthService,
+} from '@backstage/backend-plugin-api';
+import { AgentService, agentServiceRef } from './agent';
+
 import {
   DEFAULT_CONVERSATION_SUMMARY_PROMPT,
   DEFAULT_SUMMARY_PROMPT,
 } from '../constants/prompts';
 import { PromptTemplate } from '@langchain/core/prompts';
 import { Message } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
-import { CallbackService } from './callbacks';
+import {
+  createServiceFactory,
+  createServiceRef,
+  ServiceRef,
+} from '@backstage/backend-plugin-api';
+import { v4 as uuid } from 'uuid';
 
 export type SummarizerService = {
   summarizeConversation: (options: {
@@ -21,73 +31,68 @@ export type SummarizerService = {
   }) => Promise<string>;
 };
 
-type SummarizerServiceOptions = {
+export type SummarizerServiceOptions = {
   config: RootConfigService;
-  models: Model[];
-  callback: CallbackService;
+  agent: AgentService;
+  auth: AuthService;
 };
 
-export const createSummarizerService = async ({
+const createSummarizerService = async ({
   config,
-  models,
-  callback,
+  agent,
+  auth,
 }: SummarizerServiceOptions): Promise<SummarizerService> => {
-  const summaryModelId =
-    config.getOptionalString('aiAssistant.conversation.summaryModel') ??
-    models[0].id;
+  const summaryModelId = config.getOptionalString(
+    'aiAssistant.conversation.summaryModel',
+  );
 
   const conversationSummaryPrompt =
     config.getOptionalString('aiAssistant.conversation.summaryPrompt') ??
     DEFAULT_CONVERSATION_SUMMARY_PROMPT;
-
-  const model = models.find(m => m.id === summaryModelId);
-
-  if (!model) {
-    throw new Error(`Summary model with id ${summaryModelId} not found`);
-  }
-
-  const llm = model.chatModel;
 
   const summaryPromptTemplate = PromptTemplate.fromTemplate(`
     PURPOSE:
     {summaryPrompt}
 
     Summarize the following content in {length}.
-
-    Content:
-    {content}
   `);
 
-  const summarize: SummarizerService['summarize'] = async (
+  const summarize: SummarizerService['summarize'] = async ({
     content,
-    summaryPrompt = DEFAULT_SUMMARY_PROMPT,
     length = 'as few words as possible',
-  ) => {
+    prompt: summaryPrompt = DEFAULT_SUMMARY_PROMPT,
+  }) => {
     const prompt = await summaryPromptTemplate.format({
       summaryPrompt,
       content,
       length,
     });
 
-    const { callbacks } = await callback.getChainCallbacks({
-      conversationId: 'summarizer',
-      userId: 'system',
+    const credentials = await auth.getOwnServiceCredentials();
+
+    const messages = await agent.prompt({
+      messages: [{ role: 'system', content, score: 0, metadata: {} }],
+      metadata: {
+        conversationId: 'summarizer',
+        userId: 'system:summarizer',
+        runId: uuid(),
+        runName: 'summarizer',
+      },
+      systemPrompt: prompt,
       modelId: summaryModelId,
+      credentials,
+      tools: [],
     });
 
-    const { metadata } = await callback.getChainMetadata({
-      conversationId: 'summarizer',
-      userId: 'system',
-      modelId: summaryModelId,
-    });
+    const aiMessages = messages.filter(m => m.role === 'ai');
 
-    const { text } = await llm.invoke(prompt, {
-      callbacks,
-      runName: 'summarizer',
-      metadata,
-    });
+    if (aiMessages.length === 0) {
+      throw new Error('Failed to summarize content');
+    }
 
-    return text.trim();
+    const response = messages.pop()!;
+
+    return response.content.trim();
   };
 
   const summarizeConversation: SummarizerService['summarizeConversation'] =
@@ -109,3 +114,23 @@ export const createSummarizerService = async ({
 
   return { summarizeConversation, summarize };
 };
+
+export const summarizerServiceRef: ServiceRef<
+  SummarizerService,
+  'plugin',
+  'singleton'
+> = createServiceRef<SummarizerService>({
+  id: 'ai-assistant.summarizer-service',
+  defaultFactory: async service =>
+    createServiceFactory({
+      service,
+      deps: {
+        config: coreServices.rootConfig,
+        agent: agentServiceRef,
+        auth: coreServices.auth,
+      },
+      factory: async options => {
+        return createSummarizerService(options);
+      },
+    }),
+});

@@ -54,7 +54,8 @@
     "@backstage/dev-utils": "backstage:^",
     "@backstage/plugin-api-docs": "backstage:^",
     "@backstage/plugin-catalog": "backstage:^",
-    "@backstage/plugin-org": "backstage:^"
+    "@backstage/plugin-org": "backstage:^",
+    "@drodil/backstage-plugin-qeta": "^3.46.0"
   },
   "files": [
     "dist"

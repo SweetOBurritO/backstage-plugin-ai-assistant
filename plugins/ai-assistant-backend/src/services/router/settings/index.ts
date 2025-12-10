@@ -1,18 +1,12 @@
 import express from 'express';
 import Router from 'express-promise-router';
-import {
-  LoggerService,
-  RootConfigService,
-} from '@backstage/backend-plugin-api';
-import { MiddlewareFactory } from '@backstage/backend-defaults/rootHttpRouter';
+
 import { createMcpRouter, McpRouterOptions } from './mcp';
 import { UserSettingsService } from '../../user-settings';
 import z from 'zod';
 import { validation } from '../middleware/validation';
 
 export type SettingsRouterOptions = McpRouterOptions & {
-  config: RootConfigService;
-  logger: LoggerService;
   userSettings: UserSettingsService;
 };
 
@@ -56,10 +50,6 @@ export async function createSettingsRouter(
     await userSettings.setSettingsForType(credentials, type, settings);
     res.status(204).send();
   });
-
-  const middleware = MiddlewareFactory.create(options);
-
-  router.use(middleware.error());
 
   return router;
 }

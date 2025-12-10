@@ -1,19 +1,19 @@
 import express from 'express';
 import Router from 'express-promise-router';
-import { ChatService } from '../chat';
+import { ModelService } from '../model';
 
 export type ModelRouterOptions = {
-  chat: ChatService;
+  model: ModelService;
 };
 
 export async function createModelRouter(
   options: ModelRouterOptions,
 ): Promise<express.Router> {
-  const { chat } = options;
+  const { model } = options;
   const router = Router();
 
   router.get('/', async (_req, res) => {
-    const models = await chat.getAvailableModels();
+    const models = await model.getAvailableModels();
     res.json({ models });
   });
 

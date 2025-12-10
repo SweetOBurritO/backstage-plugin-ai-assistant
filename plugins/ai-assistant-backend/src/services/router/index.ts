@@ -9,11 +9,13 @@ import {
 import { MiddlewareFactory } from '@backstage/backend-defaults/rootHttpRouter';
 import { SummaryRouterOptions, createSummaryRouter } from './summary';
 import { createSettingsRouter, SettingsRouterOptions } from './settings';
+import { createAgentRouter, AgentRouterOptions } from './agent';
 
 export type RouterOptions = ChatRouterOptions &
   SummaryRouterOptions &
   ModelRouterOptions &
-  SettingsRouterOptions & {
+  SettingsRouterOptions &
+  AgentRouterOptions & {
     config: RootConfigService;
     logger: LoggerService;
   };
@@ -28,6 +30,7 @@ export async function createRouter(
   router.use('/models', await createModelRouter(options));
   router.use('/summary', await createSummaryRouter(options));
   router.use('/settings', await createSettingsRouter(options));
+  router.use('/agent', await createAgentRouter(options));
 
   const middleware = MiddlewareFactory.create(options);
 

@@ -9,6 +9,12 @@ backend.add(import('@backstage/plugin-catalog-backend'));
 backend.add(import('@backstage/plugin-events-backend'));
 backend.add(import('@backstage/plugin-signals-backend'));
 
+// Q&A Plugin support
+backend.add(import('@drodil/backstage-plugin-qeta-backend'));
+backend.add(
+  import('@sweetoburrito/backstage-plugin-qeta-backend-module-ai-assistant'),
+);
+
 backend.add(import('@sweetoburrito/backstage-plugin-ai-assistant-backend'));
 
 // Uncomment if you wan to use ollama

@@ -1,8 +1,16 @@
 import {
+  createServiceFactory,
+  createServiceRef,
+  coreServices,
+} from '@backstage/backend-plugin-api';
+
+import type {
+  ServiceRef,
   BackstageCredentials,
   DatabaseService,
   UserInfoService,
 } from '@backstage/backend-plugin-api';
+
 import { UserSettingsStore } from '../database/user-settings-store';
 
 type CreateUserSettingsServiceOptions = {
@@ -66,3 +74,22 @@ export const createUserSettingsService = async ({
     deleteSettingsForType,
   };
 };
+
+export const userSettingsServiceRef: ServiceRef<
+  UserSettingsService,
+  'plugin',
+  'singleton'
+> = createServiceRef<UserSettingsService>({
+  id: 'ai-assistant.user-settings-service',
+  defaultFactory: async service =>
+    createServiceFactory({
+      service,
+      deps: {
+        userInfo: coreServices.userInfo,
+        database: coreServices.database,
+      },
+      factory: async options => {
+        return createUserSettingsService(options);
+      },
+    }),
+});
