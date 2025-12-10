@@ -12,7 +12,8 @@
   },
   "backstage": {
     "role": "backend-plugin-module",
-    "pluginId": "qeta"
+    "pluginId": "qeta",
+    "pluginPackage": "@drodil/backstage-plugin-qeta-backend"
   },
   "scripts": {
     "start": "backstage-cli package start",
