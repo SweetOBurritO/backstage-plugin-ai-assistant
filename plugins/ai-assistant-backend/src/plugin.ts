@@ -28,6 +28,7 @@ import {
   chatServiceRef,
   userSettingsServiceRef,
   conversationServiceRef,
+  agentServiceRef,
 } from './services';
 
 /**
@@ -107,21 +108,11 @@ export const aiAssistantPlugin = createBackendPlugin({
         chat: chatServiceRef,
         userSettings: userSettingsServiceRef,
         conversation: conversationServiceRef,
+        agent: agentServiceRef,
       },
 
       async init(options) {
-        const {
-          httpRouter,
-          database,
-          callback,
-          summarizer,
-          model,
-          mcp,
-          tool,
-          chat,
-          userSettings,
-          conversation,
-        } = options;
+        const { httpRouter, database, callback, model, tool } = options;
 
         const client = await database.getClient();
 
@@ -147,16 +138,7 @@ export const aiAssistantPlugin = createBackendPlugin({
         callback.registerCallbacks(callbacks);
         model.registerModels(models);
 
-        httpRouter.use(
-          await createRouter({
-            ...options,
-            chat,
-            mcp,
-            summarizer,
-            userSettings,
-            conversation,
-          }),
-        );
+        httpRouter.use(await createRouter(options));
         dataIngestionPipeline.start();
       },
     });
