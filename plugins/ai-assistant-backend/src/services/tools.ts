@@ -8,17 +8,17 @@ import {
 } from '@backstage/backend-plugin-api';
 import {
   Tool,
-  UserTool,
+  EnabledTool,
 } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { McpService, mcpServiceRef } from './mcp';
 import { DynamicStructuredTool } from '@langchain/core/tools';
 
 export type ToolsService = {
   registerTools: (tools: Tool[]) => void;
-  getTools: () => Tool[];
+  registerCoreTools: (tools: Tool[]) => void;
   getAvailableUserTools: (options: {
     credentials: BackstageCredentials;
-  }) => Promise<UserTool[]>;
+  }) => Promise<EnabledTool[]>;
   getPrincipalTools: (options: {
     credentials: BackstageCredentials;
     filter?: (tool: Tool) => boolean;
@@ -35,25 +35,30 @@ const createToolsService = async ({
   auth,
 }: CreateToolsServiceOptions): Promise<ToolsService> => {
   const tools: Tool[] = [];
+  const coreTools: Tool[] = [];
 
   const registerTools: ToolsService['registerTools'] = async providers => {
     tools.push(...providers);
   };
 
-  const getTools: ToolsService['getTools'] = () => {
-    return tools;
-  };
+  const registerCoreTools: ToolsService['registerCoreTools'] =
+    async providers => {
+      coreTools.push(...providers.map(tool => ({ ...tool, provider: 'core' })));
+    };
 
   const getAvailableUserTools: ToolsService['getAvailableUserTools'] = async ({
     credentials,
   }) => {
     const mcpTools = await mcp.getTools(credentials);
 
-    const availableTools: UserTool[] = tools.concat(mcpTools).map(tool => ({
-      name: tool.name,
-      provider: tool.provider,
-      description: tool.description,
-    }));
+    const availableTools: EnabledTool[] = tools
+      .concat(mcpTools)
+      .concat(coreTools)
+      .map(tool => ({
+        name: tool.name,
+        provider: tool.provider,
+        description: tool.description,
+      }));
 
     return availableTools;
   };
@@ -70,11 +75,18 @@ const createToolsService = async ({
 
     const mcpTools = await mcp.getTools(credentials);
 
-    const allTools = tools.concat(mcpTools);
+    const userTools = tools.concat(mcpTools);
+
+    const allTools: Tool[] = userTools.filter(filter).concat(coreTools);
     return allTools.filter(filter).map(t => new DynamicStructuredTool(t));
   };
 
-  return { registerTools, getTools, getAvailableUserTools, getPrincipalTools };
+  return {
+    registerTools,
+    registerCoreTools,
+    getAvailableUserTools,
+    getPrincipalTools,
+  };
 };
 
 export const toolsServiceRef: ServiceRef<ToolsService, 'plugin', 'singleton'> =

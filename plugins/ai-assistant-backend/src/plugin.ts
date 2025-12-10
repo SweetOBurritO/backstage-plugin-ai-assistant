@@ -134,7 +134,8 @@ export const aiAssistantPlugin = createBackendPlugin({
 
         const searchKnowledgeTool = createSearchKnowledgeTool({ vectorStore });
 
-        tool.registerTools([...tools, searchKnowledgeTool]);
+        tool.registerTools(tools);
+        tool.registerCoreTools([searchKnowledgeTool]);
         callback.registerCallbacks(callbacks);
         model.registerModels(models);
 

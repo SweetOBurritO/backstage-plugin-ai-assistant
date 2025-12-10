@@ -10,12 +10,14 @@ import { MiddlewareFactory } from '@backstage/backend-defaults/rootHttpRouter';
 import { SummaryRouterOptions, createSummaryRouter } from './summary';
 import { createSettingsRouter, SettingsRouterOptions } from './settings';
 import { createAgentRouter, AgentRouterOptions } from './agent';
+import { createToolRouter, ToolRouterOptions } from './tools';
 
 export type RouterOptions = ChatRouterOptions &
   SummaryRouterOptions &
   ModelRouterOptions &
   SettingsRouterOptions &
-  AgentRouterOptions & {
+  AgentRouterOptions &
+  ToolRouterOptions & {
     config: RootConfigService;
     logger: LoggerService;
   };
@@ -31,6 +33,7 @@ export async function createRouter(
   router.use('/summary', await createSummaryRouter(options));
   router.use('/settings', await createSettingsRouter(options));
   router.use('/agent', await createAgentRouter(options));
+  router.use('/tools', await createToolRouter(options));
 
   const middleware = MiddlewareFactory.create(options);
 
