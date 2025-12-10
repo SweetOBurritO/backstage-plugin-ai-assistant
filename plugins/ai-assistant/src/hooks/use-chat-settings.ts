@@ -101,13 +101,18 @@ export const useChatSettings = () => {
 
     const coreTools = availableTools.filter(tool => tool.provider === 'core');
 
-    setToolsEnabled(coreTools);
+    setToolsEnabledState(coreTools);
+    // Persist to backend
+    await fetchApi.fetch(`${baseUrl}/settings`, {
+      method: 'PATCH',
+      body: JSON.stringify({ type: 'user-tools', settings: { tools: coreTools } }),
+      headers: { 'Content-Type': 'application/json' },
+    });
   }, [
     discoveryApi,
     fetchApi,
     setToolsEnabledState,
     getAvailableTools,
-    setToolsEnabled,
   ]);
 
   useEffect(() => {
