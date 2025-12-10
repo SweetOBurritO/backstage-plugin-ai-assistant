@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-common
 
+## 0.8.0
+
+### Minor Changes
+
+- 593cee0: include description in EnabledTool type definition and remove user tool type
+
 ## 0.7.0
 
 ### Minor Changes

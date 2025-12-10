@@ -1,5 +1,14 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-google-vertex-ai
 
+## 0.2.3
+
+### Patch Changes
+
+- Updated dependencies [6370262]
+- Updated dependencies [6370262]
+- Updated dependencies [6370262]
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.9.0
+
 ## 0.2.2
 
 ### Patch Changes
