@@ -47,6 +47,18 @@ export const useChatSettings = () => {
     state => state.setToolsEnabled,
   );
 
+  const getAvailableTools = useCallback(async (): Promise<EnabledTool[]> => {
+    const baseUrl = await discoveryApi.getBaseUrl('ai-assistant');
+
+    const response = await fetchApi.fetch(`${baseUrl}/tools`);
+
+    const { tools } = (await response.json()) as {
+      tools: EnabledTool[];
+    };
+
+    return tools;
+  }, [discoveryApi, fetchApi]);
+
   const setToolsEnabled = useCallback(
     async (tools: EnabledTool[]) => {
       setToolsEnabledState(tools);
@@ -80,8 +92,23 @@ export const useChatSettings = () => {
       settings: { tools?: EnabledTool[] };
     };
 
-    setToolsEnabledState(tools ?? []);
-  }, [discoveryApi, fetchApi, setToolsEnabledState]);
+    if (tools) {
+      setToolsEnabledState(tools);
+      return;
+    }
+
+    const availableTools = await getAvailableTools();
+
+    const coreTools = availableTools.filter(tool => tool.provider === 'core');
+
+    setToolsEnabled(coreTools);
+  }, [
+    discoveryApi,
+    fetchApi,
+    setToolsEnabledState,
+    getAvailableTools,
+    setToolsEnabled,
+  ]);
 
   useEffect(() => {
     fetchUserEnabledTools();
@@ -94,5 +121,6 @@ export const useChatSettings = () => {
     setSummaryEnabled,
     toolsEnabled,
     setToolsEnabled,
+    getAvailableTools,
   };
 };
