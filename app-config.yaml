@@ -140,15 +140,36 @@ aiAssistant:
       #   - '.json'
       #   - '.txt'
       # repositories:
-      #   - name: <repository-name>
-      #     fileTypes:
-      #       - '.json'
-      #       - '.md'
-      #       - '.txt'
+      #   include:
+      #     # Exact name matching (case-sensitive)
+      #     - name: backend-api
+      #       fileTypes:
+      #         - '.json'
+      #         - '.md'
+      #     # Regex pattern matching (automatically treated as regex)
+      #     - name: '^backend-.*'         # All repos starting with 'backend-'
+      #     - name: '.*-service$'         # All repos ending with '-service'
+      #   exclude:
+      #     # Exclude by exact name
+      #     - name: test-repo
+      #     # Exclude by regex pattern
+      #     - name: '^temp-.*'            # Exclude repos starting with 'temp-'
+      #     - name: '.*-archived$'        # Exclude repos ending with '-archived'
       # filesBatchSize: <number-of-repository-files-to-process-in-batches> # default: 50
 
       # wikis:
-      #   - name: <wiki-name>
+      #   include:
+      #     # Exact name matching (case-sensitive)
+      #     - name: production-wiki
+      #     # Regex pattern matching (automatically treated as regex)
+      #     - name: '^prod-.*'            # All wikis starting with 'prod-'
+      #     - name: '.*-docs$'            # All wikis ending with '-docs'
+      #   exclude:
+      #     # Exclude by exact name
+      #     - name: draft-wiki
+      #     # Exclude by regex pattern
+      #     - name: '^test-.*'            # Exclude wikis starting with 'test-'
+      #     - name: '.*-temp$'            # Exclude wikis ending with '-temp'
       # pagesBatchSize: <number-of-wiki-pages-to-process-in-batches> # default: 50
 
   callbacks:
