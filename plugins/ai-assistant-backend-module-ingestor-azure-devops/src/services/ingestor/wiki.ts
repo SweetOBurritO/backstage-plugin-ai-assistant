@@ -33,6 +33,70 @@ export const createWikiIngestor = async ({
     Config['aiAssistant']['ingestors']['azureDevOps']['wikis']
   >('aiAssistant.ingestors.azureDevOps.wikis');
 
+  // Process and validate wiki filters
+  type WikiMatcher = {
+    value: string;
+    regex: RegExp;
+  };
+
+  const includeMatchers: WikiMatcher[] = [];
+  const excludeMatchers: WikiMatcher[] = [];
+
+  if (wikisFilter?.include) {
+    for (const filter of wikisFilter.include) {
+      try {
+        // All strings are valid regex - plain strings match exactly, patterns match as regex
+        const regex = new RegExp(filter.name);
+        includeMatchers.push({
+          value: filter.name,
+          regex,
+        });
+      } catch (error) {
+        logger.error(
+          `Invalid regular expression in wiki include '${filter.name}': ${error}`,
+        );
+        throw new Error(
+          `Invalid wiki include pattern '${filter.name}': ${error}`,
+        );
+      }
+    }
+  }
+
+  if (wikisFilter?.exclude) {
+    for (const filter of wikisFilter.exclude) {
+      try {
+        // All strings are valid regex - plain strings match exactly, patterns match as regex
+        const regex = new RegExp(filter.name);
+        excludeMatchers.push({
+          value: filter.name,
+          regex,
+        });
+      } catch (error) {
+        logger.error(
+          `Invalid regular expression in wiki exclude '${filter.name}': ${error}`,
+        );
+        throw new Error(
+          `Invalid wiki exclude pattern '${filter.name}': ${error}`,
+        );
+      }
+    }
+  }
+
+  if (includeMatchers.length > 0) {
+    logger.info(
+      `Wiki include filters: ${includeMatchers
+        .map(m => `'${m.value}'`)
+        .join(', ')}`,
+    );
+  }
+  if (excludeMatchers.length > 0) {
+    logger.info(
+      `Wiki exclude filters: ${excludeMatchers
+        .map(m => `'${m.value}'`)
+        .join(', ')}`,
+    );
+  }
+
   // Get batch size for processing pages (default to 50 pages per batch)
   const pagesBatchSize =
     config.getOptionalNumber(
@@ -157,19 +221,32 @@ export const createWikiIngestor = async ({
       return;
     }
 
-    logger.info(
-      `Filtering for wikis: ${wikisFilter?.map(repo => repo.name).join(', ')}`,
-    );
+    // Filter wikis using matchers
+    let wikisToIngest = wikisList;
 
-    // Filter wikis if a filter is provided in the config
-    const wikisToIngest = wikisFilter
-      ? wikisList.filter(wiki =>
-          wikisFilter?.some(
-            filteredWiki =>
-              filteredWiki.name.toLowerCase() === wiki.name!.toLowerCase(),
-          ),
-        )
-      : wikisList;
+    // If include matchers exist, only include wikis that match at least one
+    if (includeMatchers.length > 0) {
+      wikisToIngest = wikisToIngest.filter(wiki => {
+        return includeMatchers.some(matcher => matcher.regex!.test(wiki.name!));
+      });
+    }
+
+    // Apply exclusions
+    if (excludeMatchers.length > 0) {
+      const excludedWikis = wikisToIngest.filter(wiki => {
+        return excludeMatchers.some(matcher => matcher.regex!.test(wiki.name!));
+      });
+      if (excludedWikis.length > 0) {
+        logger.info(
+          `Excluding wikis: ${excludedWikis.map(w => w.name).join(', ')}`,
+        );
+      }
+      wikisToIngest = wikisToIngest.filter(wiki => {
+        return !excludeMatchers.some(matcher =>
+          matcher.regex!.test(wiki.name!),
+        );
+      });
+    }
 
     if (wikisToIngest.length === 0) {
       logger.warn('No wikis found for ingestion after applying the filter');

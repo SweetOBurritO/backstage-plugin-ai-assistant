@@ -39,6 +39,74 @@ export const createRepositoryIngestor = async ({
     Config['aiAssistant']['ingestors']['azureDevOps']['repositories']
   >('aiAssistant.ingestors.azureDevOps.repositories');
 
+  // Process and validate repository filters
+  type RepositoryMatcher = {
+    value: string;
+    regex: RegExp;
+    fileTypes?: string[];
+    pathExclusions?: string[];
+  };
+
+  const includeMatchers: RepositoryMatcher[] = [];
+  const excludeMatchers: RepositoryMatcher[] = [];
+
+  if (repositoriesFilter?.include) {
+    for (const filter of repositoriesFilter.include) {
+      try {
+        // All strings are valid regex - plain strings match exactly, patterns match as regex
+        const regex = new RegExp(filter.name);
+        includeMatchers.push({
+          value: filter.name,
+          regex,
+          fileTypes: filter.fileTypes,
+          pathExclusions: filter.pathExclusions,
+        });
+      } catch (error) {
+        logger.error(
+          `Invalid regular expression in repository include '${filter.name}': ${error}`,
+        );
+        throw new Error(
+          `Invalid repository include pattern '${filter.name}': ${error}`,
+        );
+      }
+    }
+  }
+
+  if (repositoriesFilter?.exclude) {
+    for (const filter of repositoriesFilter.exclude) {
+      try {
+        // All strings are valid regex - plain strings match exactly, patterns match as regex
+        const regex = new RegExp(filter.name);
+        excludeMatchers.push({
+          value: filter.name,
+          regex,
+        });
+      } catch (error) {
+        logger.error(
+          `Invalid regular expression in repository exclude '${filter.name}': ${error}`,
+        );
+        throw new Error(
+          `Invalid repository exclude pattern '${filter.name}': ${error}`,
+        );
+      }
+    }
+  }
+
+  if (includeMatchers.length > 0) {
+    logger.info(
+      `Repository include filters: ${includeMatchers
+        .map(m => `'${m.value}'`)
+        .join(', ')}`,
+    );
+  }
+  if (excludeMatchers.length > 0) {
+    logger.info(
+      `Repository exclude filters: ${excludeMatchers
+        .map(m => `'${m.value}'`)
+        .join(', ')}`,
+    );
+  }
+
   // Default to common file types if none are specified
   const fileTypes =
     config.getOptionalStringArray(
@@ -177,21 +245,34 @@ export const createRepositoryIngestor = async ({
       return;
     }
 
-    logger.info(
-      `Filtering for repositories: ${repositoriesFilter
-        ?.map(repo => repo.name)
-        .join(', ')}`,
-    );
+    // Filter repositories using matchers
+    let repositoriesToIngest = repositoriesList;
 
-    // Filter repositories if a filter is provided in the config
-    const repositoriesToIngest = repositoriesFilter
-      ? repositoriesList.filter(repo =>
-          repositoriesFilter?.some(
-            filteredRepo =>
-              filteredRepo.name.toLowerCase() === repo.name!.toLowerCase(),
-          ),
-        )
-      : repositoriesList;
+    // If include matchers exist, only include repos that match at least one
+    if (includeMatchers.length > 0) {
+      repositoriesToIngest = repositoriesToIngest.filter(repo => {
+        return includeMatchers.some(matcher => matcher.regex!.test(repo.name!));
+      });
+    }
+
+    // Apply exclusions
+    if (excludeMatchers.length > 0) {
+      const excludedRepos = repositoriesToIngest.filter(repo => {
+        return excludeMatchers.some(matcher => matcher.regex!.test(repo.name!));
+      });
+      if (excludedRepos.length > 0) {
+        logger.info(
+          `Excluding repositories: ${excludedRepos
+            .map(r => r.name)
+            .join(', ')}`,
+        );
+      }
+      repositoriesToIngest = repositoriesToIngest.filter(repo => {
+        return !excludeMatchers.some(matcher =>
+          matcher.regex!.test(repo.name!),
+        );
+      });
+    }
 
     if (repositoriesToIngest.length === 0) {
       logger.warn(
@@ -210,17 +291,17 @@ export const createRepositoryIngestor = async ({
         `Beginning ingestion for repository: ${repo.name} (${repo.id})`,
       );
 
+      // Find the matching include matcher for this repository
+      const matchingMatcher = includeMatchers.find(matcher =>
+        matcher.regex!.test(repo.name!),
+      );
+
       // Determine the file types to use for this repository or use default
-      const repositoryFileTypesFilter =
-        repositoriesFilter?.find(
-          r => r.name.toLowerCase() === repo.name!.toLowerCase(),
-        )?.fileTypes ?? fileTypes;
+      const repositoryFileTypesFilter = matchingMatcher?.fileTypes ?? fileTypes;
 
       // Determine the path exclusions to use for this repository or use global default
       const repositoryPathExclusions =
-        repositoriesFilter?.find(
-          r => r.name.toLowerCase() === repo.name!.toLowerCase(),
-        )?.pathExclusions ?? globalPathExclusions;
+        matchingMatcher?.pathExclusions ?? globalPathExclusions;
 
       logger.info(
         `Processing file types for repository ${
