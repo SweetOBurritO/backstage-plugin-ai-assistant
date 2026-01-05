@@ -226,6 +226,12 @@ export const createWikiIngestor = async ({
 
     // If include matchers exist, only include wikis that match at least one
     if (includeMatchers.length > 0) {
+      logger.info(
+        `Include filter found. Only including wikis matching the following patterns for ingestion: ${includeMatchers
+          .map(m => `'${m.value}'`)
+          .join(', ')}`,
+      );
+
       wikisToIngest = wikisToIngest.filter(wiki => {
         return includeMatchers.some(matcher => matcher.regex!.test(wiki.name!));
       });
@@ -233,9 +239,16 @@ export const createWikiIngestor = async ({
 
     // Apply exclusions
     if (excludeMatchers.length > 0) {
+      logger.info(
+        `Exclude filter found. Excluding wikis matching the following patterns from ingestion: ${excludeMatchers
+          .map(m => `'${m.value}'`)
+          .join(', ')}`,
+      );
+
       const excludedWikis = wikisToIngest.filter(wiki => {
         return excludeMatchers.some(matcher => matcher.regex!.test(wiki.name!));
       });
+
       if (excludedWikis.length > 0) {
         logger.info(
           `Excluding wikis: ${excludedWikis.map(w => w.name).join(', ')}`,
@@ -252,6 +265,10 @@ export const createWikiIngestor = async ({
       logger.warn('No wikis found for ingestion after applying the filter');
       return;
     }
+
+    logger.debug(
+      `Wikis to ingest: ${wikisToIngest.map(w => w.name).join(', ')}`,
+    );
 
     logger.info(`Ingesting ${wikisToIngest.length} wikis from Azure DevOps`);
 
