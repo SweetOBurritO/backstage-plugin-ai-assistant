@@ -250,6 +250,12 @@ export const createRepositoryIngestor = async ({
 
     // If include matchers exist, only include repos that match at least one
     if (includeMatchers.length > 0) {
+      logger.info(
+        `Include filter found. Only including repositories matching the following patterns for ingestion: ${includeMatchers
+          .map(m => `'${m.value}'`)
+          .join(', ')}`,
+      );
+
       repositoriesToIngest = repositoriesToIngest.filter(repo => {
         return includeMatchers.some(matcher => matcher.regex!.test(repo.name!));
       });
@@ -257,9 +263,16 @@ export const createRepositoryIngestor = async ({
 
     // Apply exclusions
     if (excludeMatchers.length > 0) {
+      logger.info(
+        `Exclude filter found. Excluding repositories matching the following patterns from ingestion: ${excludeMatchers
+          .map(m => `'${m.value}'`)
+          .join(', ')}`,
+      );
+
       const excludedRepos = repositoriesToIngest.filter(repo => {
         return excludeMatchers.some(matcher => matcher.regex!.test(repo.name!));
       });
+
       if (excludedRepos.length > 0) {
         logger.info(
           `Excluding repositories: ${excludedRepos
@@ -280,6 +293,12 @@ export const createRepositoryIngestor = async ({
       );
       return;
     }
+
+    logger.debug(
+      `Repositories to ingest: ${repositoriesToIngest
+        .map(r => r.name)
+        .join(', ')}`,
+    );
 
     logger.info(
       `Ingesting ${repositoriesToIngest.length} repositories from Azure DevOps`,
