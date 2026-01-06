@@ -45,7 +45,7 @@ export const createWikiIngestor = async ({
   if (wikisFilter?.include) {
     for (const filter of wikisFilter.include) {
       try {
-        // All strings are valid regex - plain strings match exactly, patterns match as regex
+        // All strings are treated as regex patterns; escape special characters for exact literal matches
         const regex = new RegExp(filter.name);
         includeMatchers.push({
           value: filter.name,
