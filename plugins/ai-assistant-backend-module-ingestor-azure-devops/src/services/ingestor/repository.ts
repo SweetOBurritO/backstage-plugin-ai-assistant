@@ -53,7 +53,7 @@ export const createRepositoryIngestor = async ({
   if (repositoriesFilter?.include) {
     for (const filter of repositoriesFilter.include) {
       try {
-        // All strings are valid regex - plain strings match exactly, patterns match as regex
+        // All strings are treated as regular expression patterns; escape special characters for exact literal matches
         const regex = new RegExp(filter.name);
         includeMatchers.push({
           value: filter.name,
