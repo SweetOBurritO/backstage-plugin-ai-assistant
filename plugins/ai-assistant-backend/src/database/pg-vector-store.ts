@@ -133,7 +133,25 @@ export class PgVectorStore implements VectorStore {
 
     // Delete old versions before re-adding
     if (documentsToUpdate.length > 0) {
-      await this.deleteById(documentsToUpdate.map(doc => doc.id));
+      const uniqueDocKeys = new Set(
+        documentsToUpdate.map(
+          doc => `${doc.metadata.id}:${doc.metadata.source}`,
+        ),
+      );
+
+      for (const key of uniqueDocKeys) {
+        const [id, source] = key.split(':');
+        await this.client(this.tableName)
+          .delete()
+          .whereRaw(`metadata->>'id' = ? AND metadata->>'source' = ?`, [
+            id,
+            source,
+          ]);
+      }
+
+      this.logger.info(
+        `Deleted all chunks for ${uniqueDocKeys.size} updated documents`,
+      );
     }
 
     const rows = await Promise.all(
