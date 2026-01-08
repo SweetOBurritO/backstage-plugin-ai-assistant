@@ -295,7 +295,7 @@ spec:
   owner: engineering
   system: website-platform
 ---
-# Duplucate component with a different name to test recency biasing
+# Duplicate component with a different name to test recency biasing
 # Run this in your db to test
 
 # UPDATE embeddings

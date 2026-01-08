@@ -154,22 +154,22 @@ export class PgVectorStore implements VectorStore {
       );
     }
 
-    const rows = await Promise.all(
-      allDocumentsToAdd.map(async doc => {
-        const [vector] = await this.embeddings!.embedDocuments([doc.content]);
-        const hash = createHash('sha256').update(doc.content).digest('hex');
+    const contents = allDocumentsToAdd.map(doc => doc.content);
+    const vectors = await this.embeddings!.embedDocuments(contents);
 
-        return {
-          hash,
-          id: doc.id ?? uuid(),
-          metadata: doc.metadata,
-          lastUpdated: new Date(),
-          content: doc.content.replace(/\0/g, ''),
-          vector: `[${vector.join(',')}]`,
-        };
-      }),
-    );
+    const rows = allDocumentsToAdd.map((doc, index) => {
+      const vector = vectors[index];
+      const hash = createHash('sha256').update(doc.content).digest('hex');
 
+      return {
+        hash,
+        id: doc.id ?? uuid(),
+        metadata: doc.metadata,
+        lastUpdated: new Date(),
+        content: doc.content.replace(/\0/g, ''),
+        vector: `[${vector.join(',')}]`,
+      };
+    });
     this.logger.info(
       `Adding ${rows.length} documents (${newDocuments.length} new, ${documentsToUpdate.length} updated).`,
     );
@@ -258,10 +258,10 @@ export class PgVectorStore implements VectorStore {
       SELECT
         *,
         (vector <=> :embeddingString) as "_distance",
-        (EXTRACT(EPOCH FROM (NOW() - "lastUpdated")) / :ageScaleFactor) as "_age_days",
+        (EXTRACT(EPOCH FROM (NOW() - COALESCE("lastUpdated", NOW()))) / :ageScaleFactor) as "_age_days",
         (
           ((vector <=> :embeddingString) * :similarityWeight) +
-          (EXP(-0.693 * (EXTRACT(EPOCH FROM (NOW() - "lastUpdated")) / :ageScaleFactor) / :recencyHalfLife) * :recencyWeight)
+          (EXP(-0.693 * (EXTRACT(EPOCH FROM (NOW() - COALESCE("lastUpdated", NOW()))) / :ageScaleFactor) / :recencyHalfLife) * :recencyWeight)
         ) as "_combined_score"
       FROM ${this.tableName}
       WHERE metadata::jsonb @> :filter
