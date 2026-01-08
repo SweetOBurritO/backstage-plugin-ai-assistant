@@ -1,5 +1,16 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend
 
+## 0.15.0
+
+### Minor Changes
+
+- 341565d: add recency biasing to vector store and enhance document handling
+
+### Patch Changes
+
+- Updated dependencies [341565d]
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.10.0
+
 ## 0.14.0
 
 ### Minor Changes

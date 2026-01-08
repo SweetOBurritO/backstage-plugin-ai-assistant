@@ -1,5 +1,12 @@
 # @sweetoburrito/backstage-plugin-qeta-backend-module-ai-assistant
 
+## 0.2.2
+
+### Patch Changes
+
+- Updated dependencies [341565d]
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.10.0
+
 ## 0.2.1
 
 ### Patch Changes
