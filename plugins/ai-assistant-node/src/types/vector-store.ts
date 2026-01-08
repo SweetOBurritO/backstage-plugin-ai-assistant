@@ -15,16 +15,13 @@ export type EmbeddingDocumentMetadata = {
   [key: string]: string;
 };
 
-export type Embedding = {
-  metadata: EmbeddingDocumentMetadata;
-  content: string;
-  vector: number[];
-  id: string;
-};
-
 export type EmbeddingDocument = {
   metadata: EmbeddingDocumentMetadata;
   content: string;
+  vector?: string;
+  hash?: string;
+  lastUpdated?: Date;
+  id?: string;
 };
 
 type DeletionParams = {

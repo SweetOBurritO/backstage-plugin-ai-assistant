@@ -50,15 +50,8 @@ Do NOT use for general knowledge that doesn't require company-specific informati
           };
         }
 
-        const content = results.map(r => r.content).join('\n---\n');
-
-        const urls = results.map(r => r.metadata.url);
-
         return {
-          content,
-          metadata: {
-            urls,
-          },
+          content: JSON.stringify(results),
         };
       },
     },

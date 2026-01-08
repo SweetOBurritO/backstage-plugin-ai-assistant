@@ -69,7 +69,7 @@ export const createDataIngestionPipeline = ({
       logger.info(`Running ingestor: ${ingestor.id}`);
 
       const saveDocumentsBatch = async (documents: EmbeddingDocument[]) => {
-        logger.info(
+        logger.debug(
           `Ingested documents for ${ingestor.id}: ${documents.length}`,
         );
 
@@ -80,14 +80,6 @@ export const createDataIngestionPipeline = ({
 
         const documentChunks = await Promise.all(
           documents.map(async document => {
-            // Delete existing documents with this document id and ingestor source
-            logger.debug(
-              `Deleting existing documents with id: [${document.metadata.id}] and source: [${ingestor.id}]`,
-            );
-            await vectorStore.deleteDocuments({
-              filter: { source: ingestor.id, id: document.metadata.id },
-            });
-
             const chunks = await splitter.splitText(document.content);
 
             const docChunks: EmbeddingDocument[] = chunks.flatMap(
@@ -101,23 +93,23 @@ export const createDataIngestionPipeline = ({
           }),
         );
 
-        logger.info(`Adding documents to vector store...`);
+        logger.debug(`Adding documents to vector store...`);
         const allChunks = documentChunks.flat();
 
-        logger.info(
+        logger.debug(
           `Total document chunks for batch to add for ${ingestor.id}: ${allChunks.length}`,
         );
 
         for (let i = 0; i < allChunks.length; i += maxChunkProcessingSize) {
           const chunkBatch = allChunks.slice(i, i + maxChunkProcessingSize);
-          logger.info(
+          logger.debug(
             `Adding batch of ${chunkBatch.length} document chunks to vector store for ${ingestor.id}`,
           );
 
           await vectorStore.addDocuments(chunkBatch);
         }
 
-        logger.info(`Added documents to vector store for ${ingestor.id}`);
+        logger.debug(`Added documents to vector store for ${ingestor.id}`);
       };
 
       const documents = await ingestor.ingest({
