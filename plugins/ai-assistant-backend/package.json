@@ -36,7 +36,7 @@
     "@backstage/errors": "backstage:^",
     "@backstage/plugin-catalog-node": "backstage:^",
     "@backstage/plugin-signals-node": "backstage:^",
-    "@langchain/core": "^0.3.72",
+    "@langchain/core": "^0.3.80",
     "@langchain/langgraph": "^0.4.9",
     "@langchain/mcp-adapters": "^1.0.0",
     "@langchain/textsplitters": "^0.1.0",
