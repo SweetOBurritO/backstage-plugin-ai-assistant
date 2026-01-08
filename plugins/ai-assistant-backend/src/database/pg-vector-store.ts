@@ -255,19 +255,19 @@ export class PgVectorStore implements VectorStore {
     const embeddingString = `[${query.join(',')}]`;
 
     const queryString = `
-      SELECT
-        *,
-        (vector <=> :embeddingString) as "_distance",
-        (EXTRACT(EPOCH FROM (NOW() - COALESCE("lastUpdated", NOW()))) / :ageScaleFactor) as "_age_days",
-        (
-          ((vector <=> :embeddingString) * :similarityWeight) +
-          (EXP(-0.693 * (EXTRACT(EPOCH FROM (NOW() - COALESCE("lastUpdated", NOW()))) / :ageScaleFactor) / :recencyHalfLife) * :recencyWeight)
-        ) as "_combined_score"
-      FROM ${this.tableName}
-      WHERE metadata::jsonb @> :filter
-      ORDER BY "_combined_score" ASC
-      LIMIT :amount
-    `;
+    SELECT
+      *,
+      (vector <=> :embeddingString) as "_distance",
+      (EXTRACT(EPOCH FROM (NOW() - COALESCE("lastUpdated", NOW()))) / :ageScaleFactor) as "_age_days",
+      (
+        ((vector <=> :embeddingString) * :similarityWeight) -
+        (EXP(-0.693 * (EXTRACT(EPOCH FROM (NOW() - COALESCE("lastUpdated", NOW()))) / :ageScaleFactor) / :recencyHalfLife) * :recencyWeight)
+      ) as "_combined_score"
+    FROM ${this.tableName}
+    WHERE metadata::jsonb @> :filter
+    ORDER BY "_combined_score" ASC
+    LIMIT :amount
+  `;
 
     const documents = (
       await this.client.raw(queryString, {
