@@ -1,5 +1,16 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-azure-devops
 
+## 0.7.0
+
+### Minor Changes
+
+- 341565d: add ado resource filtering using regex
+
+### Patch Changes
+
+- Updated dependencies [341565d]
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.10.0
+
 ## 0.6.1
 
 ### Patch Changes

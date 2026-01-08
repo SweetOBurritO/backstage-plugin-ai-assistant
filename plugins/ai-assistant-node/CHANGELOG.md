@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-node
 
+## 0.10.0
+
+### Minor Changes
+
+- 341565d: removed unused types and update EmbeddingsDocument type to align with database
+
 ## 0.9.0
 
 ### Minor Changes
