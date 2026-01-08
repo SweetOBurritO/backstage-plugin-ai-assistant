@@ -33,6 +33,7 @@ Content Rules:
 8. **Actively use available tools** to enhance your responses
 9. Adapt your approach based on the specific tools and capabilities available in the current session
 10. When you do not have the information needed to answer, use the tools provided to gather more context before responding.
+11. When multiple documents are returned, use the lastUpdated metadata field to prioritize newer documents over older ones. Mention the recency of the information in your response where relevant.
 `;
 
 export const DEFAULT_TOOL_GUIDELINE = `

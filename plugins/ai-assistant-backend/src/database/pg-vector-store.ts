@@ -10,6 +10,8 @@ import {
 } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
 import { Embeddings } from '@langchain/core/embeddings';
 import { Knex } from 'knex';
+import { createHash } from 'crypto';
+import { v4 as uuid } from 'uuid';
 
 export type PgVectorStoreOptions = {
   database: DatabaseService;
@@ -20,6 +22,12 @@ export type PgVectorStoreOptions = {
 export class PgVectorStore implements VectorStore {
   private readonly tableName: string = 'embeddings';
   private embeddings?: Omit<Embeddings, 'caller'>;
+
+  // Recency bias configuration
+  private readonly RECENCY_WEIGHT = 0.3; // Weight for document recency (0-1)
+  private readonly SIMILARITY_WEIGHT = 1 - this.RECENCY_WEIGHT; // Weight for vector similarity (0-1)
+  private readonly RECENCY_HALF_LIFE_DAYS = 180; // Days until recency boost is halved (6 months)
+  private readonly AGE_SCALE_FACTOR = 86400; // Seconds in a day for timestamp conversion
 
   /**
    * Creates an instance of PgVectorStore.
@@ -68,48 +76,105 @@ export class PgVectorStore implements VectorStore {
     if (documents.length === 0) {
       return;
     }
-    const texts = documents.map(({ content }) => content);
+
     if (!this.embeddings) {
       throw new Error('No Embeddings configured for the vector store.');
     }
 
-    const vectors = await this.embeddings.embedDocuments(texts);
-    this.logger.info(
-      `Received ${vectors.length} vectors from embeddings creation.`,
-    );
-    this.addVectors(vectors, documents);
-  }
+    // Fetch existing documents with matching (id, source) pairs
+    const conditions = documents
+      .map(() => `(metadata->>'id' = ? AND metadata->>'source' = ?)`)
+      .join(' OR ');
 
-  /**
-   * Adds vectors to the database along with corresponding documents.
-   *
-   * @param {number[][]} vectors - The vectors to be added.
-   * @param {EmbeddingDoc[]} documents - The corresponding documents.
-   * @return {Promise<void>} - A promise that resolves when the vectors are added successfully.
-   * @throws {Error} - If there is an error inserting the vectors.
-   */
-  private async addVectors(
-    vectors: number[][],
-    documents: EmbeddingDocument[],
-  ): Promise<void> {
-    try {
-      const rows = [];
-      for (let i = 0; i < vectors.length; i += 1) {
-        const embedding = vectors[i];
-        const embeddingString = `[${embedding.join(',')}]`;
-        const values = {
-          content: documents[i].content.replace(/\0/g, ''),
-          vector: embeddingString.replace(/\0/g, ''),
-          metadata: documents[i].metadata,
-        };
-        rows.push(values);
+    const params = documents.flatMap(doc => [
+      doc.metadata.id,
+      doc.metadata.source,
+    ]);
+
+    const existingDocuments: EmbeddingDocument[] = await this.client
+      .select('*')
+      .from(this.tableName)
+      .whereRaw(conditions, params);
+
+    // Build a map for quick lookups
+    const existingMap = new Map(
+      existingDocuments.map(doc => [
+        `${doc.metadata.id}:${doc.metadata.source}`,
+        doc,
+      ]),
+    );
+
+    // Categorize documents
+    const newDocuments: EmbeddingDocument[] = [];
+    const documentsToUpdate: Array<EmbeddingDocument & { id: string }> = [];
+
+    for (const doc of documents) {
+      const key = `${doc.metadata.id}:${doc.metadata.source}`;
+      const existing = existingMap.get(key);
+
+      if (!existing) {
+        newDocuments.push(doc);
+        continue;
       }
 
-      await this.client.batchInsert(this.tableName, rows, this.chunkSize);
-    } catch (e) {
-      this.logger.error((e as Error).message);
-      throw new Error(`Error inserting: ${(e as Error).message}`);
+      // Check if content changed
+      const newHash = createHash('sha256').update(doc.content).digest('hex');
+      if (!existing.hash || newHash !== existing.hash) {
+        documentsToUpdate.push({ ...doc, id: existing.id! });
+      }
     }
+
+    const allDocumentsToAdd = [...newDocuments, ...documentsToUpdate];
+
+    if (allDocumentsToAdd.length === 0) {
+      this.logger.debug('No new or updated documents to add.');
+      return;
+    }
+
+    // Delete old versions before re-adding
+    if (documentsToUpdate.length > 0) {
+      const uniqueDocKeys = new Set(
+        documentsToUpdate.map(
+          doc => `${doc.metadata.id}:${doc.metadata.source}`,
+        ),
+      );
+
+      for (const key of uniqueDocKeys) {
+        const [id, source] = key.split(':');
+        await this.client(this.tableName)
+          .delete()
+          .whereRaw(`metadata->>'id' = ? AND metadata->>'source' = ?`, [
+            id,
+            source,
+          ]);
+      }
+
+      this.logger.info(
+        `Deleted all chunks for ${uniqueDocKeys.size} updated documents`,
+      );
+    }
+
+    const contents = allDocumentsToAdd.map(doc => doc.content);
+    const vectors = await this.embeddings!.embedDocuments(contents);
+
+    const rows = allDocumentsToAdd.map((doc, index) => {
+      const vector = vectors[index];
+      const hash = createHash('sha256').update(doc.content).digest('hex');
+
+      return {
+        hash,
+        id: doc.id ?? uuid(),
+        metadata: doc.metadata,
+        lastUpdated: new Date(),
+        content: doc.content.replace(/\0/g, ''),
+        vector: `[${vector.join(',')}]`,
+      };
+    });
+    this.logger.info(
+      `Adding ${rows.length} documents (${newDocuments.length} new, ${documentsToUpdate.length} updated).`,
+    );
+
+    await this.client.batchInsert(this.tableName, rows, this.chunkSize);
   }
 
   /**
@@ -173,6 +238,8 @@ export class PgVectorStore implements VectorStore {
 
   /**
    * Finds the most similar documents to a given query vector, along with their similarity scores.
+   * Results are ranked by a weighted combination of vector similarity and document recency.
+   * i.e newer documents are favored in the ranking but if no new documents exist, older but more similar documents will still be returned.
    *
    * @param {number[]} query - The query vector to compare against.
    * @param {number} amount - The maximum number of results to return.
@@ -186,19 +253,31 @@ export class PgVectorStore implements VectorStore {
     filter?: EmbeddingDocumentMetadata,
   ): Promise<[EmbeddingDocument, number][]> {
     const embeddingString = `[${query.join(',')}]`;
+
     const queryString = `
-      SELECT *, vector <=> :embeddingString as "_distance"
-      FROM ${this.tableName}
-      WHERE metadata::jsonb @> :filter
-      ORDER BY "_distance" ASC
-      LIMIT :amount
-    `;
+    SELECT
+      *,
+      (vector <=> :embeddingString) as "_distance",
+      (EXTRACT(EPOCH FROM (NOW() - COALESCE("lastUpdated", NOW()))) / :ageScaleFactor) as "_age_days",
+      (
+        ((vector <=> :embeddingString) * :similarityWeight) -
+        (EXP(-0.693 * (EXTRACT(EPOCH FROM (NOW() - COALESCE("lastUpdated", NOW()))) / :ageScaleFactor) / :recencyHalfLife) * :recencyWeight)
+      ) as "_combined_score"
+    FROM ${this.tableName}
+    WHERE metadata::jsonb @> :filter
+    ORDER BY "_combined_score" ASC
+    LIMIT :amount
+  `;
 
     const documents = (
       await this.client.raw(queryString, {
         embeddingString,
         filter: JSON.stringify(filter ?? {}),
         amount,
+        similarityWeight: this.SIMILARITY_WEIGHT,
+        recencyWeight: this.RECENCY_WEIGHT,
+        recencyHalfLife: this.RECENCY_HALF_LIFE_DAYS,
+        ageScaleFactor: this.AGE_SCALE_FACTOR,
       })
     ).rows;
 
@@ -206,9 +285,13 @@ export class PgVectorStore implements VectorStore {
     for (const doc of documents) {
       // eslint-ignore-next-line
       if (doc._distance !== null && doc.content !== null) {
-        const document = {
+        const document: EmbeddingDocument = {
           content: doc.content,
-          metadata: doc.metadata,
+          metadata: {
+            ...doc.metadata,
+            ageInDays: Math.round(doc._age_days),
+            lastUpdated: doc.lastUpdated,
+          },
         };
         results.push([document, doc._distance]);
       }

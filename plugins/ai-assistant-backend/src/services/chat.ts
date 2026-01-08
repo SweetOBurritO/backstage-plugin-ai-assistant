@@ -122,11 +122,7 @@ export const createChatService = async ({
             m => conversationMessages.findIndex(cm => cm.id === m.id) === -1,
           );
 
-          console.log('newMessages: ', newMessages);
-
           if (newMessages.length !== 0) {
-            console.log('newMessages in if: ', newMessages);
-
             conversation.addMessages(
               newMessages,
               userEntityRef,

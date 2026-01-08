@@ -74,10 +74,10 @@ backend.add(
 );
 
 // Uncomment to enable langfuse tracing for prompts
-backend.add(
-  import(
-    '@sweetoburrito/backstage-plugin-ai-assistant-backend-module-callback-provider-langfuse'
-  ),
-);
+// backend.add(
+//   import(
+//     '@sweetoburrito/backstage-plugin-ai-assistant-backend-module-callback-provider-langfuse'
+//   ),
+// );
 
 backend.start();

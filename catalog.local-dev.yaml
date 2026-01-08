@@ -282,3 +282,36 @@ metadata:
 spec:
   domain: data
   owner: data
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: payment-service
+  description: Payment processing service for handling customer transactions
+spec:
+  type: service
+  lifecycle: production
+  owner: engineering
+  system: website-platform
+---
+# Duplicate component with a different name to test recency biasing
+# Run this in your db to test
+
+# UPDATE embeddings
+# SET "lastUpdated" = NOW() - INTERVAL '400 days'
+# WHERE metadata->>'name' = 'payment-service';
+
+# UPDATE embeddings
+# SET "lastUpdated" = NOW() - INTERVAL '1 day'
+# WHERE metadata->>'name' = 'payment-service-gateway';
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: payment-service-gateway
+  description: Payment processing service for handling customer transactions
+spec:
+  type: service
+  lifecycle: production
+  owner: engineering
+  system: website-platform
