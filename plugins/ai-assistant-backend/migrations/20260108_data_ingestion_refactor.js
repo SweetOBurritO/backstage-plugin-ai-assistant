@@ -21,6 +21,7 @@ exports.up = async knex => {
 
     table
       .timestamp('lastUpdated')
+      .defaultTo(knex.fn.now())
       .comment('Timestamp of the last update to the embedding document');
   });
 };
