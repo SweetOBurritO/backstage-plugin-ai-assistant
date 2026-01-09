@@ -11,7 +11,6 @@ import {
 import { Embeddings } from '@langchain/core/embeddings';
 import { Knex } from 'knex';
 import { createHash } from 'crypto';
-import { v4 as uuid } from 'uuid';
 
 export type PgVectorStoreOptions = {
   database: DatabaseService;
@@ -163,7 +162,6 @@ export class PgVectorStore implements VectorStore {
 
       return {
         hash,
-        id: doc.id ?? uuid(),
         metadata: doc.metadata,
         lastUpdated: doc.lastUpdated ?? new Date(),
         content: doc.content.replace(/\0/g, ''),
