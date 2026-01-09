@@ -130,5 +130,32 @@ export const createGitHubService = async ({
     return content;
   };
 
-  return { owner, getRepos, getRepoFiles, getRepoFileContent };
+  /**
+   * Get the last updated date for a specific file
+   * @param repoName The name of the repository
+   * @param path The path of the file
+   * @returns The date when the file was last updated
+   */
+  const getFileLastUpdated = async (repoName: string, path: string) => {
+    const { data: commits } = await octokit.rest.repos.listCommits({
+      owner,
+      repo: repoName,
+      path,
+      per_page: 1,
+    });
+
+    if (commits.length === 0) {
+      throw new Error(`No commits found for file: ${path}`);
+    }
+
+    return commits[0].commit.committer?.date;
+  };
+
+  return {
+    owner,
+    getRepos,
+    getRepoFiles,
+    getRepoFileContent,
+    getFileLastUpdated,
+  };
 };

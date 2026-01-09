@@ -117,10 +117,10 @@ export const createGitHubIngestor = async ({
         const globalIndex = batchStart + index;
 
         try {
-          const content = await githubService.getRepoFileContent(
-            repo.name,
-            file.path!,
-          );
+          const [content, lastUpdated] = await Promise.all([
+            githubService.getRepoFileContent(repo.name, file.path!),
+            githubService.getFileLastUpdated(repo.name, file.path!),
+          ]);
 
           const completionStats = getProgressStats(
             globalIndex + 1,
@@ -145,7 +145,7 @@ export const createGitHubIngestor = async ({
               ? `Repository Description: ${repo.description}`
               : ''
           }
-          
+
           Content:
           ${content}`;
 
@@ -162,6 +162,7 @@ export const createGitHubIngestor = async ({
               repositoryDescription: repo.description || '',
             },
             content: enhancedContent,
+            lastUpdated: lastUpdated ? new Date(lastUpdated) : undefined,
           };
 
           documents.push(document);
