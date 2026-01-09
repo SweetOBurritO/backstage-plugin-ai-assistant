@@ -86,6 +86,7 @@ export const createDataIngestionPipeline = ({
               (chunk, i) => ({
                 metadata: { ...document.metadata, chunk: String(i) },
                 content: chunk,
+                lastUpdated: document.lastUpdated,
               }),
             );
 

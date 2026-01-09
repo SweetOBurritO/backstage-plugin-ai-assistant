@@ -165,7 +165,7 @@ export class PgVectorStore implements VectorStore {
         hash,
         id: doc.id ?? uuid(),
         metadata: doc.metadata,
-        lastUpdated: new Date(),
+        lastUpdated: doc.lastUpdated ?? new Date(),
         content: doc.content.replace(/\0/g, ''),
         vector: `[${vector.join(',')}]`,
       };
