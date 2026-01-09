@@ -1,6 +1,6 @@
 {
   "name": "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-azure-devops",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "license": "Apache-2.0",
   "description": "The ingestor-azure-devops backend module for the ai-assistant plugin.",
   "main": "src/index.ts",

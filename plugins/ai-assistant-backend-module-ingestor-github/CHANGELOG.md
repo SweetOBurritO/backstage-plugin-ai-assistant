@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-github
 
+## 0.4.0
+
+### Minor Changes
+
+- 2e6dd84: Update github ingestion to set last updated field for embeddings
+
 ## 0.3.4
 
 ### Patch Changes
