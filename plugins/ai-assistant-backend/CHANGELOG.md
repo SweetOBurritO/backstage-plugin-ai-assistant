@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend
 
+## 0.15.2
+
+### Patch Changes
+
+- 1b89c15: fix duplicate embedings id issue
+
 ## 0.15.1
 
 ### Patch Changes
