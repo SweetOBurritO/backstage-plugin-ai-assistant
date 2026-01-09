@@ -199,7 +199,7 @@ export const createAzureDevOpsService = async ({
    * Get the last updated date for a specific page in an Azure DevOps wiki
    * @param wikiId The ID of the wiki
    * @param pagePath The path of the page
-   * @returns The date when the wiki page was last updated
+   * @returns {Date | undefined} The date when the wiki page was last updated, or undefined if the committer date is not available
    */
   const getWikiPageLastUpdated = async (wikiId: string, pagePath: string) => {
     // Wikis in Azure DevOps are backed by Git repositories
@@ -212,9 +212,11 @@ export const createAzureDevOpsService = async ({
     }
 
     // Use Git API to get the last commit for the wiki page file
-    // Wiki pages are stored as .md files in the repository
+    // Wiki pages are typically stored as files in the repository (often .md)
     const filePath = pagePath.startsWith('/') ? pagePath.slice(1) : pagePath;
-    const fullPath = filePath.endsWith('.md') ? filePath : `${filePath}.md`;
+    const fileName = filePath.split('/').pop() ?? '';
+    const hasExtension = fileName.includes('.');
+    const fullPath = hasExtension ? filePath : `${filePath}.md`;
 
     const commits = await gitApi.getCommits(
       wiki.repositoryId,

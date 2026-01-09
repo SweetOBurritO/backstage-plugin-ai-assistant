@@ -134,7 +134,7 @@ export const createGitHubService = async ({
    * Get the last updated date for a specific file
    * @param repoName The name of the repository
    * @param path The path of the file
-   * @returns The date when the file was last updated
+   * @returns The date when the file was last updated, or undefined if it cannot be determined
    */
   const getFileLastUpdated = async (repoName: string, path: string) => {
     const { data: commits } = await octokit.rest.repos.listCommits({
