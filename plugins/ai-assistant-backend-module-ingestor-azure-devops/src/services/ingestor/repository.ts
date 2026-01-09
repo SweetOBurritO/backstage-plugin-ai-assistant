@@ -190,10 +190,10 @@ export const createRepositoryIngestor = async ({
         const item = itemsBatch[index];
         const globalIndex = batchStart + index;
 
-        const content = await azureDevOpsService.getRepoItemContent(
-          repository.id!,
-          item.path!,
-        );
+        const [content, lastUpdated] = await Promise.all([
+          azureDevOpsService.getRepoItemContent(repository.id!, item.path!),
+          azureDevOpsService.getRepoItemLastUpdated(repository.id!, item.path!),
+        ]);
 
         const completionStats = getProgressStats(globalIndex + 1, items.length);
 
@@ -213,6 +213,7 @@ export const createRepositoryIngestor = async ({
             repository: repository.name!,
           },
           content: text,
+          lastUpdated,
         };
 
         documents.push(document);

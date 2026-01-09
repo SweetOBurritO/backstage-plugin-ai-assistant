@@ -150,10 +150,10 @@ export const createWikiIngestor = async ({
         const page = pagesBatch[index];
         const globalIndex = batchStart + index;
 
-        const content = await azureDevOpsService.getWikiPageContent(
-          wiki.id!,
-          page.path!,
-        );
+        const [content, lastUpdated] = await Promise.all([
+          azureDevOpsService.getWikiPageContent(wiki.id!, page.path!),
+          azureDevOpsService.getWikiPageLastUpdated(wiki.id!, page.path!),
+        ]);
 
         const completionStats = getProgressStats(globalIndex + 1, pages.length);
 
@@ -188,6 +188,7 @@ export const createWikiIngestor = async ({
             wiki: wiki.name!,
           },
           content: pageContent,
+          lastUpdated,
         };
 
         logger.debug(

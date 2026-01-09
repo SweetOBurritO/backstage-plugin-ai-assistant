@@ -124,6 +124,26 @@ export const createAzureDevOpsService = async ({
     return itemContent;
   };
 
+  /**
+   * Get the last updated date for a specific item in an Azure DevOps repository
+   * @param repoId The ID of the repository
+   * @param path The path of the item
+   * @returns The date when the item was last updated
+   */
+  const getRepoItemLastUpdated = async (repoId: string, path: string) => {
+    const commits = await gitApi.getCommits(
+      repoId,
+      { itemPath: path, $top: 1 },
+      project,
+    );
+
+    if (!commits || commits.length === 0) {
+      throw new Error(`No commits found for item: ${path}`);
+    }
+
+    return commits[0].committer?.date;
+  };
+
   /* Gets all wikis in the specified Azure DevOps project */
   const getWikis = async () => {
     const wikis = await wikiApi.getAllWikis(project);
@@ -175,14 +195,52 @@ export const createAzureDevOpsService = async ({
     return pageStream;
   };
 
+  /**
+   * Get the last updated date for a specific page in an Azure DevOps wiki
+   * @param wikiId The ID of the wiki
+   * @param pagePath The path of the page
+   * @returns {Date | undefined} The date when the wiki page was last updated, or undefined if the committer date is not available
+   */
+  const getWikiPageLastUpdated = async (wikiId: string, pagePath: string) => {
+    // Wikis in Azure DevOps are backed by Git repositories
+    // We need to get the wiki details first to access the repository
+    const wikis = await wikiApi.getAllWikis(project);
+    const wiki = wikis.find(w => w.id === wikiId);
+
+    if (!wiki?.repositoryId) {
+      throw new Error(`Could not find repository for wiki: ${wikiId}`);
+    }
+
+    // Use Git API to get the last commit for the wiki page file
+    // Wiki pages are typically stored as files in the repository (often .md)
+    const filePath = pagePath.startsWith('/') ? pagePath.slice(1) : pagePath;
+    const fileName = filePath.split('/').pop() ?? '';
+    const hasExtension = fileName.includes('.');
+    const fullPath = hasExtension ? filePath : `${filePath}.md`;
+
+    const commits = await gitApi.getCommits(
+      wiki.repositoryId,
+      { itemPath: `/${fullPath}`, $top: 1 },
+      project,
+    );
+
+    if (!commits || commits.length === 0) {
+      throw new Error(`No commits found for wiki page: ${pagePath}`);
+    }
+
+    return commits[0].committer?.date;
+  };
+
   return {
     organization,
     project,
     getRepos,
     getRepoItems,
     getRepoItemContent,
+    getRepoItemLastUpdated,
     getWikis,
     getWikiPages,
     getWikiPageContent,
+    getWikiPageLastUpdated,
   };
 };
