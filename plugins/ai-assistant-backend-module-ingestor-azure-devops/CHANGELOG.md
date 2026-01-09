@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-azure-devops
 
+## 0.8.0
+
+### Minor Changes
+
+- 2e6dd84: Update azure devops ingestion to set last updated field for embeddings
+
 ## 0.7.0
 
 ### Minor Changes
