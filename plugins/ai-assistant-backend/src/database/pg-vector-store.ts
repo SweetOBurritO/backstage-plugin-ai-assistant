@@ -82,12 +82,16 @@ export class PgVectorStore implements VectorStore {
 
     // Fetch existing documents with matching (id, source) pairs
     const conditions = documents
-      .map(() => `(metadata->>'id' = ? AND metadata->>'source' = ?)`)
+      .map(
+        () =>
+          `(metadata->>'id' = ? AND metadata->>'source' = ? AND metadata->>'chunk' = ?)`,
+      )
       .join(' OR ');
 
     const params = documents.flatMap(doc => [
       doc.metadata.id,
       doc.metadata.source,
+      doc.metadata.chunk,
     ]);
 
     const existingDocuments: EmbeddingDocument[] = await this.client
@@ -98,7 +102,7 @@ export class PgVectorStore implements VectorStore {
     // Build a map for quick lookups
     const existingMap = new Map(
       existingDocuments.map(doc => [
-        `${doc.metadata.id}:${doc.metadata.source}`,
+        `${doc.metadata.id}:${doc.metadata.source}:${doc.metadata.chunk}`,
         doc,
       ]),
     );
@@ -108,7 +112,7 @@ export class PgVectorStore implements VectorStore {
     const documentsToUpdate: Array<EmbeddingDocument & { id: string }> = [];
 
     for (const doc of documents) {
-      const key = `${doc.metadata.id}:${doc.metadata.source}`;
+      const key = `${doc.metadata.id}:${doc.metadata.source}:${doc.metadata.chunk}`;
       const existing = existingMap.get(key);
 
       if (!existing) {
@@ -123,56 +127,80 @@ export class PgVectorStore implements VectorStore {
       }
     }
 
-    const allDocumentsToAdd = [...newDocuments, ...documentsToUpdate];
+    const unchangedCount =
+      documents.length - newDocuments.length - documentsToUpdate.length;
 
-    if (allDocumentsToAdd.length === 0) {
-      this.logger.debug('No new or updated documents to add.');
+    if (newDocuments.length === 0 && documentsToUpdate.length === 0) {
+      this.logger.debug(
+        `All ${unchangedCount} documents are unchanged, skipping processing.`,
+      );
       return;
     }
 
-    // Delete old versions before re-adding
+    this.logger.info(
+      `Processing ${documents.length} documents (${newDocuments.length} new, ${documentsToUpdate.length} updated, ${unchangedCount} unchanged).`,
+    );
+
+    // Update existing documents
     if (documentsToUpdate.length > 0) {
-      const uniqueDocKeys = new Set(
-        documentsToUpdate.map(
-          doc => `${doc.metadata.id}:${doc.metadata.source}`,
-        ),
+      const contents = documentsToUpdate.map(doc =>
+        doc.content.replace(/\0/g, ''),
+      );
+      const vectors = await this.embeddings!.embedDocuments(contents);
+
+      const updatedDocuments: EmbeddingDocument[] = documentsToUpdate.map(
+        (doc, index) => {
+          const cleanedContent = contents[index];
+          const vector = vectors[index];
+          const hash = createHash('sha256')
+            .update(cleanedContent)
+            .digest('hex');
+
+          return {
+            ...doc,
+            id: doc.id!,
+            hash,
+            content: cleanedContent,
+            vector: `[${vector.join(',')}]`,
+            lastUpdated: doc.lastUpdated ?? new Date(),
+          };
+        },
       );
 
-      for (const key of uniqueDocKeys) {
-        const [id, source] = key.split(':');
-        await this.client(this.tableName)
-          .delete()
-          .whereRaw(`metadata->>'id' = ? AND metadata->>'source' = ?`, [
-            id,
-            source,
-          ]);
+      for (const doc of updatedDocuments) {
+        const { id, ...updateData } = doc;
+        await this.client(this.tableName).where('id', id).update(updateData);
       }
 
       this.logger.info(
-        `Deleted all chunks for ${uniqueDocKeys.size} updated documents`,
+        `Updated ${documentsToUpdate.length} existing documents in the vector store.`,
       );
     }
 
-    const contents = allDocumentsToAdd.map(doc => doc.content);
-    const vectors = await this.embeddings!.embedDocuments(contents);
+    if (newDocuments.length > 0) {
+      const contents = newDocuments.map(doc => doc.content.replace(/\0/g, ''));
+      const vectors = await this.embeddings!.embedDocuments(contents);
 
-    const rows = allDocumentsToAdd.map((doc, index) => {
-      const vector = vectors[index];
-      const hash = createHash('sha256').update(doc.content).digest('hex');
+      const rows = newDocuments.map((doc, index) => {
+        const vector = vectors[index];
+        const cleanedContent = contents[index];
+        const hash = createHash('sha256').update(cleanedContent).digest('hex');
 
-      return {
-        hash,
-        metadata: doc.metadata,
-        lastUpdated: doc.lastUpdated ?? new Date(),
-        content: doc.content.replace(/\0/g, ''),
-        vector: `[${vector.join(',')}]`,
-      };
-    });
-    this.logger.info(
-      `Adding ${rows.length} documents (${newDocuments.length} new, ${documentsToUpdate.length} updated).`,
-    );
+        return {
+          hash,
+          metadata: doc.metadata,
+          lastUpdated: doc.lastUpdated ?? new Date(),
+          content: cleanedContent,
+          vector: `[${vector.join(',')}]`,
+        };
+      });
 
-    await this.client.batchInsert(this.tableName, rows, this.chunkSize);
+      await this.client.batchInsert(this.tableName, rows, this.chunkSize);
+
+      this.logger.info(
+        `Added ${newDocuments.length} new documents in the vector store.`,
+      );
+    }
   }
 
   /**
