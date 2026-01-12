@@ -190,33 +190,46 @@ export const createRepositoryIngestor = async ({
         const item = itemsBatch[index];
         const globalIndex = batchStart + index;
 
-        const [content, lastUpdated] = await Promise.all([
-          azureDevOpsService.getRepoItemContent(repository.id!, item.path!),
-          azureDevOpsService.getRepoItemLastUpdated(repository.id!, item.path!),
-        ]);
+        try {
+          const [content, lastUpdated] = await Promise.all([
+            azureDevOpsService.getRepoItemContent(repository.id!, item.path!),
+            azureDevOpsService.getRepoItemLastUpdated(
+              repository.id!,
+              item.path!,
+            ),
+          ]);
 
-        const completionStats = getProgressStats(globalIndex + 1, items.length);
+          const completionStats = getProgressStats(
+            globalIndex + 1,
+            items.length,
+          );
 
-        logger.info(
-          `Retrieved content for Azure DevOps item: ${item.path} in repository: "${repository.name}" [Progress: ${completionStats.completed}/${completionStats.total} (${completionStats.percentage}%) completed of repository]`,
-        );
+          logger.info(
+            `Retrieved content for Azure DevOps item: ${item.path} in repository: "${repository.name}" [Progress: ${completionStats.completed}/${completionStats.total} (${completionStats.percentage}%) completed of repository]`,
+          );
 
-        const text = await streamToString(content);
+          const text = await streamToString(content);
 
-        const document: EmbeddingDocument = {
-          metadata: {
-            source: MODULE_ID,
-            id: `${repository.id}:${item.path}`,
-            url: item.url!,
-            organization: azureDevOpsService.organization,
-            project: azureDevOpsService.project,
-            repository: repository.name!,
-          },
-          content: text,
-          lastUpdated,
-        };
+          const document: EmbeddingDocument = {
+            metadata: {
+              source: MODULE_ID,
+              id: `${repository.id}:${item.path}`,
+              url: item.url!,
+              organization: azureDevOpsService.organization,
+              project: azureDevOpsService.project,
+              repository: repository.name!,
+            },
+            content: text,
+            lastUpdated,
+          };
 
-        documents.push(document);
+          documents.push(document);
+        } catch (error) {
+          logger.warn(
+            `Failed to retrieve content for Azure DevOps item: ${item.path} in repository: "${repository.name}". Error: ${error}. Skipping item and continuing.`,
+          );
+          // Continue to next item instead of crashing entire ingestion
+        }
       }
 
       // Save the current batch of documents

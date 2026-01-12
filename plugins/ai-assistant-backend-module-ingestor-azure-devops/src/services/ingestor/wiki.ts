@@ -150,52 +150,62 @@ export const createWikiIngestor = async ({
         const page = pagesBatch[index];
         const globalIndex = batchStart + index;
 
-        const [content, lastUpdated] = await Promise.all([
-          azureDevOpsService.getWikiPageContent(wiki.id!, page.path!),
-          azureDevOpsService.getWikiPageLastUpdated(wiki.id!, page.path!),
-        ]);
+        try {
+          const [content, lastUpdated] = await Promise.all([
+            azureDevOpsService.getWikiPageContent(wiki.id!, page.path!),
+            azureDevOpsService.getWikiPageLastUpdated(wiki.id!, page.path!),
+          ]);
 
-        const completionStats = getProgressStats(globalIndex + 1, pages.length);
-
-        logger.info(
-          `Retrieved content for Azure DevOps page: "${page.path}" in wiki: "${wiki.name}" [Progress: ${completionStats.completed}/${completionStats.total} (${completionStats.percentage}%) completed of wiki]`,
-        );
-
-        // The API returns plain markdown text directly
-        const pageContent = await streamToString(content);
-
-        logger.debug(
-          `Raw response for page "${page.path}" (length: ${pageContent.length})`,
-        );
-        // Use remoteUrl which points to the user-facing wiki page, not the API endpoint
-        const pageUrl = page.remoteUrl || page.url!;
-
-        // Check if we have actual content (not empty or just whitespace)
-        if (!pageContent || pageContent.trim().length === 0) {
-          logger.warn(
-            `No content found for Azure DevOps page: "${page.path}" in wiki: "${wiki.name}". Skipping.`,
+          const completionStats = getProgressStats(
+            globalIndex + 1,
+            pages.length,
           );
-          continue;
+
+          logger.info(
+            `Retrieved content for Azure DevOps page: "${page.path}" in wiki: "${wiki.name}" [Progress: ${completionStats.completed}/${completionStats.total} (${completionStats.percentage}%) completed of wiki]`,
+          );
+
+          // The API returns plain markdown text directly
+          const pageContent = await streamToString(content);
+
+          logger.debug(
+            `Raw response for page "${page.path}" (length: ${pageContent.length})`,
+          );
+          // Use remoteUrl which points to the user-facing wiki page, not the API endpoint
+          const pageUrl = page.remoteUrl || page.url!;
+
+          // Check if we have actual content (not empty or just whitespace)
+          if (!pageContent || pageContent.trim().length === 0) {
+            logger.warn(
+              `No content found for Azure DevOps page: "${page.path}" in wiki: "${wiki.name}". Skipping.`,
+            );
+            continue;
+          }
+
+          const document: EmbeddingDocument = {
+            metadata: {
+              source: MODULE_ID,
+              id: `${wiki.id}:${page.path}`,
+              url: pageUrl,
+              organization: azureDevOpsService.organization,
+              project: azureDevOpsService.project,
+              wiki: wiki.name!,
+            },
+            content: pageContent,
+            lastUpdated,
+          };
+
+          logger.debug(
+            `Created embedding document for Azure DevOps page: "${page.path}" in wiki: "${wiki.name}" content length: "${document.content.length}", page url: "${document.metadata.url}"`,
+          );
+
+          documents.push(document);
+        } catch (error) {
+          logger.warn(
+            `Failed to retrieve content for Azure DevOps page: "${page.path}" in wiki: "${wiki.name}". Error: ${error}. Skipping page and continuing.`,
+          );
+          // Continue to next page instead of crashing entire ingestion
         }
-
-        const document: EmbeddingDocument = {
-          metadata: {
-            source: MODULE_ID,
-            id: `${wiki.id}:${page.path}`,
-            url: pageUrl,
-            organization: azureDevOpsService.organization,
-            project: azureDevOpsService.project,
-            wiki: wiki.name!,
-          },
-          content: pageContent,
-          lastUpdated,
-        };
-
-        logger.debug(
-          `Created embedding document for Azure DevOps page: "${page.path}" in wiki: "${wiki.name}" content length: "${document.content.length}", page url: "${document.metadata.url}"`,
-        );
-
-        documents.push(document);
       }
 
       // Save the current batch of documents
