@@ -116,8 +116,8 @@ export class PgVectorStore implements VectorStore {
         continue;
       }
 
-      // Check if content changed
-      const newHash = createHash('sha256').update(doc.content).digest('hex');
+      const cleanedContent = doc.content.replace(/\0/g, '');
+      const newHash = createHash('sha256').update(cleanedContent).digest('hex');
       if (!existing.hash || newHash !== existing.hash) {
         documentsToUpdate.push({ ...doc, id: existing.id! });
       }
