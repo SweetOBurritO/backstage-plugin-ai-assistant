@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend
 
+## 0.15.3
+
+### Patch Changes
+
+- af47d6c: sanitize document content before hashing to prevent issues with null characters
+
 ## 0.15.2
 
 ### Patch Changes
