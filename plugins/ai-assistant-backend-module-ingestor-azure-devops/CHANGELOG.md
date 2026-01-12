@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-azure-devops
 
+## 0.8.1
+
+### Patch Changes
+
+- acab9f1: add error handling for Azure DevOps content retrieval in repository and wiki ingestors
+
 ## 0.8.0
 
 ### Minor Changes
