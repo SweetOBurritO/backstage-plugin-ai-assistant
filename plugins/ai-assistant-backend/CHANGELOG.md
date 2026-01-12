@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend
 
+## 0.15.4
+
+### Patch Changes
+
+- 3fcaa4a: enhance document uniqueness check by including chunk metadata in vector store
+
 ## 0.15.3
 
 ### Patch Changes
