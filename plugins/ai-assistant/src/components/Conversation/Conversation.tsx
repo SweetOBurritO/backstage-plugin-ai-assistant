@@ -3,6 +3,7 @@ import { chatApiRef } from '../../api/chat';
 import { useAsync, useAsyncFn, useLocalStorage } from 'react-use';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { signalApiRef } from '@backstage/plugin-signals-react';
+import { useSearchParams } from 'react-router-dom';
 
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
@@ -15,7 +16,7 @@ import Button from '@mui/material/Button';
 import { Message } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { MessageCard } from '../MessageCard';
 import { SettingsModal } from '../SettingsModal';
-import { useChatSettings } from '../../hooks';
+import { useAnalytics, useChatSettings } from '../../hooks';
 
 type ConversationOptions = {
   conversationId: string | undefined;
@@ -31,9 +32,22 @@ export const Conversation = ({
   const chatApi = useApi(chatApiRef);
   const errorApi = useApi(errorApiRef);
   const signalApi = useApi(signalApiRef);
+  const analytics = useAnalytics();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [input, setInput] = useState('');
+  const initialQuery = searchParams.get('query') ?? '';
+
+  const [input, setInput] = useState(initialQuery);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (initialQuery && searchParams.has('query')) {
+      setSearchParams(params => {
+        params.delete('query');
+        return params;
+      });
+    }
+  }, [initialQuery, searchParams, setSearchParams]);
 
   const [modelId, setModelId] = useLocalStorage<string | undefined>(
     'modelId',
@@ -72,6 +86,13 @@ export const Conversation = ({
         newMessages.forEach(message => {
           const index = updated.findIndex(m => m.id === message.id);
 
+          if (index === -1 && message.role !== 'human') {
+            analytics.captureEvent({
+              action: 'message_received',
+              subject: modelId ?? 'none',
+            });
+          }
+
           if (index === -1) {
             updated.push(message);
           } else {
@@ -82,7 +103,7 @@ export const Conversation = ({
         return updated;
       });
     },
-    [setMessages],
+    [setMessages, analytics, modelId],
   );
 
   useEffect(() => {
@@ -115,6 +136,11 @@ export const Conversation = ({
   }, [models, modelId, setModelId]);
 
   const [{ loading: sending }, sendMessage] = useAsyncFn(async () => {
+    analytics.captureEvent({
+      action: 'message_sent',
+      subject: modelId ?? 'none',
+    });
+
     const newMessages: Message[] = [
       { role: 'human', content: input, metadata: {}, score: 0 },
     ];
