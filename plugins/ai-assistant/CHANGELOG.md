@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant
 
+## 0.11.0
+
+### Minor Changes
+
+- c2c4f75: introduces analytics tracking to the AI Assistant's conversation component, enabling the capture of user interactions such as sending and receiving messages and adds support for initializing the chat input from a URL query parameter and cleans up the query parameter after use
+
 ## 0.10.0
 
 ### Minor Changes
