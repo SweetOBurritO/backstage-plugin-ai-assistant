@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-github
 
+## 0.4.1
+
+### Patch Changes
+
+- 9ca336d: Upgrade to backstage 1.47.2
+
 ## 0.4.0
 
 ### Minor Changes

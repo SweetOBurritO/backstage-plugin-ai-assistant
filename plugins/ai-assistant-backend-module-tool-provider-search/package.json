@@ -1,6 +1,6 @@
 {
   "name": "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-tool-provider-search",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "license": "Apache-2.0",
   "description": "The tool-provider-search backend module for the ai-assistant plugin.",
   "main": "src/index.ts",

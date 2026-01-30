@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-tool-provider-backstage
 
+## 0.4.3
+
+### Patch Changes
+
+- 9ca336d: Upgrade to backstage 1.47.2
+
 ## 0.4.2
 
 ### Patch Changes
