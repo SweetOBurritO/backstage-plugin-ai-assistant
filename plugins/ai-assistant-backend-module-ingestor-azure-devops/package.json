@@ -25,14 +25,14 @@
     "postpack": "backstage-cli package postpack"
   },
   "dependencies": {
-    "@backstage/backend-plugin-api": "^1.4.1",
+    "@backstage/backend-plugin-api": "backstage:^",
     "@sweetoburrito/backstage-plugin-ai-assistant-common": "^0.8.0",
     "@sweetoburrito/backstage-plugin-ai-assistant-node": "^0.10.0",
     "azure-devops-node-api": "^15.1.1"
   },
   "devDependencies": {
-    "@backstage/backend-test-utils": "^1.7.0",
-    "@backstage/cli": "^0.33.1"
+    "@backstage/backend-test-utils": "backstage:^",
+    "@backstage/cli": "backstage:^"
   },
   "files": [
     "dist",
