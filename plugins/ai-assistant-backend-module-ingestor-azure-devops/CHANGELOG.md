@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-ingestor-azure-devops
 
+## 0.8.2
+
+### Patch Changes
+
+- 9ca336d: Upgrade to backstage 1.47.2
+
 ## 0.8.1
 
 ### Patch Changes

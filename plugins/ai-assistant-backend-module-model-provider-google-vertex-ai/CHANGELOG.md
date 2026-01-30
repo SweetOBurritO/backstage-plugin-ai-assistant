@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-google-vertex-ai
 
+## 0.2.5
+
+### Patch Changes
+
+- 9ca336d: Upgrade to backstage 1.47.2
+
 ## 0.2.4
 
 ### Patch Changes

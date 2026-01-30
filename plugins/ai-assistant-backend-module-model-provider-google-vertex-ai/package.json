@@ -1,6 +1,6 @@
 {
   "name": "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-google-vertex-ai",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "license": "Apache-2.0",
   "description": "The model-provider-google-vertex-ai backend module for the ai-assistant plugin.",
   "main": "src/index.ts",
