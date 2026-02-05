@@ -6,7 +6,7 @@ import {
   RootConfigService,
   ServiceRef,
 } from '@backstage/backend-plugin-api';
-import { createReactAgent } from '@langchain/langgraph/prebuilt';
+import { createAgent as createLangchainAgent } from 'langchain';
 import {
   EnabledTool,
   Message,
@@ -24,8 +24,9 @@ import { CallbackService, callbackServiceRef } from '../callbacks';
 import { modelServiceRef, ModelService } from '../model';
 import { toolsServiceRef, ToolsService } from '../tools';
 
-import { BaseMessage } from '@langchain/core/messages';
+import { BaseMessage, BaseMessageChunk } from '@langchain/core/messages';
 import { parseLangchainMessage } from './helpers/message-parser';
+import { createDeterministicUuid } from './helpers/deterministic-uuid';
 
 type PromptOptions = {
   credentials: BackstageCredentials;
@@ -44,6 +45,7 @@ type PromptOptions = {
 
 type StreamOptions = PromptOptions & {
   onStreamChunk: (messages: Message[]) => void;
+  onStreamEnd?: () => void;
 };
 
 export type AgentService = {
@@ -97,7 +99,7 @@ const createAgentService = ({
 
   const createAgent = async (
     options: PromptOptions,
-  ): Promise<ReturnType<typeof createReactAgent>> => {
+  ): Promise<ReturnType<typeof createLangchainAgent>> => {
     const {
       modelId,
       credentials,
@@ -127,12 +129,6 @@ const createAgentService = ({
       systemPrompt,
     });
 
-    const agent = createReactAgent({
-      llm,
-      tools,
-      prompt: agentPrompt[0].text,
-    });
-
     const { callbacks } = await callback.getChainCallbacks({
       userId,
       conversationId,
@@ -145,19 +141,22 @@ const createAgentService = ({
       modelId: resolvedModelId,
     });
 
-    agent.config = {
-      ...agent.config,
+    const agent = createLangchainAgent({
+      model: llm,
+      tools,
+      systemPrompt: agentPrompt[0].text,
+    }).withConfig({
       callbacks,
       metadata,
       runId,
       runName,
-    };
+    });
 
     return agent;
   };
 
   const stream: AgentService['stream'] = async options => {
-    const { messages, onStreamChunk } = options;
+    const { messages, onStreamChunk, onStreamEnd } = options;
 
     const agent = await createAgent(options);
 
@@ -166,19 +165,40 @@ const createAgentService = ({
         messages,
       },
       {
-        streamMode: ['values'],
+        streamMode: ['messages'],
       },
     );
 
-    for await (const [, chunk] of promptStream) {
-      const { messages: promptMessages } = chunk;
+    const promptMessages: BaseMessageChunk[] = [];
 
-      const parsedMessages: Message[] = (promptMessages as BaseMessage[]).map(
-        m => parseLangchainMessage(m, options.metadata.runId),
+    for await (const [, [chunk]] of promptStream) {
+      const messageChunk = chunk as BaseMessageChunk;
+
+      messageChunk.id = createDeterministicUuid(messageChunk);
+
+      const existingChunksIndex = promptMessages.findIndex(
+        m => m.id === messageChunk.id,
+      );
+
+      if (existingChunksIndex === -1) {
+        promptMessages.push(messageChunk);
+      } else {
+        const existingChunk = promptMessages[existingChunksIndex];
+
+        existingChunk.concat(messageChunk);
+
+        promptMessages[existingChunksIndex] =
+          existingChunk.concat(messageChunk);
+      }
+
+      const parsedMessages: Message[] = promptMessages.map(m =>
+        parseLangchainMessage(m, options.metadata.runId),
       );
 
       onStreamChunk(parsedMessages);
     }
+
+    onStreamEnd?.();
   };
 
   const prompt: AgentService['prompt'] = async options => {

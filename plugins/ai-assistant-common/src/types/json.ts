@@ -6,6 +6,6 @@ export type JsonValue =
   | JsonObject
   | JsonArray;
 
-export type JsonObject = { [key: string]: JsonValue };
+export type JsonObject = { [key: string]: JsonValue | undefined };
 
 export type JsonArray = JsonValue[];

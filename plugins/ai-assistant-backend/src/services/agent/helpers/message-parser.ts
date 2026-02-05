@@ -4,14 +4,14 @@ import {
   JsonObject,
   Message,
 } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
-import { v4 as uuid, validate } from 'uuid';
+import { createDeterministicUuid } from './deterministic-uuid';
 
 export const parseLangchainMessage = (
   message: BaseMessage,
   traceId: string,
 ): Message => {
-  const id = validate(message.id) ? message.id : uuid();
-  const role = message.getType();
+  const id = createDeterministicUuid(message);
+  const role = message.type as Message['role'];
   const content =
     typeof message.content === 'string'
       ? message.content
@@ -23,9 +23,10 @@ export const parseLangchainMessage = (
     const aiMessage = message as AIMessage;
 
     metadata.toolCalls = aiMessage.tool_calls || [];
+
     metadata.finishReason =
-      aiMessage.response_metadata.finish_reason || undefined;
-    metadata.modelName = aiMessage.response_metadata.model_name || undefined;
+      (aiMessage.response_metadata?.finish_reason as string) || undefined;
+    metadata.modelName = aiMessage.response_metadata?.model_name || undefined;
   }
 
   if (role === 'tool') {

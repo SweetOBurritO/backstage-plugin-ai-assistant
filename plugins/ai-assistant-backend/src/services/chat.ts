@@ -105,6 +105,8 @@ export const createChatService = async ({
 
       const conversationMessages = [...recentConversationMessages, ...messages];
 
+      const newMessages: Message[] = [];
+
       agent.stream({
         credentials,
         messages: conversationMessages,
@@ -118,45 +120,42 @@ export const createChatService = async ({
         },
         context: context[0].text,
         onStreamChunk: async chunkMessages => {
-          const newMessages: Message[] = chunkMessages.filter(
-            m => conversationMessages.findIndex(cm => cm.id === m.id) === -1,
+          if (chunkMessages.length === 0) {
+            return;
+          }
+
+          const existingNewMessageIndex = newMessages.findIndex(
+            cm => cm.id === chunkMessages[0].id,
           );
 
-          if (newMessages.length !== 0) {
-            conversation.addMessages(
-              newMessages,
-              userEntityRef,
-              conversationId,
-              conversationMessages,
+          if (existingNewMessageIndex !== -1) {
+            newMessages.splice(
+              existingNewMessageIndex,
+              chunkMessages.length,
+              ...chunkMessages,
             );
-
-            conversationMessages.push(...newMessages);
-            responseMessages.push(...newMessages);
-
-            // Simulate streaming until langchain messages error is better understood
-            for await (const m of newMessages) {
-              const words = m.content.split(' ');
-              const chunkSize = 5; // Send 5 words at a time
-              let messageBuilder = '';
-
-              for (let i = 0; i < words.length; i += chunkSize) {
-                const wordChunk = words.slice(i, i + chunkSize).join(' ');
-                messageBuilder = messageBuilder.concat(wordChunk).concat(' ');
-                m.content = messageBuilder;
-
-                await new Promise(resolve => setTimeout(resolve, 50));
-
-                signals.publish({
-                  channel: `ai-assistant.chat.conversation-stream:${conversationId}`,
-                  message: { messages: [m] },
-                  recipients: {
-                    type: 'user',
-                    entityRef: userEntityRef,
-                  },
-                });
-              }
-            }
+          } else {
+            newMessages.push(...chunkMessages);
           }
+
+          responseMessages.push(...chunkMessages);
+
+          signals.publish({
+            channel: `ai-assistant.chat.conversation-stream:${conversationId}`,
+            message: { messages: chunkMessages },
+            recipients: {
+              type: 'user',
+              entityRef: userEntityRef,
+            },
+          });
+        },
+        onStreamEnd: async () => {
+          conversation.addMessages(
+            newMessages,
+            userEntityRef,
+            conversationId,
+            conversationMessages,
+          );
         },
       });
 

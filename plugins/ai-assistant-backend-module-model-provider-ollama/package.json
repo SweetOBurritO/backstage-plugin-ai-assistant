@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@backstage/backend-plugin-api": "backstage:^",
-    "@langchain/ollama": "^0.2.3",
+    "@langchain/ollama": "^1.2.2",
     "@sweetoburrito/backstage-plugin-ai-assistant-node": "^0.10.0"
   },
   "devDependencies": {
