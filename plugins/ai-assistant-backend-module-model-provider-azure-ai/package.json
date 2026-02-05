@@ -29,8 +29,8 @@
     "@azure/core-auth": "^1.10.0",
     "@azure/core-sse": "^2.3.0",
     "@backstage/backend-plugin-api": "backstage:^",
-    "@langchain/core": "^0.3.80",
-    "@langchain/openai": "^0.6.13",
+    "@langchain/core": "^1.1.19",
+    "@langchain/openai": "^1.2.4",
     "@sweetoburrito/backstage-plugin-ai-assistant-node": "^0.10.0"
   },
   "devDependencies": {

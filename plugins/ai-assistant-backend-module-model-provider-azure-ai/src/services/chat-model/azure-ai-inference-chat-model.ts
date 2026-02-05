@@ -114,9 +114,9 @@ export class AzureAiInferenceChatModel
       runManager,
     )) {
       if (!finalChunk) {
-        finalChunk = chunk.message;
+        finalChunk = chunk.message as AIMessageChunk;
       } else {
-        finalChunk = concat(finalChunk, chunk.message);
+        finalChunk = concat(finalChunk, chunk.message) as AIMessageChunk;
       }
     }
 
