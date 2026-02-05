@@ -1,5 +1,16 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai
 
+## 0.5.0
+
+### Minor Changes
+
+- 969ac04: migrate to langchain v1
+
+### Patch Changes
+
+- Updated dependencies [969ac04]
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.11.0
+
 ## 0.4.7
 
 ### Patch Changes
