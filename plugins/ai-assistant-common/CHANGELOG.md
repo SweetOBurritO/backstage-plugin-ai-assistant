@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-common
 
+## 0.9.0
+
+### Minor Changes
+
+- 969ac04: migrate to langchain v1
+
 ## 0.8.0
 
 ### Minor Changes

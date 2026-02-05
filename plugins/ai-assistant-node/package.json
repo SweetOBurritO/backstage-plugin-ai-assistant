@@ -1,6 +1,6 @@
 {
   "name": "@sweetoburrito/backstage-plugin-ai-assistant-node",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "license": "Apache-2.0",
   "description": "Node.js library for the ai-assistant plugin",
   "main": "src/index.ts",
@@ -40,7 +40,7 @@
     "@backstage/plugin-catalog-node": "backstage:^",
     "@langchain/core": "^1.1.19",
     "@langchain/mcp-adapters": "^1.1.2",
-    "@sweetoburrito/backstage-plugin-ai-assistant-common": "^0.8.0",
+    "@sweetoburrito/backstage-plugin-ai-assistant-common": "^0.9.0",
     "zod": "^4.1.11"
   }
 }

@@ -1,5 +1,12 @@
 # @sweetoburrito/backstage-plugin-ai-assistant
 
+## 0.11.1
+
+### Patch Changes
+
+- Updated dependencies [969ac04]
+  - @sweetoburrito/backstage-plugin-ai-assistant-common@0.9.0
+
 ## 0.11.0
 
 ### Minor Changes

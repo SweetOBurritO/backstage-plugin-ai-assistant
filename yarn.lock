@@ -12797,7 +12797,7 @@ __metadata:
     "@langfuse/langchain": "npm:^4.4.2"
     "@langfuse/otel": "npm:^4.4.2"
     "@opentelemetry/sdk-node": "npm:^0.208.0"
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.10.0"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.11.0"
   languageName: unknown
   linkType: soft
 
@@ -12809,7 +12809,7 @@ __metadata:
     "@backstage/backend-test-utils": "backstage:^"
     "@backstage/cli": "backstage:^"
     "@langchain/openai": "npm:^1.2.4"
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.10.0"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.11.0"
   languageName: unknown
   linkType: soft
 
@@ -12821,7 +12821,7 @@ __metadata:
     "@backstage/backend-test-utils": "backstage:^"
     "@backstage/cli": "backstage:^"
     "@langchain/ollama": "npm:^1.2.2"
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.10.0"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.11.0"
   languageName: unknown
   linkType: soft
 
@@ -12832,8 +12832,8 @@ __metadata:
     "@backstage/backend-plugin-api": "backstage:^"
     "@backstage/backend-test-utils": "backstage:^"
     "@backstage/cli": "backstage:^"
-    "@sweetoburrito/backstage-plugin-ai-assistant-common": "npm:^0.8.0"
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.10.0"
+    "@sweetoburrito/backstage-plugin-ai-assistant-common": "npm:^0.9.0"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.11.0"
     azure-devops-node-api: "npm:^15.1.1"
   languageName: unknown
   linkType: soft
@@ -12849,7 +12849,7 @@ __metadata:
     "@backstage/cli": "backstage:^"
     "@backstage/plugin-catalog-backend": "backstage:^"
     "@backstage/plugin-catalog-node": "backstage:^"
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.10.0"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.11.0"
     fetch-retry: "npm:^6.0.0"
   languageName: unknown
   linkType: soft
@@ -12861,8 +12861,8 @@ __metadata:
     "@backstage/backend-plugin-api": "backstage:^"
     "@backstage/backend-test-utils": "backstage:^"
     "@backstage/cli": "backstage:^"
-    "@sweetoburrito/backstage-plugin-ai-assistant-common": "npm:^0.8.0"
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.10.0"
+    "@sweetoburrito/backstage-plugin-ai-assistant-common": "npm:^0.9.0"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.11.0"
     octokit: "npm:^5.0.0"
   languageName: unknown
   linkType: soft
@@ -12879,7 +12879,7 @@ __metadata:
     "@backstage/cli": "backstage:^"
     "@langchain/core": "npm:^1.1.19"
     "@langchain/openai": "npm:^1.2.4"
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.10.0"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.11.0"
   languageName: unknown
   linkType: soft
 
@@ -12891,7 +12891,7 @@ __metadata:
     "@backstage/backend-test-utils": "backstage:^"
     "@backstage/cli": "backstage:^"
     "@langchain/google-vertexai": "npm:^2.1.15"
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.10.0"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.11.0"
   languageName: unknown
   linkType: soft
 
@@ -12903,7 +12903,7 @@ __metadata:
     "@backstage/backend-test-utils": "backstage:^"
     "@backstage/cli": "backstage:^"
     "@langchain/ollama": "npm:^1.2.2"
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.10.0"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.11.0"
   languageName: unknown
   linkType: soft
 
@@ -12916,7 +12916,7 @@ __metadata:
     "@backstage/cli": "backstage:^"
     "@backstage/types": "backstage:^"
     "@n8n/json-schema-to-zod": "npm:1.1.0"
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.10.0"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.11.0"
   languageName: unknown
   linkType: soft
 
@@ -12927,8 +12927,8 @@ __metadata:
     "@backstage/backend-plugin-api": "backstage:^"
     "@backstage/backend-test-utils": "backstage:^"
     "@backstage/cli": "backstage:^"
-    "@sweetoburrito/backstage-plugin-ai-assistant-common": "npm:^0.8.0"
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.10.0"
+    "@sweetoburrito/backstage-plugin-ai-assistant-common": "npm:^0.9.0"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.11.0"
     zod: "npm:^4.1.11"
   languageName: unknown
   linkType: soft
@@ -12966,8 +12966,8 @@ __metadata:
     "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-google-vertex-ai": "workspace:^"
     "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-ollama": "workspace:^"
     "@sweetoburrito/backstage-plugin-ai-assistant-backend-module-tool-provider-backstage": "workspace:^"
-    "@sweetoburrito/backstage-plugin-ai-assistant-common": "npm:^0.8.0"
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.10.0"
+    "@sweetoburrito/backstage-plugin-ai-assistant-common": "npm:^0.9.0"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.11.0"
     "@sweetoburrito/backstage-plugin-qeta-backend-module-ai-assistant": "workspace:^"
     "@types/express": "npm:^4.0.0"
     "@types/supertest": "npm:^2.0.12"
@@ -12981,7 +12981,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@sweetoburrito/backstage-plugin-ai-assistant-common@npm:^0.8.0, @sweetoburrito/backstage-plugin-ai-assistant-common@workspace:plugins/ai-assistant-common":
+"@sweetoburrito/backstage-plugin-ai-assistant-common@npm:^0.9.0, @sweetoburrito/backstage-plugin-ai-assistant-common@workspace:plugins/ai-assistant-common":
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-common@workspace:plugins/ai-assistant-common"
   dependencies:
@@ -12992,7 +12992,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@sweetoburrito/backstage-plugin-ai-assistant-node@npm:^0.10.0, @sweetoburrito/backstage-plugin-ai-assistant-node@workspace:plugins/ai-assistant-node":
+"@sweetoburrito/backstage-plugin-ai-assistant-node@npm:^0.11.0, @sweetoburrito/backstage-plugin-ai-assistant-node@workspace:plugins/ai-assistant-node":
   version: 0.0.0-use.local
   resolution: "@sweetoburrito/backstage-plugin-ai-assistant-node@workspace:plugins/ai-assistant-node"
   dependencies:
@@ -13002,7 +13002,7 @@ __metadata:
     "@backstage/plugin-catalog-node": "backstage:^"
     "@langchain/core": "npm:^1.1.19"
     "@langchain/mcp-adapters": "npm:^1.1.2"
-    "@sweetoburrito/backstage-plugin-ai-assistant-common": "npm:^0.8.0"
+    "@sweetoburrito/backstage-plugin-ai-assistant-common": "npm:^0.9.0"
     zod: "npm:^4.1.11"
   languageName: unknown
   linkType: soft
@@ -13025,7 +13025,7 @@ __metadata:
     "@drodil/backstage-plugin-qeta": "npm:^3.46.0"
     "@mui/icons-material": "npm:^6.5.0"
     "@mui/material": "npm:^6.5.0"
-    "@sweetoburrito/backstage-plugin-ai-assistant-common": "npm:^0.8.0"
+    "@sweetoburrito/backstage-plugin-ai-assistant-common": "npm:^0.9.0"
     react-markdown: "npm:^10.1.0"
     react-use: "npm:^17.2.4"
     tss-react: "npm:^4.9.19"
@@ -13045,7 +13045,7 @@ __metadata:
     "@backstage/backend-test-utils": "backstage:^"
     "@backstage/cli": "backstage:^"
     "@drodil/backstage-plugin-qeta-node": "npm:^3.46.0"
-    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.10.0"
+    "@sweetoburrito/backstage-plugin-ai-assistant-node": "npm:^0.11.0"
   languageName: unknown
   linkType: soft
 
