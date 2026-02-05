@@ -37,7 +37,7 @@
     "dist"
   ],
   "dependencies": {
-    "@langchain/mcp-adapters": "^1.0.0",
+    "@langchain/mcp-adapters": "^1.1.2",
     "minimatch": "^10.0.1",
     "zod": "^4.1.12"
   }

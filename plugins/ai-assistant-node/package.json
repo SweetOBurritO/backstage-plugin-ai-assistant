@@ -39,7 +39,7 @@
     "@backstage/catalog-model": "backstage:^",
     "@backstage/plugin-catalog-node": "backstage:^",
     "@langchain/core": "^1.1.19",
-    "@langchain/mcp-adapters": "^1.0.3",
+    "@langchain/mcp-adapters": "^1.1.2",
     "@sweetoburrito/backstage-plugin-ai-assistant-common": "^0.8.0",
     "zod": "^4.1.11"
   }
