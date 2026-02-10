@@ -64,14 +64,6 @@ export const createMcpService = async ({
         }, {} as Record<string, McpServerConfigOptions>)
       : {};
 
-  const coreServers: Set<string> = serversConfig
-    ? new Set(
-        serversConfig
-          .filter(server => server.getOptionalBoolean('core') === true)
-          .map(server => server.getString('name')),
-      )
-    : new Set();
-
   const getUserMcpServerConfigNames: McpService['getUserMcpServerConfigNames'] =
     async credentials => {
       const mcpConfig = await userSettings.getSettingsForType(
@@ -142,7 +134,7 @@ export const createMcpService = async ({
     });
 
     const serverToolPromises = serverNames.map(serverName =>
-      getToolsForServer(mcpClient, serverName, coreServers.has(serverName)),
+      getToolsForServer(mcpClient, serverName),
     );
     const toolsByServer = await Promise.all(serverToolPromises);
 

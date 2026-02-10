@@ -8,5 +8,4 @@ export type McpServerConfigOptions =
 export type McpServerConfig = {
   name: string;
   options: McpServerConfigOptions;
-  core?: boolean;
 };

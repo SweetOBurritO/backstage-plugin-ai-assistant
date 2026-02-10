@@ -47,21 +47,6 @@ export const useChatSettings = () => {
     state => state.setToolsEnabled,
   );
 
-  const persistToolsSettings = useCallback(
-    async (tools: EnabledTool[]) => {
-      const baseUrl = await discoveryApi.getBaseUrl('ai-assistant');
-      await fetchApi.fetch(`${baseUrl}/settings`, {
-        method: 'PATCH',
-        body: JSON.stringify({
-          type: 'user-tools',
-          settings: { tools },
-        }),
-        headers: { 'Content-Type': 'application/json' },
-      });
-    },
-    [discoveryApi, fetchApi],
-  );
-
   const getAvailableTools = useCallback(async (): Promise<EnabledTool[]> => {
     const baseUrl = await discoveryApi.getBaseUrl('ai-assistant');
 
@@ -77,9 +62,17 @@ export const useChatSettings = () => {
   const setToolsEnabled = useCallback(
     async (tools: EnabledTool[]) => {
       setToolsEnabledState(tools);
-      await persistToolsSettings(tools);
+      const baseUrl = await discoveryApi.getBaseUrl('ai-assistant');
+
+      await fetchApi.fetch(`${baseUrl}/settings`, {
+        method: 'PATCH',
+        body: JSON.stringify({ type: 'user-tools', settings: { tools } }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
     },
-    [persistToolsSettings, setToolsEnabledState],
+    [discoveryApi, fetchApi, setToolsEnabledState],
   );
 
   const fetchUserEnabledTools = useCallback(async () => {
@@ -99,34 +92,26 @@ export const useChatSettings = () => {
       settings: { tools?: EnabledTool[] };
     };
 
-    const availableTools = await getAvailableTools();
-    const coreTools = availableTools.filter(tool => tool.provider === 'core');
-
     if (tools) {
-      // Always ensure core tools are included
-      const toolMap = new Map(
-        [...tools, ...coreTools].map(t => [`${t.provider}-${t.name}`, t]),
-      );
-      const mergedTools = Array.from(toolMap.values());
-      setToolsEnabledState(mergedTools);
-
-      // Persist merged tools if they changed
-      if (mergedTools.length !== tools.length) {
-        await persistToolsSettings(mergedTools);
-      }
+      setToolsEnabledState(tools);
       return;
     }
 
+    const availableTools = await getAvailableTools();
+
+    const coreTools = availableTools.filter(tool => tool.provider === 'core');
+
     setToolsEnabledState(coreTools);
     // Persist to backend
-    await persistToolsSettings(coreTools);
-  }, [
-    discoveryApi,
-    fetchApi,
-    setToolsEnabledState,
-    getAvailableTools,
-    persistToolsSettings,
-  ]);
+    await fetchApi.fetch(`${baseUrl}/settings`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        type: 'user-tools',
+        settings: { tools: coreTools },
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }, [discoveryApi, fetchApi, setToolsEnabledState, getAvailableTools]);
 
   useEffect(() => {
     fetchUserEnabledTools();

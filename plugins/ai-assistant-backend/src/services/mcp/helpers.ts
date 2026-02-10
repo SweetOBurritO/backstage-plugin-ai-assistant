@@ -17,10 +17,9 @@ const sanitizeToolName = (name: string): string => {
 const convertToAssistantTool = (
   mcpTool: DynamicStructuredTool,
   serverName: string,
-  isCore: boolean,
 ): Tool => {
   const { name, description, schema } = mcpTool;
-  const provider = isCore ? 'core' : `mcp server:${serverName}`;
+  const provider = `mcp server:${serverName}`;
   const sanitizedName = sanitizeToolName(name);
 
   const tool = {
@@ -42,12 +41,11 @@ const convertToAssistantTool = (
 export const getToolsForServer = async (
   mcpClient: MultiServerMCPClient,
   serverName: string,
-  isCore: boolean = false,
 ): Promise<Tool[]> => {
   const mcpTools = await mcpClient.getTools(serverName);
 
   const assistantTools = mcpTools.map(mcpTool =>
-    convertToAssistantTool(mcpTool, serverName, isCore),
+    convertToAssistantTool(mcpTool, serverName),
   );
   return assistantTools;
 };
