@@ -159,18 +159,30 @@ export const Conversation = ({
 
     setMessages(prev => [...prev, ...newMessages]);
 
-    const response = await chatApi.sendMessage({
-      conversationId,
-      modelId,
-      messages: additionalSystemMessages
-        ? [...additionalSystemMessages, ...newMessages]
-        : newMessages,
-      tools: toolsEnabled,
-    });
+    try {
+      const response = await chatApi.sendMessage({
+        conversationId,
+        modelId,
+        messages: additionalSystemMessages
+          ? [...additionalSystemMessages, ...newMessages]
+          : newMessages,
+        tools: toolsEnabled,
+      });
 
-    setConversationId(response.conversationId);
+      setConversationId(response.conversationId);
 
-    return response;
+      return response;
+    } catch (error) {
+      errorApi.post({
+        name: 'MessageSendError',
+        message: `Failed to send message: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`,
+      });
+      // Remove the user message from the UI since it failed
+      setMessages(prev => prev.slice(0, -1));
+      return undefined;
+    }
   }, [
     input,
     inputRef,
@@ -181,6 +193,7 @@ export const Conversation = ({
     errorApi,
     setInput,
     toolsEnabled,
+    additionalSystemMessages,
   ]);
 
   const messageEndRef = useRef<HTMLDivElement>(null);

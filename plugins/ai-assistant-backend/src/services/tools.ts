@@ -51,9 +51,14 @@ const createToolsService = async ({
   }) => {
     const mcpTools = await mcp.getTools(credentials);
 
+    // Separate core MCP tools from regular MCP tools
+    const coreMcpTools = mcpTools.filter(tool => tool.provider === 'core');
+    const regularMcpTools = mcpTools.filter(tool => tool.provider !== 'core');
+
     const availableTools: EnabledTool[] = tools
-      .concat(mcpTools)
+      .concat(regularMcpTools)
       .concat(coreTools)
+      .concat(coreMcpTools)
       .map(tool => ({
         name: tool.name,
         provider: tool.provider,
@@ -75,11 +80,16 @@ const createToolsService = async ({
 
     const mcpTools = await mcp.getTools(credentials);
 
-    const userTools = tools.concat(mcpTools);
+    // Separate core MCP tools from regular MCP tools
+    const coreMcpTools = mcpTools.filter(tool => tool.provider === 'core');
+    const regularMcpTools = mcpTools.filter(tool => tool.provider !== 'core');
+
+    const userTools = tools.concat(regularMcpTools);
 
     const allTools: Tool[] = userTools
       .filter(filter)
-      .concat(coreTools.filter(filter));
+      .concat(coreTools.filter(filter))
+      .concat(coreMcpTools.filter(filter));
     return allTools.map(t => new DynamicStructuredTool(t));
   };
 
