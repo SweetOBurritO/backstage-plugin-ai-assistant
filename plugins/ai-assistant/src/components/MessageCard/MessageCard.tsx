@@ -4,6 +4,7 @@ import { useTheme } from '@mui/material/styles';
 import { useMemo, useState, type FocusEvent } from 'react';
 import { Card } from './Card';
 import { FeedbackButtons } from './FeedbackButtons';
+import { ActionButtons } from './ActionButtons';
 
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
@@ -53,11 +54,11 @@ export const MessageCard = ({ message, loading }: MessageCardProps) => {
 
   const thoughtProcess = useMemo(() => {
     // Try to match <think>...</think>
-    const closedMatch = content.match(/<think>(.*?)<\/think>/s);
+    const closedMatch = content.match(/<think>([\s\S]*?)<\/think>/);
     if (closedMatch) return closedMatch[1].trim();
 
     // If </think> is missing but <think> is present, get everything after <think>
-    const openMatch = content.match(/<think>(.*)/s);
+    const openMatch = content.match(/<think>([\s\S]*)/);
     if (openMatch) return openMatch[1].trim();
 
     return '';
@@ -181,25 +182,27 @@ export const MessageCard = ({ message, loading }: MessageCardProps) => {
           />
         )}
         {role === 'ai' && (
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'flex-end',
-              opacity: showFeedback ? 1 : 0,
-              visibility: showFeedback ? 'visible' : 'hidden',
-              pointerEvents: showFeedback ? 'auto' : 'none',
-              mt: 1,
-              transition: theme.transitions.create('opacity', {
-                duration: theme.transitions.duration.short,
-              }),
-            }}
-          >
-            <FeedbackButtons
-              messageId={message.id}
-              initialScore={message.score}
-              content={response}
-            />
-          </Box>
+          <>
+            <ActionButtons content={response} />
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                opacity: showFeedback ? 1 : 0,
+                visibility: showFeedback ? 'visible' : 'hidden',
+                pointerEvents: showFeedback ? 'auto' : 'none',
+                mt: 1,
+                transition: theme.transitions.create('opacity', {
+                  duration: theme.transitions.duration.short,
+                }),
+              }}
+            >
+              <FeedbackButtons
+                messageId={message.id}
+                initialScore={message.score}
+              />
+            </Box>
+          </>
         )}
       </Card>
     </Box>
