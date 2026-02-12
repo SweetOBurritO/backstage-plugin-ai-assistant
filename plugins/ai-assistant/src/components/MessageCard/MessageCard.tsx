@@ -197,6 +197,7 @@ export const MessageCard = ({ message, loading }: MessageCardProps) => {
             <FeedbackButtons
               messageId={message.id}
               initialScore={message.score}
+              content={response}
             />
           </Box>
         )}

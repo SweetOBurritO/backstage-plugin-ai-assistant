@@ -5,17 +5,20 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useApi } from '@backstage/core-plugin-api';
 import { chatApiRef } from '../../api/chat';
 
 export type FeedbackButtonsProps = {
   messageId?: string;
   initialScore?: number;
+  content: string;
 };
 
 export const FeedbackButtons = ({
   messageId,
   initialScore = 0,
+  content,
 }: FeedbackButtonsProps) => {
   const chatApi = useApi(chatApiRef);
   const theme = useTheme();
@@ -54,6 +57,22 @@ export const FeedbackButtons = ({
       </IconButton>
       <IconButton size="small" onClick={() => handleFeedback('bad')}>
         <ThumbDownIcon
+          fontSize="small"
+          sx={{ color: score === -1 ? theme.palette.error.main : 'inherit' }}
+        />
+      </IconButton>
+
+      <Typography
+        variant="caption"
+        sx={{ color: theme.palette.text.secondary }}
+      >
+        Copy to clipboard
+      </Typography>
+      <IconButton
+        size="small"
+        onClick={() => navigator.clipboard.writeText(content)}
+      >
+        <ContentCopyIcon
           fontSize="small"
           sx={{ color: score === -1 ? theme.palette.error.main : 'inherit' }}
         />
