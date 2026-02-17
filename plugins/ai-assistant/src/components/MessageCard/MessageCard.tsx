@@ -68,7 +68,7 @@ export const MessageCard = ({ message, loading }: MessageCardProps) => {
     if (!hasThinking) {
       return content;
     }
-    const [, contentResponse] = content.split('꽁');
+    const [, contentResponse] = content.split('</think>');
     return contentResponse ?? '';
   }, [content, hasThinking]);
 
