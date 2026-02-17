@@ -57,7 +57,7 @@ export const MessageCard = ({ message, loading }: MessageCardProps) => {
     const closedMatch = content.match(/<think>(.*?)<\/think>/s);
     if (closedMatch) return closedMatch[1].trim();
 
-    // If <think> is missing but <think> is present, get everything after <think>
+    // If </think> is missing but <think> is present, get everything after <think>
     const openMatch = content.match(/<think>(.*)/s);
     if (openMatch) return openMatch[1].trim();
 
