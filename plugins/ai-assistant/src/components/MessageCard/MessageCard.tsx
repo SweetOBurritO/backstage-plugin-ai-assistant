@@ -54,11 +54,11 @@ export const MessageCard = ({ message, loading }: MessageCardProps) => {
 
   const thoughtProcess = useMemo(() => {
     // Try to match <think>...</think>
-    const closedMatch = content.match(/<think>([\s\S]*?)<\/think>/);
+    const closedMatch = content.match(/<think>(.*?)<\/think>/s);
     if (closedMatch) return closedMatch[1].trim();
 
-    // If </think> is missing but <think> is present, get everything after <think>
-    const openMatch = content.match(/<think>([\s\S]*)/);
+    // If <think> is missing but <think> is present, get everything after <think>
+    const openMatch = content.match(/<think>(.*)/s);
     if (openMatch) return openMatch[1].trim();
 
     return '';
@@ -68,7 +68,7 @@ export const MessageCard = ({ message, loading }: MessageCardProps) => {
     if (!hasThinking) {
       return content;
     }
-    const [, contentResponse] = content.split('</think>');
+    const [, contentResponse] = content.split('꽁');
     return contentResponse ?? '';
   }, [content, hasThinking]);
 
@@ -182,16 +182,20 @@ export const MessageCard = ({ message, loading }: MessageCardProps) => {
           />
         )}
         {role === 'ai' && (
-          <>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mt: 1,
+            }}
+          >
             <ActionButtons content={response} />
             <Box
               sx={{
-                display: 'flex',
-                justifyContent: 'flex-end',
                 opacity: showFeedback ? 1 : 0,
                 visibility: showFeedback ? 'visible' : 'hidden',
                 pointerEvents: showFeedback ? 'auto' : 'none',
-                mt: 1,
                 transition: theme.transitions.create('opacity', {
                   duration: theme.transitions.duration.short,
                 }),
@@ -202,7 +206,7 @@ export const MessageCard = ({ message, loading }: MessageCardProps) => {
                 initialScore={message.score}
               />
             </Box>
-          </>
+          </Box>
         )}
       </Card>
     </Box>

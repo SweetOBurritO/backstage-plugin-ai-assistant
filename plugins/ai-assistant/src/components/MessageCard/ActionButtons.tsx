@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -35,22 +34,16 @@ export const ActionButtons = ({ content }: ActionButtonsProps) => {
         mt: 1,
       }}
     >
-      <Typography
-        variant="caption"
-        sx={{ color: theme.palette.text.secondary }}
-      >
-        {copied ? 'Copied!' : 'Copy to clipboard'}
-      </Typography>
       <Tooltip title={copied ? 'Copied!' : 'Copy to clipboard'}>
         <IconButton size="small" onClick={handleCopy}>
           {copied ? (
             <CheckIcon
-              fontSize="small"
+              fontSize="medium"
               sx={{ color: theme.palette.success.main }}
             />
           ) : (
             <ContentCopyIcon
-              fontSize="small"
+              fontSize="medium"
               sx={{ color: theme.palette.text.secondary }}
             />
           )}
