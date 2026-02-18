@@ -11,7 +11,6 @@ import { rootRouteRef } from './routes';
 import { chatApiRef, createChatService } from './api/chat';
 import { mcpApiRef, createMcpService } from './api/mcp';
 import { createSummarizerService, summarizerApiRef } from './api/summarizer';
-import { AiAssistantPageProps } from './components/AiAssistantPage';
 import { JSX } from 'react';
 
 export const aiAssistantPlugin = createPlugin({
@@ -47,15 +46,14 @@ export const aiAssistantPlugin = createPlugin({
   ],
 });
 
-export const AiAssistantPage: (props: AiAssistantPageProps) => JSX.Element =
-  aiAssistantPlugin.provide(
-    createRoutableExtension({
-      name: 'AiAssistantPage',
-      component: () =>
-        import('./components/AiAssistantPage').then(m => m.AiAssistantPage),
-      mountPoint: rootRouteRef,
-    }),
-  );
+export const AiAssistantPage: () => JSX.Element = aiAssistantPlugin.provide(
+  createRoutableExtension({
+    name: 'AiAssistantPage',
+    component: () =>
+      import('./components/AiAssistantPage').then(m => m.AiAssistantPage),
+    mountPoint: rootRouteRef,
+  }),
+);
 
 export const AiAssistantChatModal = aiAssistantPlugin.provide(
   createComponentExtension({
