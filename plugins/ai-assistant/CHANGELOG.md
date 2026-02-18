@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant
 
+## 0.12.1
+
+### Patch Changes
+
+- c3d4510: fix duplicate api names casuing plugin failures
+
 ## 0.12.0
 
 ### Minor Changes
