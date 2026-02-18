@@ -20,14 +20,9 @@ import AddIcon from '@mui/icons-material/Add';
 import { useApi } from '@backstage/core-plugin-api';
 import { signalApiRef } from '@backstage/plugin-signals-react';
 import { useChatSettings } from '../../hooks/use-chat-settings';
-import { Page, Content, Header } from '@backstage/core-components';
+import { Page, Content } from '@backstage/core-components';
 
 import { makeStyles } from 'tss-react/mui';
-
-export type AiAssistantPageProps = {
-  title?: string;
-  subtitle?: string;
-};
 
 const useStyles = makeStyles()(() => ({
   page: {
@@ -45,10 +40,7 @@ const useStyles = makeStyles()(() => ({
   },
 }));
 
-export const AiAssistantPage = ({
-  title = 'AI Assistant',
-  subtitle,
-}: AiAssistantPageProps) => {
+export const AiAssistantPage = () => {
   const chatApi = useApi(chatApiRef);
   const signalApi = useApi(signalApiRef);
 
@@ -111,7 +103,6 @@ export const AiAssistantPage = ({
 
   return (
     <Page themeId="tool" className={classes.page}>
-      <Header title={title} subtitle={subtitle} />
       <Content className={classes.content}>
         <Stack spacing={2} flex={1} boxSizing="border-box" height="100%">
           <Stack direction="row" spacing={2} justifyContent="flex-end">
