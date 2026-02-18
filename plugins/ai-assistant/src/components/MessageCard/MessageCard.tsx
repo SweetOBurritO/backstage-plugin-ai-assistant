@@ -3,8 +3,7 @@ import Markdown from 'react-markdown';
 import { useTheme } from '@mui/material/styles';
 import { useMemo, useState, type FocusEvent } from 'react';
 import { Card } from './Card';
-import { FeedbackButtons } from './FeedbackButtons';
-import { ActionButtons } from './ActionButtons';
+import { Actions } from './Actions';
 
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
@@ -30,13 +29,13 @@ export const MessageCard = ({ message, loading }: MessageCardProps) => {
   const { content, role } = message;
 
   const theme = useTheme();
-  const [showFeedback, setShowFeedback] = useState(false);
+  const [showActions, setShowActions] = useState(false);
 
-  const handleFocus = () => setShowFeedback(true);
+  const handleFocus = () => setShowActions(true);
   const handleBlur = (event: FocusEvent<HTMLDivElement>) => {
     const nextFocusTarget = event.relatedTarget as Node | null;
     if (!event.currentTarget.contains(nextFocusTarget)) {
-      setShowFeedback(false);
+      setShowActions(false);
     }
   };
 
@@ -135,8 +134,8 @@ export const MessageCard = ({ message, loading }: MessageCardProps) => {
 
   return (
     <Box
-      onMouseEnter={() => setShowFeedback(true)}
-      onMouseLeave={() => setShowFeedback(false)}
+      onMouseEnter={() => setShowActions(true)}
+      onMouseLeave={() => setShowActions(false)}
       onFocusCapture={handleFocus}
       onBlurCapture={handleBlur}
       sx={{
@@ -185,27 +184,17 @@ export const MessageCard = ({ message, loading }: MessageCardProps) => {
           <Box
             sx={{
               display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
+              justifyContent: 'flex-end',
+              opacity: showActions ? 1 : 0,
+              visibility: showActions ? 'visible' : 'hidden',
+              pointerEvents: showActions ? 'auto' : 'none',
               mt: 1,
+              transition: theme.transitions.create('opacity', {
+                duration: theme.transitions.duration.short,
+              }),
             }}
           >
-            <ActionButtons content={response} />
-            <Box
-              sx={{
-                opacity: showFeedback ? 1 : 0,
-                visibility: showFeedback ? 'visible' : 'hidden',
-                pointerEvents: showFeedback ? 'auto' : 'none',
-                transition: theme.transitions.create('opacity', {
-                  duration: theme.transitions.duration.short,
-                }),
-              }}
-            >
-              <FeedbackButtons
-                messageId={message.id}
-                initialScore={message.score}
-              />
-            </Box>
+            <Actions message={message} />
           </Box>
         )}
       </Card>
