@@ -1,5 +1,12 @@
 # @sweetoburrito/backstage-plugin-ai-assistant
 
+## 0.12.0
+
+### Minor Changes
+
+- bedbd7d: add alpha support for new backstage frontend system
+- ba6f9d7: add a copy to clipboard button to ai messages
+
 ## 0.11.1
 
 ### Patch Changes
