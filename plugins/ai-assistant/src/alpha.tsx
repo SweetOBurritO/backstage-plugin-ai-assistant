@@ -24,6 +24,7 @@ const aiAssistantPage = PageBlueprint.make({
 });
 
 const chatApi = ApiBlueprint.make({
+  name: 'chatApi',
   params: defineParams =>
     defineParams({
       api: chatApiRef,
@@ -36,6 +37,7 @@ const chatApi = ApiBlueprint.make({
 });
 
 const mcpApi = ApiBlueprint.make({
+  name: 'mcpApi',
   params: defineParams =>
     defineParams({
       api: mcpApiRef,
@@ -48,6 +50,7 @@ const mcpApi = ApiBlueprint.make({
 });
 
 const summarizerApi = ApiBlueprint.make({
+  name: 'summarizerApi',
   params: defineParams =>
     defineParams({
       api: summarizerApiRef,
