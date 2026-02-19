@@ -85,26 +85,16 @@ export const MessageCard = ({ message, loading }: MessageCardProps) => {
 
   if (message.role === 'tool') {
     return (
-      <Tooltip
-        title={<Markdown>{message.content}</Markdown>}
-        placement="bottom-start"
-      >
-        <Stack
-          direction="row"
-          spacing={1}
-          alignItems="end"
-          justifyItems="start"
+      <Stack direction="row" spacing={1} alignItems="end" justifyItems="start">
+        <ConstructionIcon />
+        <Typography
+          variant="caption"
+          sx={{ fontStyle: 'italic', color: theme.palette.text.secondary }}
         >
-          <ConstructionIcon />
-          <Typography
-            variant="caption"
-            sx={{ fontStyle: 'italic', color: theme.palette.text.secondary }}
-          >
-            Used tool{message.metadata.name ? ` ${message.metadata.name}` : ''}{' '}
-            to enhance response...
-          </Typography>
-        </Stack>
-      </Tooltip>
+          Used tool{message.metadata.name ? ` ${message.metadata.name}` : ''} to
+          enhance response...
+        </Typography>
+      </Stack>
     );
   }
 

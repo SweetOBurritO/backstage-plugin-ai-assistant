@@ -49,6 +49,8 @@ type PromptOptions = {
   modelId?: string;
 };
 
+const OMITTED_MESSAGE_TYPES: Array<Message['role']> = ['tool'];
+
 export type ChatService = {
   prompt: (options: PromptOptions) => Promise<Message[]>;
 };
@@ -124,6 +126,26 @@ export const createChatService = async ({
             return;
           }
 
+          const lastChunk = chunkMessages[chunkMessages.length - 1];
+
+          const messageToPublish = OMITTED_MESSAGE_TYPES.includes(
+            lastChunk.role,
+          )
+            ? {
+                ...lastChunk,
+                content: '',
+              }
+            : lastChunk;
+
+          signals.publish({
+            channel: `ai-assistant.chat.conversation-stream:${conversationId}`,
+            message: { messages: [messageToPublish] },
+            recipients: {
+              type: 'user',
+              entityRef: userEntityRef,
+            },
+          });
+
           const existingNewMessageIndex = newMessages.findIndex(
             cm => cm.id === chunkMessages[0].id,
           );
@@ -139,15 +161,6 @@ export const createChatService = async ({
           }
 
           responseMessages.push(...chunkMessages);
-
-          signals.publish({
-            channel: `ai-assistant.chat.conversation-stream:${conversationId}`,
-            message: { messages: [chunkMessages.pop()!] },
-            recipients: {
-              type: 'user',
-              entityRef: userEntityRef,
-            },
-          });
         },
         onStreamEnd: async () => {
           conversation.addMessages(
