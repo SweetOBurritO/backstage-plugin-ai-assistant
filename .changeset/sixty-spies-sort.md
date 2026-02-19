@@ -1,4 +1,5 @@
 ---
+
 '@sweetoburrito/backstage-plugin-ai-assistant-backend': patch
 '@sweetoburrito/backstage-plugin-ai-assistant': patch
 ---
