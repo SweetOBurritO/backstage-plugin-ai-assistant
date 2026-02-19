@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend
 
+## 0.16.1
+
+### Patch Changes
+
+- 8c3ae90: update message structure in conversation stream to send last message only
+
 ## 0.16.0
 
 ### Minor Changes
