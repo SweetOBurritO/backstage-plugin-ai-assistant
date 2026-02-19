@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend
 
+## 0.16.2
+
+### Patch Changes
+
+- 76f4830: remove tool message content causing streaming crashes
+
 ## 0.16.1
 
 ### Patch Changes
