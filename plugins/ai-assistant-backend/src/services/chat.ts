@@ -142,7 +142,7 @@ export const createChatService = async ({
 
           signals.publish({
             channel: `ai-assistant.chat.conversation-stream:${conversationId}`,
-            message: { messages: chunkMessages },
+            message: { messages: [chunkMessages.pop()!] },
             recipients: {
               type: 'user',
               entityRef: userEntityRef,
