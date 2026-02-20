@@ -23,6 +23,8 @@ export type ChatApi = {
   }>;
   getConversations: () => Promise<Conversation[]>;
   scoreMessage: (messageId: string, score: number) => Promise<void>;
+  createShareLink: (conversationId: string) => Promise<string>;
+  importSharedConversation: (shareId: string) => Promise<string>;
 };
 
 type ChatApiOptions = {
@@ -114,11 +116,42 @@ export const createChatService = ({
     );
   };
 
+  const createShareLink: ChatApi['createShareLink'] = async conversationId => {
+    const assistantBaseUrl = await discoveryApi.getBaseUrl('ai-assistant');
+
+    const response = await fetchApi.fetch(
+      `${assistantBaseUrl}/chat/share/${conversationId}`,
+      {
+        method: 'POST',
+      },
+    );
+
+    const data = await response.json();
+    return data.shareId as string;
+  };
+
+  const importSharedConversation: ChatApi['importSharedConversation'] =
+    async shareId => {
+      const assistantBaseUrl = await discoveryApi.getBaseUrl('ai-assistant');
+
+      const response = await fetchApi.fetch(
+        `${assistantBaseUrl}/chat/share/${shareId}/import`,
+        {
+          method: 'POST',
+        },
+      );
+
+      const data = await response.json();
+      return data.conversationId as string;
+    };
+
   return {
     getModels,
     getConversation,
     sendMessage,
     getConversations,
     scoreMessage,
+    createShareLink,
+    importSharedConversation,
   };
 };

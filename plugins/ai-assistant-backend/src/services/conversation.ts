@@ -11,6 +11,7 @@ import {
   Conversation,
   Message,
 } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
+import { v4 as uuid } from 'uuid';
 import { CallbackService, callbackServiceRef } from './callbacks';
 
 import {
@@ -40,6 +41,14 @@ export type ConversationService = {
     limit?: number;
     excludeRoles?: Message['role'][];
   }) => Promise<Message[]>;
+  createConversationShare: (options: {
+    conversationId: string;
+    userEntityRef: string;
+  }) => Promise<string>;
+  importSharedConversation: (options: {
+    shareId: string;
+    userEntityRef: string;
+  }) => Promise<string>;
 };
 
 export type CreateConversationServiceOptions = {
@@ -185,12 +194,72 @@ const createConversationService = async ({
     });
   };
 
+  const createConversationShare: ConversationService['createConversationShare'] =
+    async ({ conversationId, userEntityRef }) => {
+      await chatStore.getConversation(conversationId, userEntityRef);
+
+      const shareId = uuid();
+
+      await chatStore.createSharedConversation({
+        id: shareId,
+        conversationId,
+      });
+
+      return shareId;
+    };
+
+  const importSharedConversation: ConversationService['importSharedConversation'] =
+    async ({ shareId, userEntityRef }) => {
+      const sharedConversation = await chatStore.getSharedConversation(shareId);
+
+      if (!sharedConversation) {
+        throw new Error('Shared conversation not found');
+      }
+
+      const sourceConversation = await chatStore.getConversationById(
+        sharedConversation.conversationId,
+      );
+
+      if (!sourceConversation) {
+        throw new Error('Original conversation not found');
+      }
+
+      const sourceMessages = await chatStore.getChatMessagesForConversation(
+        sourceConversation.id,
+        sharedConversation.createdAt,
+      );
+
+      const newConversationId = uuid();
+      const copiedMessages: Message[] = sourceMessages.map(message => ({
+        id: uuid(),
+        role: message.role,
+        content: message.content,
+        metadata: message.metadata,
+        score: message.score,
+        traceId: message.traceId,
+      }));
+
+      await chatStore.createConversation({
+        id: newConversationId,
+        userRef: userEntityRef,
+        title: sourceConversation.title,
+      });
+
+      if (copiedMessages.length > 0) {
+        await chatStore.addChatMessage(copiedMessages, userEntityRef, newConversationId);
+      }
+
+      return newConversationId;
+    };
+
   return {
     getConversation,
     getConversations,
     addMessages,
     scoreMessage,
     getRecentConversationMessages,
+    createConversationShare,
+    importSharedConversation,
   };
 };
 

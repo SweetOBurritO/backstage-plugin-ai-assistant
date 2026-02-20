@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Conversation } from '../Conversation';
 import type { Conversation as ConversationType } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
 import { useAsync, useList } from 'react-use';
@@ -19,11 +19,63 @@ import Alert from '@mui/material/Alert';
 
 import MenuIcon from '@mui/icons-material/Menu';
 import AddIcon from '@mui/icons-material/Add';
+import ShareIcon from '@mui/icons-material/Share';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import { useApi, useRouteRef } from '@backstage/core-plugin-api';
 import { signalApiRef } from '@backstage/plugin-signals-react';
 import { useChatSettings } from '../../hooks/use-chat-settings';
-import { conversationRouteRef, newConversationRouteRef } from '../../routes';
+import {
+  conversationRouteRef,
+  newConversationRouteRef,
+  shareConversationRouteRef,
+} from '../../routes';
+
+type ConversationContentProps = {
+  isUnauthorizedConversation: boolean;
+  isImportingSharedConversation: boolean;
+  conversationId: string | undefined;
+  setConversation: (conversation: string | undefined) => void;
+};
+
+const ConversationContent = ({
+  isUnauthorizedConversation,
+  isImportingSharedConversation,
+  conversationId,
+  setConversation,
+}: ConversationContentProps) => {
+  if (isUnauthorizedConversation) {
+    return (
+      <Box sx={{ px: 2 }}>
+        <Alert severity="error">
+          Unauthorized: You do not have access to this conversation.
+        </Alert>
+      </Box>
+    );
+  }
+
+  if (isImportingSharedConversation) {
+    return (
+      <Box
+        sx={{
+          flex: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  return (
+    <Conversation
+      conversationId={conversationId}
+      setConversationId={setConversation}
+    />
+  );
+};
 
 export const ConversationPage = () => {
   const chatApi = useApi(chatApiRef);
@@ -31,8 +83,9 @@ export const ConversationPage = () => {
 
   const newConversationRoute = useRouteRef(newConversationRouteRef);
   const conversationRoute = useRouteRef(conversationRouteRef);
+  const shareConversationRoute = useRouteRef(shareConversationRouteRef);
 
-  const { id } = useParams();
+  const { id, shareId } = useParams();
   const navigate = useNavigate();
 
   const theme = useTheme();
@@ -53,6 +106,9 @@ export const ConversationPage = () => {
     useAsync(() => chatApi.getConversations(), [chatApi]);
 
   const [conversations, { set, updateAt }] = useList<ConversationType>([]);
+  const [shareError, setShareError] = useState<string | undefined>(undefined);
+  const [isImportingSharedConversation, setIsImportingSharedConversation] =
+    useState(Boolean(shareId));
 
   useEffect(() => {
     if (!conversationHistory) {
@@ -89,27 +145,71 @@ export const ConversationPage = () => {
     setOpen(drawerOpen);
   };
 
-  const setConversation = (conversation: string | undefined) => {
-    setConversationId(conversation);
+  const setConversation = useCallback(
+    (conversation: string | undefined) => {
+      setConversationId(conversation);
 
-    if (conversation) {
-      setSessionAuthorizedConversationIds(current => {
-        const next = new Set(current);
-        next.add(conversation);
-        return next;
-      });
-    }
+      if (conversation) {
+        setSessionAuthorizedConversationIds(current => {
+          const next = new Set(current);
+          next.add(conversation);
+          return next;
+        });
+      }
 
-    if (conversation) {
-      navigate(conversationRoute({ id: conversation }));
-    } else {
-      navigate(newConversationRoute!());
-    }
-  };
+      if (conversation) {
+        navigate(conversationRoute({ id: conversation }));
+      } else {
+        navigate(newConversationRoute!());
+      }
+    },
+    [conversationRoute, navigate, newConversationRoute],
+  );
 
-  const openNewChat = () => {
+  const openNewChat = useCallback(() => {
     setConversation(undefined);
+  }, [setConversation]);
+
+  const shareConversation = async () => {
+    if (!conversationId) {
+      return;
+    }
+
+    setShareError(undefined);
+
+    try {
+      const sharedId = await chatApi.createShareLink(conversationId);
+      const shareUrl = `${window.location.origin}${shareConversationRoute({
+        shareId: sharedId,
+      })}`;
+
+      await navigator.clipboard.writeText(shareUrl);
+    } catch {
+      setShareError('Unable to share conversation. Please try again.');
+    }
   };
+
+  useEffect(() => {
+    if (!shareId) {
+      setIsImportingSharedConversation(false);
+      return;
+    }
+
+    setIsImportingSharedConversation(true);
+    setShareError(undefined);
+
+    chatApi
+      .importSharedConversation(shareId)
+      .then(newConversationId => {
+        setConversation(newConversationId);
+      })
+      .catch(() => {
+        setShareError(
+          'Unable to import shared conversation. It may be invalid or unavailable.',
+        );
+        setIsImportingSharedConversation(false);
+      });
+  }, [chatApi, setConversation, shareId]);
 
   const isUnauthorizedConversation = useMemo(
     () =>
@@ -160,6 +260,12 @@ export const ConversationPage = () => {
             </IconButton>
           </Tooltip>
 
+          <Tooltip title="Share Chat">
+            <IconButton onClick={shareConversation} disabled={!conversationId}>
+              <ShareIcon />
+            </IconButton>
+          </Tooltip>
+
           {conversations.length > 0 && (
             <Tooltip title="Chat History">
               <IconButton onClick={toggleDrawer(true)}>
@@ -168,18 +274,17 @@ export const ConversationPage = () => {
             </Tooltip>
           )}
         </Stack>
-        {isUnauthorizedConversation ? (
-          <Box sx={{ px: 2 }}>
-            <Alert severity="error">
-              Unauthorized: You do not have access to this conversation.
-            </Alert>
+        <ConversationContent
+          isUnauthorizedConversation={isUnauthorizedConversation}
+          isImportingSharedConversation={isImportingSharedConversation}
+          conversationId={conversationId}
+          setConversation={setConversation}
+        />
+        {shareError ? (
+          <Box sx={{ px: 2, pb: 2 }}>
+            <Alert severity="error">{shareError}</Alert>
           </Box>
-        ) : (
-          <Conversation
-            conversationId={conversationId}
-            setConversationId={setConversation}
-          />
-        )}
+        ) : null}
       </Stack>
       <Drawer anchor="right" open={open} onClose={toggleDrawer(false)}>
         <Box

@@ -15,3 +15,9 @@ export const conversationRouteRef = createSubRouteRef({
   parent: rootRouteRef,
   path: '/conversation/:id',
 });
+
+export const shareConversationRouteRef = createSubRouteRef({
+  id: 'ai-assistant.share-conversation',
+  parent: rootRouteRef,
+  path: '/share/:shareId',
+});

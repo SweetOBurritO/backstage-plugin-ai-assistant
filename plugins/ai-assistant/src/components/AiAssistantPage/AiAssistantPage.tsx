@@ -1,7 +1,11 @@
 import { Content, Page } from '@backstage/core-components';
 import { Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import { ConversationPage } from '../ConversationPage';
-import { conversationRouteRef, newConversationRouteRef } from '../../routes';
+import {
+  conversationRouteRef,
+  newConversationRouteRef,
+  shareConversationRouteRef,
+} from '../../routes';
 
 import { useRouteRef } from '@backstage/core-plugin-api';
 
@@ -29,6 +33,10 @@ export const AiAssistantPage = () => {
           />
           <Route
             path={conversationRouteRef.path}
+            element={<ConversationPage />}
+          />
+          <Route
+            path={shareConversationRouteRef.path}
             element={<ConversationPage />}
           />
         </Routes>
