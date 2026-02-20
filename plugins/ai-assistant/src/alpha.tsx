@@ -14,12 +14,22 @@ import { createSummarizerService, summarizerApiRef } from './api/summarizer';
 
 import { AiAssistantChatModal } from './components/AiAssistantChatModal';
 
-const aiAssistantPage = PageBlueprint.make({
-  params: {
-    path: '/ai-assistant',
-    routeRef: rootRouteRef,
-    loader: () =>
-      import('./components/AiAssistantPage').then(m => <m.AiAssistantPage />),
+const aiAssistantPage = PageBlueprint.makeWithOverrides({
+  config: {
+    schema: {
+      title: z => z.string().optional(),
+      subtitle: z => z.string().optional(),
+    },
+  },
+  factory: (originalFactory, { config }) => {
+    return originalFactory({
+      path: '/ai-assistant',
+      routeRef: rootRouteRef,
+      loader: () =>
+        import('./components/AiAssistantPage').then(m => (
+          <m.AiAssistantPage {...config} />
+        )),
+    });
   },
 });
 

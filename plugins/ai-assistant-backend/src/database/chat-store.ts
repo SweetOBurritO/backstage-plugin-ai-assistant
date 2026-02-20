@@ -8,6 +8,7 @@ import { Knex } from 'knex';
 
 const MESSAGE_TABLE_NAME = 'message';
 const CONVERSATION_TABLE_NAME = 'conversation';
+const SHARED_CONVERSATION_TABLE_NAME = 'shared_conversation';
 
 export type ChatStoreOptions = {
   database: DatabaseService;
@@ -31,6 +32,10 @@ export class ChatStore {
 
   conversationTable() {
     return this.client(CONVERSATION_TABLE_NAME);
+  }
+
+  sharedConversationTable() {
+    return this.client(SHARED_CONVERSATION_TABLE_NAME);
   }
 
   async getChatMessages(
@@ -116,6 +121,24 @@ export class ChatStore {
     return conversation;
   }
 
+  async getConversationById(
+    conversationId: string,
+  ): Promise<Conversation | null> {
+    const row = await this.conversationTable()
+      .where({ id: conversationId })
+      .first();
+
+    if (!row) {
+      return null;
+    }
+
+    return {
+      id: row.id,
+      title: row.title,
+      userRef: row.userRef,
+    };
+  }
+
   async createConversation(conversation: Conversation) {
     await this.conversationTable().insert({
       id: conversation.id,
@@ -144,6 +167,59 @@ export class ChatStore {
     }));
 
     return conversations;
+  }
+
+  async getChatMessagesForConversation(
+    conversationId: string,
+    createdBeforeOrAt?: Date,
+  ): Promise<Required<Message>[]> {
+    let query = this.messageTable()
+      .where({ conversation_id: conversationId })
+      .select('*');
+
+    if (createdBeforeOrAt) {
+      query = query.andWhere('created_at', '<=', createdBeforeOrAt);
+    }
+
+    const rows = await query.orderBy('created_at', 'asc');
+
+    return rows.map(row => ({
+      role: row.role,
+      content: row.content,
+      id: row.id,
+      metadata: row.metadata,
+      score: row.score,
+      traceId: row.trace_id,
+    }));
+  }
+
+  async createSharedConversation(options: {
+    id: string;
+    conversationId: string;
+  }): Promise<void> {
+    await this.sharedConversationTable().insert({
+      id: options.id,
+      conversation_id: options.conversationId,
+      created_at: this.client.fn.now(),
+    });
+  }
+
+  async getSharedConversation(shareId: string): Promise<{
+    conversationId: string;
+    createdAt: Date;
+  } | null> {
+    const row = await this.sharedConversationTable()
+      .where({ id: shareId })
+      .first();
+
+    if (!row) {
+      return null;
+    }
+
+    return {
+      conversationId: row.conversation_id,
+      createdAt: row.created_at,
+    };
   }
 
   async getMessageById(messageId: string): Promise<Required<Message> | null> {

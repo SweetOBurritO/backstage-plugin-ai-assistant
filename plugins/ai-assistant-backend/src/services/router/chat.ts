@@ -122,5 +122,46 @@ export async function createChatRouter(
     },
   );
 
+  router.post(
+    '/share/:id',
+    validation(chatSchema, 'params'),
+    async (req, res) => {
+      const { id } = req.params;
+
+      const credentials = await httpAuth.credentials(req);
+      const { userEntityRef } = await userInfo.getUserInfo(credentials);
+
+      const shareId = await conversation.createConversationShare({
+        conversationId: id,
+        userEntityRef,
+      });
+
+      res.json({ shareId });
+    },
+  );
+
+  router.post(
+    '/share/:shareId/import',
+    validation(
+      z.object({
+        shareId: z.uuid(),
+      }),
+      'params',
+    ),
+    async (req, res) => {
+      const { shareId } = req.params;
+
+      const credentials = await httpAuth.credentials(req);
+      const { userEntityRef } = await userInfo.getUserInfo(credentials);
+
+      const conversationId = await conversation.importSharedConversation({
+        shareId,
+        userEntityRef,
+      });
+
+      res.json({ conversationId });
+    },
+  );
+
   return router;
 }

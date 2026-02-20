@@ -21,6 +21,10 @@ export const Card = ({ children, role }: CardProps) => {
         backgroundOrigin: 'border-box',
         backgroundClip: 'content-box, border-box',
         wordBreak: 'break-word',
+        [theme.breakpoints.down('sm')]: {
+          maxWidth: '95%',
+          width: '95%',
+        },
       }}
       elevation={2}
     >
