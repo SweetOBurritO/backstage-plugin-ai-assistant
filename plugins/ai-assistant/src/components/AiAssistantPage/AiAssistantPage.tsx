@@ -1,4 +1,4 @@
-import { Content, Page } from '@backstage/core-components';
+import { Content, Page, Header } from '@backstage/core-components';
 import { Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import { ConversationPage } from '../ConversationPage';
 import {
@@ -9,12 +9,21 @@ import {
 
 import { useRouteRef } from '@backstage/core-plugin-api';
 
-export const AiAssistantPage = () => {
+export type AiAssistantPageProps = {
+  title?: string;
+  subtitle?: string;
+};
+
+export const AiAssistantPage = ({
+  title = 'AI Assistant',
+  subtitle,
+}: AiAssistantPageProps) => {
   const newConversationRoute = useRouteRef(newConversationRouteRef);
   const location = useLocation();
 
   return (
     <Page themeId="tool">
+      <Header title={title} subtitle={subtitle} />
       <Content noPadding stretch>
         <Routes>
           <Route
