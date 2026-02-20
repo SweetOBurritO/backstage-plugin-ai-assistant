@@ -1,5 +1,12 @@
 # @sweetoburrito/backstage-plugin-ai-assistant
 
+## 0.13.0
+
+### Minor Changes
+
+- 7bd6fc5: Add permanent links to conversations
+- 7bd6fc5: add shared conversations feature with share and import functionality
+
 ## 0.12.2
 
 ### Patch Changes

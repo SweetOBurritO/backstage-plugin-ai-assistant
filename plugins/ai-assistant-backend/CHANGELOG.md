@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend
 
+## 0.17.0
+
+### Minor Changes
+
+- 7bd6fc5: add shared conversations feature with share and import functionality
+
 ## 0.16.2
 
 ### Patch Changes
