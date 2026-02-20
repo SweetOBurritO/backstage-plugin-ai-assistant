@@ -73,9 +73,7 @@ const createToolsService = async ({
       return tools.filter(filter).map(t => new DynamicStructuredTool(t));
     }
 
-    const mcpTools = await mcp.getTools(credentials);
-
-    const userTools = tools.concat(mcpTools);
+    const userTools = await mcp.getTools(credentials);
 
     const allTools: Tool[] = userTools
       .filter(filter)
