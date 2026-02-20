@@ -121,8 +121,12 @@ export class ChatStore {
     return conversation;
   }
 
-  async getConversationById(conversationId: string): Promise<Conversation | null> {
-    const row = await this.conversationTable().where({ id: conversationId }).first();
+  async getConversationById(
+    conversationId: string,
+  ): Promise<Conversation | null> {
+    const row = await this.conversationTable()
+      .where({ id: conversationId })
+      .first();
 
     if (!row) {
       return null;
@@ -204,7 +208,9 @@ export class ChatStore {
     conversationId: string;
     createdAt: Date;
   } | null> {
-    const row = await this.sharedConversationTable().where({ id: shareId }).first();
+    const row = await this.sharedConversationTable()
+      .where({ id: shareId })
+      .first();
 
     if (!row) {
       return null;

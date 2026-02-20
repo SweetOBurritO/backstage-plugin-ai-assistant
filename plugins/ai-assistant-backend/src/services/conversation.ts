@@ -246,7 +246,11 @@ const createConversationService = async ({
       });
 
       if (copiedMessages.length > 0) {
-        await chatStore.addChatMessage(copiedMessages, userEntityRef, newConversationId);
+        await chatStore.addChatMessage(
+          copiedMessages,
+          userEntityRef,
+          newConversationId,
+        );
       }
 
       return newConversationId;
