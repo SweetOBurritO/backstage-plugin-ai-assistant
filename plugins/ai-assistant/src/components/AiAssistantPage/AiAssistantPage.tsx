@@ -8,11 +8,33 @@ import {
 } from '../../routes';
 
 import { useRouteRef } from '@backstage/core-plugin-api';
+import { makeStyles } from 'tss-react/mui';
 
 export type AiAssistantPageProps = {
   title?: string;
   subtitle?: string;
 };
+
+const useStyles = makeStyles()(theme => ({
+  page: {
+    minHeight: '100vh',
+    maxHeight: '100vh',
+    overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'column',
+    [theme.breakpoints.down('sm')]: {
+      height: `calc(100vh - ${theme.spacing(6)})`,
+      maxHeight: `calc(100vh - ${theme.spacing(6)})`,
+      minHeight: `calc(100vh - ${theme.spacing(6)})`,
+    },
+  },
+  content: {
+    flex: 1,
+    minHeight: 0,
+    display: 'flex',
+    flexDirection: 'column',
+  },
+}));
 
 export const AiAssistantPage = ({
   title = 'AI Assistant',
@@ -21,10 +43,12 @@ export const AiAssistantPage = ({
   const newConversationRoute = useRouteRef(newConversationRouteRef);
   const location = useLocation();
 
+  const { classes } = useStyles();
+
   return (
-    <Page themeId="tool">
+    <Page themeId="tool" className={classes.page}>
       <Header title={title} subtitle={subtitle} />
-      <Content noPadding stretch>
+      <Content noPadding stretch className={classes.content}>
         <Routes>
           <Route
             path="/"

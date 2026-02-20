@@ -228,16 +228,10 @@ export const ConversationPage = () => {
   return (
     <Box
       sx={{
-        height: '100vh',
-        maxHeight: '100vh',
+        height: '100%',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
-
-        [theme.breakpoints.down('sm')]: {
-          height: `calc(100vh - ${theme.spacing(6)})`,
-          maxHeight: `calc(100vh - ${theme.spacing(6)})`,
-        },
       }}
     >
       <Stack
