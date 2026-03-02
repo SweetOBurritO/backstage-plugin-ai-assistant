@@ -5,6 +5,7 @@ import {
   createServiceRef,
   ServiceRef,
   AuthService,
+  RootConfigService,
 } from '@backstage/backend-plugin-api';
 import {
   Tool,
@@ -28,14 +29,81 @@ export type ToolsService = {
 export type CreateToolsServiceOptions = {
   mcp: McpService;
   auth: AuthService;
+  config: RootConfigService;
 };
+
+type ToolSelector = Pick<EnabledTool, 'name' | 'provider'>;
 
 const createToolsService = async ({
   mcp,
   auth,
+  config,
 }: CreateToolsServiceOptions): Promise<ToolsService> => {
   const tools: Tool[] = [];
   const coreTools: Tool[] = [];
+
+  const areSameTools = (left: ToolSelector, right: ToolSelector) =>
+    left.name === right.name && left.provider === right.provider;
+
+  const getConfiguredTools = (path: string): ToolSelector[] | undefined => {
+    const configuredTools = config.getOptionalConfigArray(path);
+
+    if (!configuredTools) {
+      return undefined;
+    }
+
+    return configuredTools.map(tool => ({
+      name: tool.getString('name'),
+      provider: tool.getString('provider'),
+    }));
+  };
+
+  const uniqTools = (allTools: Tool[]): Tool[] => {
+    const toolMap = new Map(
+      allTools.map(tool => [`${tool.provider}:${tool.name}`, tool]),
+    );
+
+    return Array.from(toolMap.values());
+  };
+
+  const resolveCoreTools = (allTools: Tool[]): Tool[] => {
+    const configuredCoreTools = getConfiguredTools('aiAssistant.tools.core');
+
+    if (configuredCoreTools === undefined) {
+      return coreTools;
+    }
+
+    return allTools.filter(tool =>
+      configuredCoreTools.some(configuredTool =>
+        areSameTools(configuredTool, {
+          name: tool.name,
+          provider: tool.provider,
+        }),
+      ),
+    );
+  };
+
+  const resolveDefaultEnabledTools = (
+    allTools: Tool[],
+    resolvedCore: Tool[],
+  ) => {
+    const configuredDefaultTools = getConfiguredTools(
+      'aiAssistant.tools.defaultEnabled',
+    );
+
+    if (configuredDefaultTools === undefined) {
+      return resolvedCore;
+    }
+
+    return allTools.filter(tool =>
+      configuredDefaultTools.some(configuredTool =>
+        areSameTools(configuredTool, {
+          name: tool.name,
+          provider: tool.provider,
+        }),
+      ),
+    );
+  };
 
   const registerTools: ToolsService['registerTools'] = async providers => {
     tools.push(...providers);
@@ -51,16 +119,33 @@ const createToolsService = async ({
   }) => {
     const mcpTools = await mcp.getTools(credentials);
 
-    const availableTools: EnabledTool[] = tools
-      .concat(mcpTools)
-      .concat(coreTools)
-      .map(tool => ({
-        name: tool.name,
-        provider: tool.provider,
-        description: tool.description,
-      }));
+    const availableTools = uniqTools(tools.concat(mcpTools).concat(coreTools));
 
-    return availableTools;
+    const resolvedCoreTools = resolveCoreTools(availableTools);
+    const resolvedDefaultEnabledTools = resolveDefaultEnabledTools(
+      availableTools,
+      resolvedCoreTools,
+    );
+
+    const availableUserTools: EnabledTool[] = availableTools.map(tool => ({
+      name: tool.name,
+      provider: tool.provider,
+      description: tool.description,
+      isCore: resolvedCoreTools.some(coreTool =>
+        areSameTools(coreTool, {
+          name: tool.name,
+          provider: tool.provider,
+        }),
+      ),
+      enabledByDefault: resolvedDefaultEnabledTools.some(defaultTool =>
+        areSameTools(defaultTool, {
+          name: tool.name,
+          provider: tool.provider,
+        }),
+      ),
+    }));
+
+    return availableUserTools;
   };
 
   const getPrincipalTools: ToolsService['getPrincipalTools'] = async ({
@@ -75,11 +160,23 @@ const createToolsService = async ({
 
     const mcpTools = await mcp.getTools(credentials);
 
-    const userTools = tools.concat(mcpTools);
+    const availableTools = uniqTools(tools.concat(mcpTools).concat(coreTools));
+    const resolvedCoreTools = resolveCoreTools(availableTools);
 
-    const allTools: Tool[] = userTools
-      .filter(filter)
-      .concat(coreTools.filter(filter));
+    const userSelectableTools = availableTools.filter(
+      tool =>
+        !resolvedCoreTools.some(coreTool =>
+          areSameTools(coreTool, {
+            name: tool.name,
+            provider: tool.provider,
+          }),
+        ),
+    );
+
+    const allTools: Tool[] = uniqTools(
+      userSelectableTools.filter(filter).concat(resolvedCoreTools),
+    );
+
     return allTools.map(t => new DynamicStructuredTool(t));
   };
 
@@ -100,6 +197,7 @@ export const toolsServiceRef: ServiceRef<ToolsService, 'plugin', 'singleton'> =
         deps: {
           mcp: mcpServiceRef,
           auth: coreServices.auth,
+          config: coreServices.rootConfig,
         },
         factory: async options => {
           return createToolsService(options);

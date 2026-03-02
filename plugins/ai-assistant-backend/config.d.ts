@@ -45,6 +45,28 @@ export interface Config {
         maxChunkProcessingSize?: number;
       };
     };
+    tools?: {
+      /**
+       * List of tools that should always be enabled and not user-toggleable.
+       *
+       * For MCP tools, provider format is: `mcp server:<server-name>`.
+       */
+      core?: Array<{
+        provider: string;
+        name: string;
+      }>;
+
+      /**
+       * List of tools enabled by default for users that don't have existing
+       * `user-tools` settings.
+       *
+       * For MCP tools, provider format is: `mcp server:<server-name>`.
+       */
+      defaultEnabled?: Array<{
+        provider: string;
+        name: string;
+      }>;
+    };
     mcp: {
       /**
        * @visibility secret
