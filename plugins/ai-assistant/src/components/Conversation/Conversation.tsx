@@ -55,6 +55,13 @@ export const Conversation = ({
   );
 
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+  const [settingsButtonClicked, setSettingsButtonClicked] = useState(() => {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+
+    return localStorage.getItem('settingsButtonClicked') === 'true';
+  });
 
   const { value: models, loading: loadingModels } = useAsync(
     () => chatApi.getModels(),
@@ -274,7 +281,11 @@ export const Conversation = ({
             variant="contained"
             color="info"
             title="Settings"
-            onClick={() => setSettingsModalOpen(true)}
+            onClick={() => {
+              localStorage.setItem('settingsButtonClicked', 'true');
+              setSettingsButtonClicked(true);
+              setSettingsModalOpen(true);
+            }}
             sx={{
               '@keyframes jump-shaking': {
                 '0%': { transform: 'translateX(0)' },
@@ -285,7 +296,9 @@ export const Conversation = ({
                 '75%': { transform: 'translateY(-9px) rotate(-17deg)' },
                 '100%': { transform: 'translateY(0) rotate(0)' },
               },
-              animation: 'jump-shaking 1s ease-in-out 2',
+              animation: settingsButtonClicked
+                ? 'none'
+                : 'jump-shaking 1s ease-in-out 2',
             }}
           >
             <SettingsIcon />
