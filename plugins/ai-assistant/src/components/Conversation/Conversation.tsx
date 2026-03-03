@@ -210,16 +210,25 @@ export const Conversation = ({
         <Stack
           spacing={1}
           flex={1}
-          sx={{
+          sx={theme => ({
             overflowY: 'auto',
             pr: 1,
+            scrollbarWidth: 'thin',
+            scrollbarColor: `${theme.palette.action.disabled} transparent`,
             '&::-webkit-scrollbar': {
-              background: 'transparent',
+              width: 10,
             },
             '&::-webkit-scrollbar-track': {
               background: 'transparent',
             },
-          }}
+            '&::-webkit-scrollbar-thumb': {
+              backgroundColor: theme.palette.action.disabled,
+              borderRadius: 8,
+            },
+            '&::-webkit-scrollbar-thumb:hover': {
+              backgroundColor: theme.palette.action.active,
+            },
+          })}
         >
           {messages.map((message, idx) => (
             <MessageCard
