@@ -275,6 +275,18 @@ export const Conversation = ({
             color="info"
             title="Settings"
             onClick={() => setSettingsModalOpen(true)}
+            sx={{
+              '@keyframes jump-shaking': {
+                '0%': { transform: 'translateX(0)' },
+                '25%': { transform: 'translateY(-9px)' },
+                '35%': { transform: 'translateY(-9px) rotate(17deg)' },
+                '55%': { transform: 'translateY(-9px) rotate(-17deg)' },
+                '65%': { transform: 'translateY(-9px) rotate(17deg)' },
+                '75%': { transform: 'translateY(-9px) rotate(-17deg)' },
+                '100%': { transform: 'translateY(0) rotate(0)' },
+              },
+              animation: 'jump-shaking 1s ease-in-out 2',
+            }}
           >
             <SettingsIcon />
           </Button>
