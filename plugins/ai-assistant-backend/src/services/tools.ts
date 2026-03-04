@@ -95,7 +95,7 @@ const createToolsService = async ({
       return resolvedCore;
     }
 
-    return allTools.filter(tool =>
+    const resolvedConfiguredDefaultTools = allTools.filter(tool =>
       configuredDefaultTools.some(configuredTool =>
         areSameTools(configuredTool, {
           name: tool.name,
@@ -103,6 +103,8 @@ const createToolsService = async ({
         }),
       ),
     );
+
+    return uniqTools(resolvedConfiguredDefaultTools.concat(resolvedCore));
   };
 
   const registerTools: ToolsService['registerTools'] = async providers => {

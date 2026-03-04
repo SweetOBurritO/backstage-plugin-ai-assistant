@@ -41,10 +41,10 @@ aiAssistant:
   tools:
     core:
       - provider: core
-        name: searchKnowledge
+        name: search-knowledge-base
     defaultEnabled:
       - provider: core
-        name: searchKnowledge
+        name: search-knowledge-base
       - provider: mcp server:foo
         name: foo_someTool
 ```

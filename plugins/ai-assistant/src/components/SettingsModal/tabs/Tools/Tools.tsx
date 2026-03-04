@@ -103,12 +103,15 @@ export const Tab = () => {
       return;
     }
 
-    const providerToolStrings = new Set(
-      providerTools.filter(tool => !tool.isCore).map(t => JSON.stringify(t)),
+    const providerToolKeys = new Set(
+      providerTools
+        .filter(tool => !tool.isCore)
+        .map(tool => `${tool.provider}:${tool.name}`),
     );
     setToolsEnabled(
       toolsEnabled.filter(
-        (tool: EnabledTool) => !providerToolStrings.has(JSON.stringify(tool)),
+        (tool: EnabledTool) =>
+          !providerToolKeys.has(`${tool.provider}:${tool.name}`),
       ),
     );
   };
