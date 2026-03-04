@@ -277,7 +277,11 @@ export const Conversation = ({
             title="Settings"
             aria-label="Settings"
             onClick={() => {
-              localStorage.setItem('settingsButtonClicked', 'true');
+              try {
+                localStorage.setItem('settingsButtonClicked', 'true');
+              } catch (_error) {
+                // Ignore storage errors (e.g., blocked or unavailable localStorage)
+              }
               setSettingsButtonClicked(true);
               setSettingsModalOpen(true);
             }}
