@@ -55,14 +55,8 @@ export const Conversation = ({
   );
 
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
-  const [settingsButtonClicked, setSettingsButtonClicked] = useState(() => {
-    if (typeof window === 'undefined') {
-      return false;
-    }
-
-    return localStorage.getItem('settingsButtonClicked') === 'true';
-  });
-
+  const [settingsButtonClicked, setSettingsButtonClicked] =
+    useLocalStorage<boolean>('settingsButtonClicked', false);
   const { value: models, loading: loadingModels } = useAsync(
     () => chatApi.getModels(),
     [chatApi],
@@ -281,6 +275,7 @@ export const Conversation = ({
             variant="contained"
             color="info"
             title="Settings"
+            aria-label="Settings"
             onClick={() => {
               localStorage.setItem('settingsButtonClicked', 'true');
               setSettingsButtonClicked(true);
@@ -299,6 +294,9 @@ export const Conversation = ({
               animation: settingsButtonClicked
                 ? 'none'
                 : 'jump-shaking 1s ease-in-out 2',
+              '@media (prefers-reduced-motion: reduce)': {
+                animation: 'none',
+              },
             }}
           >
             <SettingsIcon />
