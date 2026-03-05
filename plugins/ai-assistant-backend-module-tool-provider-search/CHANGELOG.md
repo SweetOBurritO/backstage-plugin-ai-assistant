@@ -1,5 +1,13 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-tool-provider-search
 
+## 0.4.5
+
+### Patch Changes
+
+- Updated dependencies [35f8a25]
+  - @sweetoburrito/backstage-plugin-ai-assistant-common@0.10.0
+  - @sweetoburrito/backstage-plugin-ai-assistant-node@0.11.1
+
 ## 0.4.4
 
 ### Patch Changes
