@@ -103,12 +103,15 @@ export const Tab = () => {
       return;
     }
 
-    const providerToolStrings = new Set(
-      providerTools.map(t => JSON.stringify(t)),
+    const providerToolKeys = new Set(
+      providerTools
+        .filter(tool => !tool.isCore)
+        .map(tool => `${tool.provider}:${tool.name}`),
     );
     setToolsEnabled(
       toolsEnabled.filter(
-        tool => !providerToolStrings.has(JSON.stringify(tool)),
+        (tool: EnabledTool) =>
+          !providerToolKeys.has(`${tool.provider}:${tool.name}`),
       ),
     );
   };
@@ -124,7 +127,8 @@ export const Tab = () => {
 
     setToolsEnabled(
       toolsEnabled.filter(
-        t => !(t.name === tool.name && t.provider === tool.provider),
+        (t: EnabledTool) =>
+          !(t.name === tool.name && t.provider === tool.provider),
       ),
     );
   };
@@ -164,12 +168,15 @@ export const Tab = () => {
                 onChange={(_e, checked) =>
                   handleProviderClick(provider, checked)
                 }
-                disabled={provider === 'core'}
+                disabled={availableUserTools!
+                  .filter(tool => tool.provider === provider)
+                  .every(tool => tool.isCore)}
                 checked={availableUserTools!
                   .filter(tool => tool.provider === provider)
                   .every(tool =>
                     toolsEnabled?.some(
-                      t => t.name === tool.name && t.provider === tool.provider,
+                      (t: EnabledTool) =>
+                        t.name === tool.name && t.provider === tool.provider,
                     ),
                   )}
               />
@@ -182,12 +189,12 @@ export const Tab = () => {
                       label={tool.name}
                       checked={
                         toolsEnabled?.some(
-                          t =>
+                          (t: EnabledTool) =>
                             t.name === tool.name &&
                             t.provider === tool.provider,
                         ) || false
                       }
-                      disabled={tool.provider === 'core'}
+                      disabled={tool.isCore}
                       onChange={(_e, checked) => handleToolClick(tool, checked)}
                     />
                   </Tooltip>

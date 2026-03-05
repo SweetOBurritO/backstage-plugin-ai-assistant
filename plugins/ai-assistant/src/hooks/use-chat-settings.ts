@@ -99,15 +99,17 @@ export const useChatSettings = () => {
 
     const availableTools = await getAvailableTools();
 
-    const coreTools = availableTools.filter(tool => tool.provider === 'core');
+    const defaultEnabledTools = availableTools.filter(
+      tool => tool.enabledByDefault,
+    );
 
-    setToolsEnabledState(coreTools);
+    setToolsEnabledState(defaultEnabledTools);
     // Persist to backend
     await fetchApi.fetch(`${baseUrl}/settings`, {
       method: 'PATCH',
       body: JSON.stringify({
         type: 'user-tools',
-        settings: { tools: coreTools },
+        settings: { tools: defaultEnabledTools },
       }),
       headers: { 'Content-Type': 'application/json' },
     });
