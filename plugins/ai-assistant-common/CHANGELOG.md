@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-common
 
+## 0.10.0
+
+### Minor Changes
+
+- 35f8a25: make core and default-enabled tools configurable via app config
+
 ## 0.9.0
 
 ### Minor Changes

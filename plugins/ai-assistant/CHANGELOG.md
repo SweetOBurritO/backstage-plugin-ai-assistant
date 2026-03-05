@@ -1,5 +1,18 @@
 # @sweetoburrito/backstage-plugin-ai-assistant
 
+## 0.14.0
+
+### Minor Changes
+
+- 35f8a25: adding a one-time animation to the conversation settings button to draw attention to the button, and persisting the animation state using local storage
+- 35f8a25: make core and default-enabled tools configurable via app config
+
+### Patch Changes
+
+- 35f8a25: updates the styling of the conversation message list to improve the appearance and usability of scrollbars
+- Updated dependencies [35f8a25]
+  - @sweetoburrito/backstage-plugin-ai-assistant-common@0.10.0
+
 ## 0.13.0
 
 ### Minor Changes
