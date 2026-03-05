@@ -1,7 +1,12 @@
-import { useApi, errorApiRef } from '@backstage/core-plugin-api';
+import { useApi, errorApiRef, storageApiRef } from '@backstage/core-plugin-api';
 import { chatApiRef } from '../../api/chat';
-import { useAsync, useAsyncFn, useLocalStorage } from 'react-use';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  useAsync,
+  useAsyncFn,
+  useLocalStorage,
+  useObservable,
+} from 'react-use';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { signalApiRef } from '@backstage/plugin-signals-react';
 import { useSearchParams } from 'react-router-dom';
 
@@ -23,7 +28,7 @@ type ConversationOptions = {
   setConversationId: (id: string) => void;
   additionalSystemMessages?: Message[];
 };
-
+const SETTINGS_BUTTON_CLICKED_KEY = 'ai-assistant.settings-button-clicked';
 export const Conversation = ({
   conversationId,
   setConversationId,
@@ -32,6 +37,9 @@ export const Conversation = ({
   const chatApi = useApi(chatApiRef);
   const errorApi = useApi(errorApiRef);
   const signalApi = useApi(signalApiRef);
+  const storageApi = useApi(storageApiRef).forBucket(
+    SETTINGS_BUTTON_CLICKED_KEY,
+  );
   const analytics = useAnalytics();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -55,11 +63,23 @@ export const Conversation = ({
   );
 
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
-
   const { value: models, loading: loadingModels } = useAsync(
     () => chatApi.getModels(),
     [chatApi],
   );
+  const settingsButtonClickedSnapshot = useObservable(
+    storageApi.observe$(SETTINGS_BUTTON_CLICKED_KEY),
+    storageApi.snapshot(SETTINGS_BUTTON_CLICKED_KEY),
+  );
+  const settingsButtonClicked = useMemo(() => {
+    if (
+      !settingsButtonClickedSnapshot ||
+      settingsButtonClickedSnapshot.presence === 'absent'
+    ) {
+      return false;
+    }
+    return (settingsButtonClickedSnapshot.value as boolean) ?? false;
+  }, [settingsButtonClickedSnapshot]);
 
   const { value: history, loading: loadingHistory } = useAsync(
     () => chatApi.getConversation(conversationId),
@@ -283,7 +303,36 @@ export const Conversation = ({
             variant="contained"
             color="info"
             title="Settings"
-            onClick={() => setSettingsModalOpen(true)}
+            aria-label="Settings"
+            onClick={() => {
+              storageApi.set(SETTINGS_BUTTON_CLICKED_KEY, true).catch(err => {
+                errorApi.post({
+                  message: `Failed to update settings button state: ${
+                    (err as Error).message
+                  }. This will cause the settings button animation to still play on every render. Please try again.`,
+                  name: 'SettingsButtonStateError',
+                });
+              });
+
+              setSettingsModalOpen(true);
+            }}
+            sx={{
+              '@keyframes jump-shaking': {
+                '0%': { transform: 'translateX(0)' },
+                '25%': { transform: 'translateY(-9px)' },
+                '35%': { transform: 'translateY(-9px) rotate(17deg)' },
+                '55%': { transform: 'translateY(-9px) rotate(-17deg)' },
+                '65%': { transform: 'translateY(-9px) rotate(17deg)' },
+                '75%': { transform: 'translateY(-9px) rotate(-17deg)' },
+                '100%': { transform: 'translateY(0) rotate(0)' },
+              },
+              animation: settingsButtonClicked
+                ? 'none'
+                : 'jump-shaking 1s ease-in-out 2',
+              '@media (prefers-reduced-motion: reduce)': {
+                animation: 'none',
+              },
+            }}
           >
             <SettingsIcon />
           </Button>
