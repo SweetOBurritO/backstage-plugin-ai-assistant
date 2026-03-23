@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend-module-model-provider-azure-ai
 
+## 0.6.0
+
+### Minor Changes
+
+- 7896e9d: add optional apiKey to model configuration for Azure AI
+
 ## 0.5.0
 
 ### Minor Changes
