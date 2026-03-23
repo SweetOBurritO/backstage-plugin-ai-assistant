@@ -29,9 +29,10 @@ export const aiAssistantModuleModelProviderAzureAi = createBackendModule({
             const endpoint = modelConfig.getString('endpoint');
             const modelName = modelConfig.getString('modelName');
             const sdk = modelConfig.getOptionalString('sdk') ?? 'openai';
+            const modelApiKey = modelConfig.getOptionalString('apiKey');
 
             const chatModel = createChatModeForSdk(sdk, {
-              apiKey,
+              apiKey: modelApiKey ?? apiKey,
               endpoint,
               modelName,
             });

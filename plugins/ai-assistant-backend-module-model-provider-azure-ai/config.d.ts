@@ -12,6 +12,7 @@ export interface Config {
           modelName: string;
           endpoint: string;
           sdk?: SdkType;
+          apiKey?: string;
         }[];
       };
     };
