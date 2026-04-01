@@ -321,7 +321,7 @@ export const Conversation = ({
           onClick={() => scrollToBottom('smooth')}
           sx={{ alignSelf: 'center' }}
         >
-          Jump to latest ↓
+          Scroll to bottom ↓
         </Button>
       )}
 
