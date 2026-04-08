@@ -47,15 +47,7 @@ export const Conversation = ({
 
   const [input, setInput] = useState(initialQuery);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (initialQuery && searchParams.has('query')) {
-      setSearchParams(params => {
-        params.delete('query');
-        return params;
-      });
-    }
-  }, [initialQuery, searchParams, setSearchParams]);
+  const autoSentRef = useRef(false);
 
   const [modelId, setModelId] = useLocalStorage<string | undefined>(
     'modelId',
@@ -201,7 +193,21 @@ export const Conversation = ({
     errorApi,
     setInput,
     toolsEnabled,
+    analytics,
+    additionalSystemMessages,
   ]);
+
+  // Auto-send initial query
+  useEffect(() => {
+    if (initialQuery && !autoSentRef.current && modelId && !loadingHistory) {
+      autoSentRef.current = true;
+      sendMessage();
+      setSearchParams(params => {
+        params.delete('query');
+        return params;
+      });
+    }
+  }, [initialQuery, modelId, loadingHistory, sendMessage, setSearchParams]);
 
   const messageEndRef = useRef<HTMLDivElement>(null);
 
