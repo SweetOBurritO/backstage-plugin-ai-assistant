@@ -64,7 +64,6 @@ export const Conversation = ({
       }, 100);
       return () => clearTimeout(timer);
     }
-    return undefined;
   }, [initialQuery, searchParams, setSearchParams]);
 
   const [modelId, setModelId] = useLocalStorage<string | undefined>(
