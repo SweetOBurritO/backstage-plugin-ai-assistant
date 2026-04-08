@@ -197,9 +197,9 @@ export const Conversation = ({
     additionalSystemMessages,
   ]);
 
-  // CHANGED: Auto-send only when autoSend=true parameter is present
+  // Auto-send only when autoSend=true parameter is present
   useEffect(() => {
-    const autoSend = searchParams.get('autoSend') === 'true'; // ADDED THIS LINE
+    const autoSend = searchParams.get('autoSend') === 'true'; 
 
     if (
       initialQuery &&
@@ -212,7 +212,7 @@ export const Conversation = ({
       sendMessage();
       setSearchParams(params => {
         params.delete('query');
-        params.delete('autoSend'); // ADDED: Also clean up autoSend param
+        params.delete('autoSend'); 
         return params;
       });
     }
