@@ -47,7 +47,25 @@ export const Conversation = ({
 
   const [input, setInput] = useState(initialQuery);
   const inputRef = useRef<HTMLInputElement>(null);
-  const autoSentRef = useRef(false);
+  const autoSentRef = useRef(false); 
+
+  // Clean up URL parameters after pre-populating (always, not just on auto-send)
+  useEffect(() => {
+    if (
+      initialQuery &&
+      (searchParams.has('query') || searchParams.has('autoSend'))
+    ) {
+      const timer = setTimeout(() => {
+        setSearchParams(params => {
+          params.delete('query');
+          params.delete('autoSend');
+          return params;
+        });
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [initialQuery, searchParams, setSearchParams]);
 
   const [modelId, setModelId] = useLocalStorage<string | undefined>(
     'modelId',
@@ -199,7 +217,7 @@ export const Conversation = ({
 
   // Auto-send only when autoSend=true parameter is present
   useEffect(() => {
-    const autoSend = searchParams.get('autoSend') === 'true'; 
+    const autoSend = searchParams.get('autoSend') === 'true';
 
     if (
       initialQuery &&
@@ -210,20 +228,8 @@ export const Conversation = ({
     ) {
       autoSentRef.current = true;
       sendMessage();
-      setSearchParams(params => {
-        params.delete('query');
-        params.delete('autoSend'); 
-        return params;
-      });
     }
-  }, [
-    initialQuery,
-    modelId,
-    loadingHistory,
-    sendMessage,
-    setSearchParams,
-    searchParams,
-  ]);
+  }, [initialQuery, modelId, loadingHistory, sendMessage, searchParams]);
 
   const messageEndRef = useRef<HTMLDivElement>(null);
 
