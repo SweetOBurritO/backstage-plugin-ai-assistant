@@ -197,17 +197,33 @@ export const Conversation = ({
     additionalSystemMessages,
   ]);
 
-  // Auto-send initial query
+  // CHANGED: Auto-send only when autoSend=true parameter is present
   useEffect(() => {
-    if (initialQuery && !autoSentRef.current && modelId && !loadingHistory) {
+    const autoSend = searchParams.get('autoSend') === 'true'; // ADDED THIS LINE
+
+    if (
+      initialQuery &&
+      autoSend &&
+      !autoSentRef.current &&
+      modelId &&
+      !loadingHistory
+    ) {
       autoSentRef.current = true;
       sendMessage();
       setSearchParams(params => {
         params.delete('query');
+        params.delete('autoSend'); // ADDED: Also clean up autoSend param
         return params;
       });
     }
-  }, [initialQuery, modelId, loadingHistory, sendMessage, setSearchParams]);
+  }, [
+    initialQuery,
+    modelId,
+    loadingHistory,
+    sendMessage,
+    setSearchParams,
+    searchParams,
+  ]);
 
   const messageEndRef = useRef<HTMLDivElement>(null);
 
