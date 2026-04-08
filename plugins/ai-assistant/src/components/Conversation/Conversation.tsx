@@ -55,14 +55,11 @@ export const Conversation = ({
       initialQuery &&
       (searchParams.has('query') || searchParams.has('autoSend'))
     ) {
-      const timer = setTimeout(() => {
-        setSearchParams(params => {
-          params.delete('query');
-          params.delete('autoSend');
-          return params;
-        });
-      }, 100);
-      return () => clearTimeout(timer);
+      setSearchParams(params => {
+        params.delete('query');
+        params.delete('autoSend');
+        return params;
+      });
     }
   }, [initialQuery, searchParams, setSearchParams]);
 
