@@ -47,7 +47,7 @@ export const Conversation = ({
 
   const [input, setInput] = useState(initialQuery);
   const inputRef = useRef<HTMLInputElement>(null);
-  const autoSentRef = useRef(false); 
+  const autoSentRef = useRef(false);
 
   // Clean up URL parameters after pre-populating (always, not just on auto-send)
   useEffect(() => {
@@ -211,8 +211,6 @@ export const Conversation = ({
     errorApi,
     setInput,
     toolsEnabled,
-    analytics,
-    additionalSystemMessages,
   ]);
 
   // Auto-send only when autoSend=true parameter is present
