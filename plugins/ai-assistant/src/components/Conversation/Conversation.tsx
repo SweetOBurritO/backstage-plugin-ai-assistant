@@ -87,8 +87,13 @@ export const Conversation = ({
   );
 
   const [messages, setMessages] = useState<Message[]>([]);
+  const messagesRef = useRef<Message[]>([]);
 
   const { toolsEnabled } = useChatSettings();
+
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
 
   useEffect(() => {
     if (!history || !history.length) {
@@ -100,18 +105,17 @@ export const Conversation = ({
 
   const handleMessageUpdate = useCallback(
     (newMessages: Required<Message>[]) => {
+      const newAiMessages = newMessages.filter(
+        message =>
+          message.role !== 'human' &&
+          !messagesRef.current.some(m => m.id === message.id),
+      );
+
       setMessages(prev => {
         const updated = [...prev];
 
         newMessages.forEach(message => {
           const index = updated.findIndex(m => m.id === message.id);
-
-          if (index === -1 && message.role !== 'human') {
-            analytics.captureEvent({
-              action: 'message_received',
-              subject: modelId ?? 'none',
-            });
-          }
 
           if (index === -1) {
             updated.push(message);
@@ -121,6 +125,13 @@ export const Conversation = ({
         });
 
         return updated;
+      });
+
+      newAiMessages.forEach(() => {
+        analytics.captureEvent({
+          action: 'message_received',
+          subject: modelId ?? 'none',
+        });
       });
     },
     [setMessages, analytics, modelId],
@@ -201,6 +212,7 @@ export const Conversation = ({
     errorApi,
     setInput,
     toolsEnabled,
+    analytics,
   ]);
 
   const messageEndRef = useRef<HTMLDivElement>(null);
