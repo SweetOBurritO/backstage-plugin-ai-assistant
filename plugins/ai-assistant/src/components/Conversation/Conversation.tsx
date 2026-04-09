@@ -49,17 +49,25 @@ export const Conversation = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const autoSentRef = useRef(false);
 
-  // Clean up URL parameters after pre-populating (always, not just on auto-send)
+  // Capture autoSend BEFORE cleanup runs
+  const shouldAutoSend = useRef(
+    searchParams.get('autoSend') === 'true',
+  ).current;
+
+  // Clean up URL parameters after capturing
   useEffect(() => {
     if (
       initialQuery &&
       (searchParams.has('query') || searchParams.has('autoSend'))
     ) {
-      setSearchParams(params => {
-        params.delete('query');
-        params.delete('autoSend');
-        return params;
-      });
+      setSearchParams(
+        params => {
+          params.delete('query');
+          params.delete('autoSend');
+          return params;
+        },
+        { replace: true },
+      );
     }
   }, [initialQuery, searchParams, setSearchParams]);
 
@@ -209,13 +217,11 @@ export const Conversation = ({
     toolsEnabled,
   ]);
 
-  // Auto-send only when autoSend=true parameter is present
+  // Auto-send only when autoSend=true parameter was present
   useEffect(() => {
-    const autoSend = searchParams.get('autoSend') === 'true';
-
     if (
       initialQuery &&
-      autoSend &&
+      shouldAutoSend &&
       !autoSentRef.current &&
       modelId &&
       !loadingHistory
@@ -223,7 +229,7 @@ export const Conversation = ({
       autoSentRef.current = true;
       sendMessage();
     }
-  }, [initialQuery, modelId, loadingHistory, sendMessage, searchParams]);
+  }, [initialQuery, shouldAutoSend, modelId, loadingHistory, sendMessage]);
 
   const messageEndRef = useRef<HTMLDivElement>(null);
 
