@@ -28,6 +28,9 @@ type ConversationOptions = {
   setConversationId: (id: string) => void;
   additionalSystemMessages?: Message[];
 };
+
+const SCROLL_BOTTOM_THRESHOLD_PX = 80;
+
 const SETTINGS_BUTTON_CLICKED_KEY = 'ai-assistant.settings-button-clicked';
 export const Conversation = ({
   conversationId,
@@ -216,10 +219,52 @@ export const Conversation = ({
   ]);
 
   const messageEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const [isUserAtBottom, setIsUserAtBottom] = useState(true);
+  const isUserAtBottomRef = useRef(true);
+
+  const getIsNearBottom = useCallback((element: HTMLDivElement) => {
+    const distanceToBottom =
+      element.scrollHeight - element.scrollTop - element.clientHeight;
+    return distanceToBottom <= SCROLL_BOTTOM_THRESHOLD_PX;
+  }, []);
+
+  const syncUserAtBottom = useCallback((value: boolean) => {
+    isUserAtBottomRef.current = value;
+    setIsUserAtBottom(value);
+  }, []);
+
+  const handleMessagesScroll = useCallback(() => {
+    if (!messagesContainerRef.current) {
+      return;
+    }
+
+    syncUserAtBottom(getIsNearBottom(messagesContainerRef.current));
+  }, [getIsNearBottom, syncUserAtBottom]);
+
+  const scrollToBottom = useCallback(
+    (behavior: ScrollBehavior = 'auto') => {
+      messageEndRef.current?.scrollIntoView({ behavior });
+      syncUserAtBottom(true);
+    },
+    [syncUserAtBottom],
+  );
 
   useEffect(() => {
-    messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (!isUserAtBottomRef.current) {
+      return;
+    }
+
+    scrollToBottom('auto');
+  }, [messages, scrollToBottom]);
+
+  useEffect(() => {
+    if (!messagesContainerRef.current) {
+      return;
+    }
+
+    syncUserAtBottom(getIsNearBottom(messagesContainerRef.current));
+  }, [messages, getIsNearBottom, syncUserAtBottom]);
 
   if (loadingHistory && loadingModels) {
     return <Typography>Loading...</Typography>;
@@ -240,6 +285,8 @@ export const Conversation = ({
     >
       {messages && (
         <Stack
+          ref={messagesContainerRef}
+          onScroll={handleMessagesScroll}
           spacing={1}
           flex={1}
           sx={theme => ({
@@ -278,6 +325,16 @@ export const Conversation = ({
             )}
           <div ref={messageEndRef} />
         </Stack>
+      )}
+
+      {!isUserAtBottom && messages.length > 0 && (
+        <Button
+          variant="outlined"
+          onClick={() => scrollToBottom('smooth')}
+          sx={{ alignSelf: 'center' }}
+        >
+          Scroll to bottom ↓
+        </Button>
       )}
 
       <Paper elevation={2} sx={{ padding: 1 }}>
