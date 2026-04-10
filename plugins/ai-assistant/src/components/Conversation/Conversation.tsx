@@ -44,32 +44,11 @@ export const Conversation = ({
   const [searchParams, setSearchParams] = useSearchParams();
 
   const initialQuery = searchParams.get('query') ?? '';
+  const shouldAutoSend = searchParams.get('autoSend') === 'true';
 
   const [input, setInput] = useState(initialQuery);
   const inputRef = useRef<HTMLInputElement>(null);
   const autoSentRef = useRef(false);
-
-  // Capture autoSend BEFORE cleanup runs
-  const shouldAutoSend = useRef(
-    searchParams.get('autoSend') === 'true',
-  ).current;
-
-  // Clean up URL parameters after capturing
-  useEffect(() => {
-    if (
-      initialQuery &&
-      (searchParams.has('query') || searchParams.has('autoSend'))
-    ) {
-      setSearchParams(
-        params => {
-          params.delete('query');
-          params.delete('autoSend');
-          return params;
-        },
-        { replace: true },
-      );
-    }
-  }, [initialQuery, searchParams, setSearchParams]);
 
   const [modelId, setModelId] = useLocalStorage<string | undefined>(
     'modelId',
@@ -227,9 +206,25 @@ export const Conversation = ({
       !loadingHistory
     ) {
       autoSentRef.current = true;
-      sendMessage();
+      sendMessage().then(() => {
+        setSearchParams(
+          params => {
+            params.delete('query');
+            params.delete('autoSend');
+            return params;
+          },
+          { replace: true },
+        );
+      });
     }
-  }, [initialQuery, shouldAutoSend, modelId, loadingHistory, sendMessage]);
+  }, [
+    initialQuery,
+    shouldAutoSend,
+    modelId,
+    loadingHistory,
+    sendMessage,
+    setSearchParams,
+  ]);
 
   const messageEndRef = useRef<HTMLDivElement>(null);
 
