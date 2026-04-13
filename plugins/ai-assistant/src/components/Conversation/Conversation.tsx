@@ -462,9 +462,6 @@ export const Conversation = ({
       <SettingsModal
         open={settingsModalOpen}
         onClose={() => setSettingsModalOpen(false)}
-        models={models}
-        modelId={modelId}
-        setModelId={setModelId}
       />
     </Stack>
   );
