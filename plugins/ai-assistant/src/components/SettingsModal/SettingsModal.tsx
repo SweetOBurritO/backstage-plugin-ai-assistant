@@ -7,6 +7,10 @@ import Button from '@mui/material/Button';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import Box from '@mui/material/Box';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
@@ -18,11 +22,17 @@ import tabs from './tabs';
 interface SettingsModalProps {
   open: boolean;
   onClose: () => void;
+  models: string[];
+  modelId?: string;
+  setModelId: (value: string | undefined) => void;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
   open,
   onClose,
+  models,
+  modelId,
+  setModelId,
 }) => {
   const [selectedTab, setSelectedTab] = useState(0);
 
@@ -59,6 +69,34 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       </DialogTitle>
 
       <DialogContent dividers sx={{ p: 0 }}>
+        <Box
+          sx={{
+            p: 2,
+            borderBottom: 1,
+            borderColor: 'divider',
+          }}
+        >
+          <Stack spacing={0.75}>
+            <Typography variant="subtitle2">Model</Typography>
+            <FormControl size="small" fullWidth>
+              <InputLabel id="model-select-label">Model</InputLabel>
+              <Select
+                labelId="model-select-label"
+                label="Model"
+                value={modelId ?? ''}
+                onChange={event =>
+                  setModelId((event.target.value as string) || undefined)
+                }
+              >
+                {models.map(model => (
+                  <MenuItem key={model} value={model}>
+                    {model}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Stack>
+        </Box>
         <Box
           sx={{
             flexGrow: 1,
