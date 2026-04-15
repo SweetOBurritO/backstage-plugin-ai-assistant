@@ -54,6 +54,7 @@ export const Conversation = ({
 
   const [input, setInput] = useState(initialQuery);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const autoSentRef = useRef(false);
 
   useEffect(() => {
     if (initialQuery && searchParams.has('query')) {
@@ -322,8 +323,6 @@ export const Conversation = ({
     >
       {messages && (
         <Stack
-          ref={messagesContainerRef}
-          onScroll={handleMessagesScroll}
           ref={messagesContainerRef}
           onScroll={handleMessagesScroll}
           spacing={1}
