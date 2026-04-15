@@ -61,7 +61,7 @@ const createCallbackService =
 
           const callbackData = await chainMetadataCallback(options);
 
-          Object.assign(metadata, callbackData.metadata);
+          Object.assign(metadata, callbackData);
         }
 
         return { metadata };
