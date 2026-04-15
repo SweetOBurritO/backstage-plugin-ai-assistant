@@ -199,7 +199,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   textAlign: 'left',
                   pl: 3,
                   pr: 2,
-                  minHeight: theme => theme.spacing(5),
+                  minHeight: themeSpacing => themeSpacing.spacing(5),
                   borderRight: 3,
                   borderRightColor: 'transparent',
                   '&.Mui-selected': selectedTabStyles,
@@ -207,14 +207,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               }}
             >
               {tabs.map((tab, index) => (
-                <Tab key={tab.name} label={tab.title} aria-label={tab.title} />
+                <Tab key={index} label={tab.name} aria-label={tab.title} />
               ))}
             </Tabs>
           </Box>
 
           {tabs.map((tab, index) => (
             <TabPanel
-              key={tab.name}
+              key={index}
               value={selectedTab}
               index={index}
               title={tab.title}
