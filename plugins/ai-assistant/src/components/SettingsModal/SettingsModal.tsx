@@ -12,7 +12,6 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import SettingsIcon from '@mui/icons-material/Settings';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { TabPanel } from './TabPanel';
 import tabs from './tabs';
 
@@ -28,7 +27,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [selectedTab, setSelectedTab] = useState(0);
-  const [mobileView, setMobileView] = useState<'menu' | 'details'>('menu');
+  const [, setMobileView] = useState<'menu' | 'details'>('menu');
 
   useEffect(() => {
     if (open && isMobile) {
