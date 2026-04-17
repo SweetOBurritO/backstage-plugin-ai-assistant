@@ -1,5 +1,13 @@
 # @sweetoburrito/backstage-plugin-ai-assistant
 
+## 0.15.0
+
+### Minor Changes
+
+- ac658d2: Improve conversation experience by refining message rendering and interaction behavior in the AI Assistant UI.
+- 5c1eb03: Add optional autoSend query parameter to control automatic message sending. The ?query= parameter now pre-populates the input without auto-sending by default. Use ?query=text&autoSend=true to enable automatic sending for browser search engine integration.
+- a6b5f5b: fix analytics to work with the updated LangChain (v1) version
+
 ## 0.14.0
 
 ### Minor Changes
