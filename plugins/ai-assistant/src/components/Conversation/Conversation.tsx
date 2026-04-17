@@ -13,9 +13,12 @@ import { useSearchParams } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
-import Autocomplete from '@mui/material/Autocomplete';
 import Paper from '@mui/material/Paper';
-import NorthIcon from '@mui/icons-material/North';
+import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
+import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import SettingsIcon from '@mui/icons-material/Settings';
 import Button from '@mui/material/Button';
 import { Message } from '@sweetoburrito/backstage-plugin-ai-assistant-common';
@@ -50,8 +53,17 @@ export const Conversation = ({
   const shouldAutoSend = searchParams.get('autoSend') === 'true';
 
   const [input, setInput] = useState(initialQuery);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const autoSentRef = useRef(false);
+
+  useEffect(() => {
+    if (initialQuery && searchParams.has('query')) {
+      setSearchParams(params => {
+        params.delete('query');
+        return params;
+      });
+    }
+  }, [initialQuery, searchParams, setSearchParams]);
 
   const [modelId, setModelId] = useLocalStorage<string | undefined>(
     'modelId',
@@ -59,6 +71,9 @@ export const Conversation = ({
   );
 
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+  const appTheme = useTheme();
+  const isMobile = useMediaQuery(appTheme.breakpoints.down('sm'));
+
   const { value: models, loading: loadingModels } = useAsync(
     () => chatApi.getModels(),
     [chatApi],
@@ -289,6 +304,14 @@ export const Conversation = ({
     syncUserAtBottom(getIsNearBottom(messagesContainerRef.current));
   }, [messages, getIsNearBottom, syncUserAtBottom]);
 
+  useEffect(() => {
+    if (!isUserAtBottomRef.current) {
+      return;
+    }
+
+    scrollToBottom('auto');
+  }, [input, scrollToBottom]);
+
   if (loadingHistory && loadingModels) {
     return <Typography>Loading...</Typography>;
   }
@@ -299,8 +322,12 @@ export const Conversation = ({
 
   return (
     <Stack
-      padding={2}
-      spacing={2}
+      sx={{
+        px: { xs: 1, sm: 2 },
+        pt: 1,
+        pb: 0,
+      }}
+      spacing={1}
       flex={1}
       boxSizing="border-box"
       height="100%"
@@ -315,6 +342,7 @@ export const Conversation = ({
           sx={theme => ({
             overflowY: 'auto',
             pr: 1,
+            pb: 1,
             scrollbarWidth: 'thin',
             scrollbarColor: `${theme.palette.action.disabled} transparent`,
             '&::-webkit-scrollbar': {
@@ -354,27 +382,47 @@ export const Conversation = ({
         <Button
           variant="outlined"
           onClick={() => scrollToBottom('smooth')}
-          sx={{ alignSelf: 'center' }}
+          sx={{ alignSelf: 'center', py: 0.5 }}
         >
           Scroll to bottom ↓
         </Button>
       )}
 
-      <Paper elevation={2} sx={{ padding: 1 }}>
+      <Paper
+        elevation={2}
+        sx={{
+          mt: 'auto',
+          px: 1,
+          pt: 1,
+          pb: `calc(env(safe-area-inset-bottom, 0px) + 8px)`,
+          position: 'sticky',
+          bottom: 0,
+          zIndex: 1,
+        }}
+      >
         <Stack
-          direction="row"
+          direction="column"
           spacing={1}
-          alignItems="center"
-          justifyContent="start"
+          alignItems="stretch"
+          justifyContent="center"
         >
           <TextField
             multiline
-            maxRows={3}
-            variant="standard"
-            sx={{ flex: 1 }}
+            minRows={1}
+            maxRows={24}
+            variant="outlined"
+            size="small"
+            sx={{
+              flex: 1,
+              '& textarea': {
+                maxHeight: isMobile ? '35vh' : '30vh',
+                overflowY: 'auto !important',
+              },
+            }}
             value={input}
             onChange={e => setInput(e.target.value)}
             inputRef={inputRef}
+            placeholder="Type a message"
             onKeyDown={e => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -382,59 +430,76 @@ export const Conversation = ({
               }
             }}
           />
-          <Autocomplete
-            options={models}
-            defaultValue={modelId}
-            onChange={(_, value) => setModelId(value || undefined)}
-            sx={{ width: 180 }}
-            size="small"
-            renderInput={params => <TextField {...params} label="Models" />}
-          />
-          <Button
-            disabled={sending}
-            variant="contained"
-            color="info"
-            title="Settings"
-            aria-label="Settings"
-            onClick={() => {
-              storageApi.set(SETTINGS_BUTTON_CLICKED_KEY, true).catch(err => {
-                errorApi.post({
-                  message: `Failed to update settings button state: ${
-                    (err as Error).message
-                  }. This will cause the settings button animation to still play on every render. Please try again.`,
-                  name: 'SettingsButtonStateError',
-                });
-              });
+          <Stack direction="row" spacing={1} justifyContent="flex-end">
+            <IconButton
+              disabled={sending || !input.trim()}
+              title="Send"
+              aria-label="Send"
+              onClick={sendMessage}
+              color="primary"
+              sx={{
+                width: 44,
+                height: 44,
+                borderRadius: 2,
+                backgroundColor: theme => theme.palette.primary.main,
+                color: theme => theme.palette.primary.contrastText,
+                '&:hover': {
+                  backgroundColor: theme => theme.palette.primary.dark,
+                },
+                '&.Mui-disabled': {
+                  backgroundColor: theme =>
+                    theme.palette.action.disabledBackground,
+                  color: theme => theme.palette.action.disabled,
+                },
+              }}
+            >
+              <SendRoundedIcon />
+            </IconButton>
+            <Box>
+              <IconButton
+                disabled={sending}
+                title="Settings"
+                aria-label="Settings"
+                onClick={() => {
+                  storageApi
+                    .set(SETTINGS_BUTTON_CLICKED_KEY, true)
+                    .catch(err => {
+                      errorApi.post({
+                        message: `Failed to update settings button state: ${
+                          (err as Error).message
+                        }. This will cause the settings button animation to still play on every render. Please try again.`,
+                        name: 'SettingsButtonStateError',
+                      });
+                    });
 
-              setSettingsModalOpen(true);
-            }}
-            sx={{
-              '@keyframes jump-shaking': {
-                '0%': { transform: 'translateX(0)' },
-                '25%': { transform: 'translateY(-9px)' },
-                '35%': { transform: 'translateY(-9px) rotate(17deg)' },
-                '55%': { transform: 'translateY(-9px) rotate(-17deg)' },
-                '65%': { transform: 'translateY(-9px) rotate(17deg)' },
-                '75%': { transform: 'translateY(-9px) rotate(-17deg)' },
-                '100%': { transform: 'translateY(0) rotate(0)' },
-              },
-              animation: settingsButtonClicked
-                ? 'none'
-                : 'jump-shaking 1s ease-in-out 2',
-              '@media (prefers-reduced-motion: reduce)': {
-                animation: 'none',
-              },
-            }}
-          >
-            <SettingsIcon />
-          </Button>
-          <Button
-            variant="contained"
-            disabled={sending || !input.trim()}
-            onClick={sendMessage}
-          >
-            <NorthIcon />
-          </Button>
+                  setSettingsModalOpen(true);
+                }}
+                sx={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 2,
+                  border: theme => `1px solid ${theme.palette.divider}`,
+                  '@keyframes jump-shaking': {
+                    '0%': { transform: 'translateX(0)' },
+                    '25%': { transform: 'translateY(-9px)' },
+                    '35%': { transform: 'translateY(-9px) rotate(17deg)' },
+                    '55%': { transform: 'translateY(-9px) rotate(-17deg)' },
+                    '65%': { transform: 'translateY(-9px) rotate(17deg)' },
+                    '75%': { transform: 'translateY(-9px) rotate(-17deg)' },
+                    '100%': { transform: 'translateY(0) rotate(0)' },
+                  },
+                  animation: settingsButtonClicked
+                    ? 'none'
+                    : 'jump-shaking 1s ease-in-out 2',
+                  '@media (prefers-reduced-motion: reduce)': {
+                    animation: 'none',
+                  },
+                }}
+              >
+                <SettingsIcon fontSize={isMobile ? 'small' : 'medium'} />
+              </IconButton>
+            </Box>
+          </Stack>
         </Stack>
       </Paper>
 
