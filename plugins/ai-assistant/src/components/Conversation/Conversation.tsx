@@ -431,30 +431,6 @@ export const Conversation = ({
             }}
           />
           <Stack direction="row" spacing={1} justifyContent="flex-end">
-            <IconButton
-              disabled={sending || !input.trim()}
-              title="Send"
-              aria-label="Send"
-              onClick={sendMessage}
-              color="primary"
-              sx={{
-                width: 44,
-                height: 44,
-                borderRadius: 2,
-                backgroundColor: theme => theme.palette.primary.main,
-                color: theme => theme.palette.primary.contrastText,
-                '&:hover': {
-                  backgroundColor: theme => theme.palette.primary.dark,
-                },
-                '&.Mui-disabled': {
-                  backgroundColor: theme =>
-                    theme.palette.action.disabledBackground,
-                  color: theme => theme.palette.action.disabled,
-                },
-              }}
-            >
-              <SendRoundedIcon />
-            </IconButton>
             <Box>
               <IconButton
                 disabled={sending}
@@ -499,6 +475,31 @@ export const Conversation = ({
                 <SettingsIcon fontSize={isMobile ? 'small' : 'medium'} />
               </IconButton>
             </Box>
+            <IconButton
+              disabled={sending || !input.trim()}
+              title="Send"
+              aria-label="Send"
+              onClick={sendMessage}
+              color="primary"
+              sx={{
+                ml: 0.5,
+                width: 44,
+                height: 44,
+                borderRadius: 2,
+                backgroundColor: theme => theme.palette.primary.main,
+                color: theme => theme.palette.primary.contrastText,
+                '&:hover': {
+                  backgroundColor: theme => theme.palette.primary.dark,
+                },
+                '&.Mui-disabled': {
+                  backgroundColor: theme =>
+                    theme.palette.action.disabledBackground,
+                  color: theme => theme.palette.action.disabled,
+                },
+              }}
+            >
+              <SendRoundedIcon />
+            </IconButton>
           </Stack>
         </Stack>
       </Paper>

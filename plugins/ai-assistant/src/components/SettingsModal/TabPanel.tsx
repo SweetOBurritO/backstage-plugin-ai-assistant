@@ -33,11 +33,12 @@ export const TabPanel = (props: TabPanelProps) => {
     <Box
       role="tabpanel"
       hidden={value !== index}
-      id={`vertical-tabpanel-${index}`}
-      aria-labelledby={`vertical-tab-${index}`}
+      id={`settings-tabpanel-${index}`}
+      aria-labelledby={`settings-tab-${index}`}
       sx={{
         width: '100%',
         height: '100%',
+        minHeight: 0,
         overflow: 'auto', // Allow content to scroll independently
         padding: 2,
       }}

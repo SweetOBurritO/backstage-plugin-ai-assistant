@@ -1,5 +1,5 @@
 import Tools from './Tools';
 import McpServers from './McpServers';
-import Models from './Models';
+import Conversation from './Conversation';
 
-export default [McpServers, Tools, Models];
+export default [Conversation, McpServers, Tools];
