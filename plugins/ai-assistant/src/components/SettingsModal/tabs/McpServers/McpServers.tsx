@@ -24,6 +24,15 @@ type McpConfigFormData = {
   options: string;
 };
 
+const normalizeMcpServerName = (name: string): string => {
+  return name.trim().replace(/[\s-]/g, '_');
+};
+
+const filterServerNameInput = (input: string): string => {
+  // Allow only letters, numbers, spaces, and underscores
+  return input.replace(/[^a-zA-Z0-9\s_]/g, '');
+};
+
 export const Tab = () => {
   const mcpApi = useApi(mcpApiRef);
   const alertApi = useApi(alertApiRef);
@@ -73,6 +82,8 @@ export const Tab = () => {
       return false;
     }
 
+    const normalizedName = normalizeMcpServerName(config.name);
+
     try {
       const parsedConfig = JSON.parse(config.options);
 
@@ -90,7 +101,7 @@ export const Tab = () => {
 
     // Check for duplicate names (excluding current editing item)
     const isDuplicate = configs.some(
-      (c, index) => c === config.name.trim() && index !== editingIndex,
+      (c, index) => normalizeMcpServerName(c) === normalizedName && index !== editingIndex,
     );
 
     if (isDuplicate) {
@@ -107,9 +118,10 @@ export const Tab = () => {
 
     try {
       const parsedOptions = JSON.parse(currentConfig.options);
+      const normalizedName = normalizeMcpServerName(currentConfig.name);
 
       const newConfig: McpServerConfig = {
-        name: currentConfig.name.trim(),
+        name: normalizedName,
         options: parsedOptions,
       };
 
@@ -236,12 +248,34 @@ export const Tab = () => {
               onChange={e =>
                 setCurrentConfig({
                   ...currentConfig,
-                  name: e.target.value,
+                  name: filterServerNameInput(e.target.value),
                 })
               }
               placeholder="my-mcp-server"
               required
             />
+
+            {currentConfig.name.trim() && (
+              <Box
+                sx={{
+                  p: 1.5,
+                  backgroundColor: 'action.hover',
+                  borderRadius: 1,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                }}
+              >
+                <Typography variant="caption" color="text.secondary">
+                  Will be saved as:
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ fontFamily: 'monospace', fontWeight: 500 }}
+                >
+                  {normalizeMcpServerName(currentConfig.name)}
+                </Typography>
+              </Box>
+            )}
 
             <Box>
               <Typography variant="subtitle2" gutterBottom>
