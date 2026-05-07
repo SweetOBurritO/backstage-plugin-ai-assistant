@@ -6,7 +6,10 @@ import {
   RootConfigService,
   ServiceRef,
 } from '@backstage/backend-plugin-api';
-import { createAgent as createLangchainAgent } from 'langchain';
+import {
+  createAgent as createLangchainAgent,
+  modelFallbackMiddleware,
+} from 'langchain';
 import {
   EnabledTool,
   Message,
@@ -84,6 +87,9 @@ const createAgentService = ({
     config.getOptionalString('aiAssistant.prompt.toolGuideline') ||
     DEFAULT_TOOL_GUIDELINE;
 
+  const fallbackEnabled =
+    config.getOptionalBoolean('models.fallbackEnabled') ?? true;
+
   const systemPromptTemplate = SystemMessagePromptTemplate.fromTemplate(`
     PURPOSE:
     {systemPrompt}
@@ -141,10 +147,21 @@ const createAgentService = ({
       modelId: resolvedModelId,
     });
 
+    const middleware = [];
+
+    if (fallbackEnabled) {
+      const models = model.getAllModels();
+
+      const llms = models.map(m => m.chatModel);
+
+      middleware.push(modelFallbackMiddleware(...llms));
+    }
+
     const agent = createLangchainAgent({
       model: llm,
       tools,
       systemPrompt: agentPrompt[0].text,
+      middleware,
     }).withConfig({
       callbacks,
       metadata,

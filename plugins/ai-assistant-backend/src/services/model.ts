@@ -10,6 +10,7 @@ import { Model } from '@sweetoburrito/backstage-plugin-ai-assistant-node';
 export type ModelService = {
   registerModels: (modelProviders: Model[]) => void;
   getModel: (id: string) => Model;
+  getAllModels: () => Model[];
   getAvailableModels: () => string[];
 };
 
@@ -48,7 +49,15 @@ const createModelService = async ({
     return models.map(x => x.id);
   };
 
-  return { registerModels, getModel, getAvailableModels };
+  const getAllModels = () => {
+    if (models.length === 0) {
+      logger.error('No models have been registered.');
+      throw new Error('No models have been registered.');
+    }
+    return models;
+  };
+
+  return { registerModels, getModel, getAvailableModels, getAllModels };
 };
 
 export const modelServiceRef: ServiceRef<ModelService, 'plugin', 'singleton'> =
