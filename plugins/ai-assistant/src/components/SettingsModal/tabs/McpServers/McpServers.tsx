@@ -101,7 +101,8 @@ export const Tab = () => {
 
     // Check for duplicate names (excluding current editing item)
     const isDuplicate = configs.some(
-      (c, index) => normalizeMcpServerName(c) === normalizedName && index !== editingIndex,
+      (c, index) =>
+        normalizeMcpServerName(c) === normalizedName && index !== editingIndex,
     );
 
     if (isDuplicate) {
