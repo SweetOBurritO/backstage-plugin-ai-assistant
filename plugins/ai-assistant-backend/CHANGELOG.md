@@ -1,5 +1,15 @@
 # @sweetoburrito/backstage-plugin-ai-assistant-backend
 
+## 0.19.0
+
+### Minor Changes
+
+- 3cc372c: add model fallback middleware to handle provider failures
+
+### Patch Changes
+
+- e0b6178: Standardizes how MCP server names are handled throughout both the backend service and frontend UI to prevent duplicate and inconsistent entries
+
 ## 0.18.0
 
 ### Minor Changes

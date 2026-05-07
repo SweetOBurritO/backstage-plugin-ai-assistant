@@ -1,5 +1,11 @@
 # @sweetoburrito/backstage-plugin-ai-assistant
 
+## 0.15.1
+
+### Patch Changes
+
+- e0b6178: Standardizes how MCP server names are handled throughout both the backend service and frontend UI to prevent duplicate and inconsistent entries
+
 ## 0.15.0
 
 ### Minor Changes
