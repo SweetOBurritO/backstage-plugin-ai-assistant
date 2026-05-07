@@ -28,6 +28,27 @@ type CreateMcpServiceOptions = {
 
 const MCP_SETTINGS_TYPE = 'mcp_server_config';
 
+const normalizeMcpServerName = (name: string): string => {
+  return name.trim().replace(/[\s-]/g, '_');
+};
+
+const normalizeMcpServerConfigs = (
+  configs: McpServerConfig[],
+): McpServerConfig[] => {
+  const normalizedByName = configs.reduce((acc, server) => {
+    const normalizedName = normalizeMcpServerName(server.name);
+
+    acc[normalizedName] = {
+      ...server,
+      name: normalizedName,
+    };
+
+    return acc;
+  }, {} as Record<string, McpServerConfig>);
+
+  return Object.values(normalizedByName);
+};
+
 export type McpService = {
   getTools: (credentials: BackstageCredentials) => Promise<Tool[]>;
   getUserMcpServerConfigNames: (
@@ -171,18 +192,24 @@ export const createMcpService = async ({
     credentials,
     mcpConfig,
   ) => {
-    const { name } = mcpConfig;
+    const normalizedName = normalizeMcpServerName(mcpConfig.name);
+    const normalizedConfig: McpServerConfig = {
+      ...mcpConfig,
+      name: normalizedName,
+    };
 
-    const existingConfig = await getUserMcpServerConfig(credentials);
+    const existingConfig = normalizeMcpServerConfigs(
+      await getUserMcpServerConfig(credentials),
+    );
 
     const existingServerIndex = existingConfig.findIndex(
-      server => server.name === name,
+      server => server.name === normalizedName,
     );
 
     if (existingServerIndex === -1) {
-      existingConfig.push(mcpConfig);
+      existingConfig.push(normalizedConfig);
     } else {
-      existingConfig[existingServerIndex] = mcpConfig;
+      existingConfig[existingServerIndex] = normalizedConfig;
     }
 
     await validateMcpServerConfig(existingConfig);
@@ -207,10 +234,13 @@ export const createMcpService = async ({
 
   const deleteUserMcpServerConfig: McpService['deleteUserMcpServerConfig'] =
     async (credentials, name) => {
-      const existingConfig = await getUserMcpServerConfig(credentials);
+      const normalizedName = normalizeMcpServerName(name);
+      const existingConfig = normalizeMcpServerConfigs(
+        await getUserMcpServerConfig(credentials),
+      );
 
       const updatedConfig: Record<string, string> = existingConfig
-        .filter(server => server.name !== name)
+        .filter(server => server.name !== normalizedName)
         .reduce((acc, server) => {
           acc[server.name] = encrypt(
             JSON.stringify(server.options),
